@@ -1,0 +1,227 @@
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color: #1e293b !important;
+    }
+
+    /* main overrides */
+    body {
+        background: white !important;
+        color: #1e293b !important;
+    }
+
+    /* Fix Title visibility */
+    h1,
+    h2,
+    h3,
+    h4,
+    .highlight,
+    .section-title,
+    .module-header h2,
+    .result-header span,
+    strong {
+        color: #1e293b !important;
+        text-shadow: none !important;
+        font-weight: 800 !important;
+    }
+
+    .highlight {
+        color: #2563eb !important;
+    }
+
+    /* Force labels and descriptions to be dark */
+    label,
+    p,
+    span,
+    small,
+    .check-desc,
+    .vigilance-text,
+    .opp-desc,
+    .index-desc {
+        color: #334155 !important;
+        opacity: 1 !important;
+    }
+
+    .academic-info,
+    .academic-info * {
+        display: block !important;
+        text-align: center !important;
+        color: #475569 !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    .academic-info img {
+        height: 80px !important;
+        margin: 0 auto 10px auto !important;
+        display: block !important;
+        filter: none !important;
+    }
+
+    /* Form Fields */
+    .form-control,
+    select,
+    input {
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+
+    /* Cards with dark text */
+    .result-card,
+    .glass-card,
+    .form-section,
+    .audit-journal-card,
+    .opportunity-index-card {
+        border: 1px solid #cbd5e1 !important;
+        background: white !important;
+        /* Force white background */
+        color: #1e293b !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        border-radius: 8px !important;
+        margin-top: 20px;
+        padding: 20px !important;
+        page-break-inside: avoid;
+    }
+
+    /* Remove glass effects */
+    .glass-card::before,
+    .glass-card::after {
+        display: none !important;
+    }
+
+    /* Chart handling */
+    canvas {
+        max-width: 100% !important;
+        width: 500px !important;
+        margin: 30px auto !important;
+        display: block;
+        /* Force black legends if they were white */
+        filter: invert(1) hue-rotate(180deg) !important;
+    }
+
+    /* Footer Print Date */
+    body::after {
+        content: "Document généré le " attr(data-date) " - Simulateur Fiscal PFE 2026 - ISAAS";
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 9pt;
+        color: #64748b !important;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+        background: white;
+    }
+
+    /* Hide UI elements */
+    .advisor-hero,
+    .section-badge,
+    .action-zone,
+    .advisor-config-card,
+    .no-print,
+    .btn-primary,
+    #legal-warning,
+    .tabs-nav,
+    .close-btn,
+    .app-background,
+    /* Hide animated background */
+    #ai-chat-container,
+    .ai-bubble,
+    .shape,
+    .api-config-panel {
+        display: none !important;
+    }
+
+    /* Journal de Calcul (Audit) - Force light background / dark text */
+    .audit-journal-card {
+        background: #f8fafc !important;
+        color: #1e293b !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    .audit-journal-card * {
+        color: #1e293b !important;
+    }
+
+    .audit-journal-card h4 {
+        color: #1e293b !important;
+        border-bottom-color: #cbd5e1 !important;
+    }
+
+    .opportunity-index-card {
+        border-width: 2px !important;
+        margin-bottom: 30px !important;
+        border-radius: 16px !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        padding: 30px !important;
+        background: #f8fafc !important;
+    }
+
+    .index-value {
+        text-shadow: none !important;
+    }
+
+    .opp-item {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        border-left-width: 8px !important;
+        margin-bottom: 15px !important;
+        padding: 20px !important;
+        border-radius: 12px !important;
+        page-break-inside: avoid;
+    }
+
+    .opp-title {
+        color: #1e293b !important;
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
+    }
+
+    .opp-source {
+        background: #dbeafe !important;
+        color: #1e40af !important;
+        padding: 4px 10px !important;
+        border-radius: 6px !important;
+        font-weight: 700 !important;
+        display: inline-block !important;
+        margin-top: 8px !important;
+        border: 1px solid #bfdbfe !important;
+    }
+
+    .vigilance-item {
+        border: 2px solid #fecaca !important;
+        background: #fef2f2 !important;
+        color: #991b1b !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+        page-break-inside: avoid;
+    }
+
+    .vigilance-text {
+        color: #991b1b !important;
+        font-weight: 500 !important;
+    }
+
+    /* Table borders */
+    table,
+    th,
+    td {
+        border: 1px solid #cbd5e1 !important;
+        border-collapse: collapse;
+    }
+
+    th {
+        background-color: #f1f5f9 !important;
+        color: #1e293b !important;
+        font-weight: 700 !important;
+    }
+
+    td {
+        color: #334155 !important;
+    }
+}
