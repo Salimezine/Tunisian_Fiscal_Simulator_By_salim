@@ -495,30 +495,30 @@
     animation: floatBubble 6s ease-in-out infinite;
 }
 
-    #ai-chat-container {
-        width: calc(100% - 30px);
-        height: 70vh;
-        bottom: 80px;
-        right: 15px;
-        left: 15px;
-    }
+#ai-chat-container {
+    width: calc(100% - 30px);
+    height: 70vh;
+    bottom: 80px;
+    right: 15px;
+    left: 15px;
+}
 
-    #ai-floating-bubble {
-        bottom: 15px !important;
-        right: 15px !important;
-        width: 50px !important;
-        height: 50px !important;
-        padding: 0 !important;
-    }
+#ai-floating-bubble {
+    bottom: 15px !important;
+    right: 15px !important;
+    width: 50px !important;
+    height: 50px !important;
+    padding: 0 !important;
+}
 
-    #ai-floating-bubble .ai-bubble-label {
-        display: none !important;
-    }
+#ai-floating-bubble .ai-bubble-label {
+    display: none !important;
+}
 
-    #ai-floating-bubble .bubble-icon {
-        margin: 0 !important;
-        font-size: 1.5rem !important;
-    }
+#ai-floating-bubble .bubble-icon {
+    margin: 0 !important;
+    font-size: 1.5rem !important;
+}
 }
 
 @keyframes floatBubble {
@@ -531,4 +531,23 @@
     50% {
         transform: translateY(-10px);
     }
+}
+
+/* Educational AI Assistant - Chat Disclaimer Styling */
+.chat-disclaimer {
+    background: rgba(251, 191, 36, 0.15);
+    border-left: 3px solid #fbbf24;
+    padding: 10px 14px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #fcd34d;
+    font-style: italic;
+}
+
+/* Legal reference styling in chat */
+.msg-text strong {
+    color: #60a5fa !important;
 }

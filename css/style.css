@@ -312,18 +312,19 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* 🤖 Floating AI Bubble - Premium */
+/* 🤖 Floating AI Bubble - Premium & Prominent */
 .ai-bubble {
     position: fixed !important;
     bottom: 40px !important;
     right: 40px !important;
-    width: 60px;
     height: 60px;
+    padding: 0 20px;
     background: var(--primary-gradient);
-    border-radius: 50%;
+    border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
     box-shadow:
         0 15px 35px rgba(0, 0, 0, 0.3),
         0 0 20px rgba(59, 130, 246, 0.5),
@@ -332,20 +333,46 @@ body {
     z-index: 10000 !important;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 1.5rem;
-    /* Icon size */
     backdrop-filter: blur(5px);
+    animation: gentlePulse 3s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 15px 35px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(59, 130, 246, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 15px 35px rgba(0, 0, 0, 0.3),
+            0 0 30px rgba(59, 130, 246, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+}
+
+.bubble-icon {
+    font-size: 1.5rem;
+}
+
+.ai-bubble-label {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
 }
 
 @media (max-width: 768px) {
     .ai-bubble {
         bottom: 15px !important;
         right: 15px !important;
-        padding: 12px 18px;
-        width: 50px;
-        height: 50px;
-        justify-content: center;
+        padding: 0;
+        width: 55px;
+        height: 55px;
         border-radius: 50%;
     }
 
@@ -769,4 +796,91 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Educational AI Assistant - Result Disclaimers & Trust Signals */
+.result-disclaimer {
+    background: rgba(251, 191, 36, 0.1);
+    border-left: 4px solid #fbbf24;
+    padding: 16px 20px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #fcd34d;
+    line-height: 1.6;
+}
+
+.result-disclaimer strong {
+    color: #fbbf24;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+/* Legal reference box for calculation results */
+.legal-reference-box {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 20px;
+}
+
+.legal-reference-box h4 {
+    color: #60a5fa;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legal-reference-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legal-reference-box li {
+    padding: 8px 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.legal-reference-box li:last-child {
+    border-bottom: none;
+}
+
+.legal-reference-box a {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legal-reference-box a:hover {
+    color: #93c5fd;
+}
+
+/* Enhanced spacing for better hierarchy */
+.form-section {
+    padding: 35px !important;
+    margin-bottom: 35px !important;
+}
+
+.form-group {
+    margin-bottom: 25px !important;
+}
+
+/* Result card improvements */
+.result-card {
+    padding: 30px !important;
+    margin-top: 35px !important;
+}
+
+.result-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-main);
 }

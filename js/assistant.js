@@ -153,15 +153,36 @@ function addMessage(text, type) {
 }
 
 /**
- * Basic formatting for chat responses
+ * Basic formatting for chat responses with educational emphasis
  */
 function formatChatResponse(text) {
     if (!text) return "";
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>')
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // Format bold text
+    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Format code
+    formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
+
+    // Format links
+    formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // Highlight disclaimers with warning style
+    formatted = formatted.replace(
+        /(Cette explication est fournie à des fins éducatives.*?fiscal\.?)/gi,
+        '<div class="chat-disclaimer">⚠️ $1</div>'
+    );
+
+    // Add icon before legal references (look for common patterns)
+    formatted = formatted.replace(
+        /(Article\s+\d+|Code\s+\w+|JORT\s+n°\d+|LF\s+202\d)/gi,
+        '📚 <strong>$1</strong>'
+    );
+
+    // Format line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    return formatted;
 }
 
 /**
