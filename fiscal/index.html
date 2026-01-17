@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Fiscal Tunisien 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ai-chat-styles.css">
+    <link rel="stylesheet" href="css/ai-chat-widget.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-background">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <main class="container">
+        <!-- 1️⃣ Avertissement Légal (Indispensable) -->
+        <div id="legal-warning" class="legal-banner">
+            <div class="legal-content">
+                <span class="icon">⚠️</span>
+                <div>
+                    <strong>Avertissement Légal</strong>
+                    <p>Ce simulateur est un outil pédagogique et informatif développé dans un cadre universitaire. Il ne
+                        remplace ni les textes législatifs officiels ni les consultations auprès de l'administration
+                        fiscale tunisienne ou d'un expert-comptable.</p>
+                </div>
+                <button onclick="document.getElementById('legal-warning').style.display='none'"
+                    class="close-btn">×</button>
+            </div>
+        </div>
+
+        <header class="main-header">
+            <div class="academic-info"
+                style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="img/isaas_logo.jpg" alt="Logo ISAAS"
+                    style="height: 100px; margin-bottom: 15px; background: white; padding: 5px; border-radius: 8px;">
+                <h3 style="font-size: 1.1em; color: var(--text-main); margin-bottom: 5px;">Institut Supérieur
+                    d'Administration des Affaires de Sfax</h3>
+                <p style="font-size: 0.95em; color: var(--text-muted);">Licence coconstruite en comptabilité :
+                    <strong>Assistant Comptable Auditeur Interne</strong>
+                </p>
+                <p style="font-size: 0.95em; color: var(--primary); margin-top: 5px;">Réalisé par : <strong>Mouhamed
+                        Salim Ezzine</strong></p>
+            </div>
+            <h1>Simulateur Fiscal <span class="highlight">Tunisie 2026</span> <span
+                    style="font-size: 0.4em; vertical-align: middle; background: var(--success); color: white; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">Officiel
+                    JORT 148</span></h1>
+            <p class="subtitle">Expertise Comptable & Juridique - Outil Pédagogique Certifié</p>
+        </header>
+
+        <div class="glass-card">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="irpp">IRPP</button>
+                <button class="tab-btn" data-tab="is">IS (Sociétés)</button>
+                <button class="tab-btn" data-tab="tva">TVA</button>
+                <button class="tab-btn" data-tab="isf">IF (Fortune)</button>
+                <button class="tab-btn" data-tab="rs" style="color: #34d399;">RS (Retenue)</button>
+                <button class="tab-btn" data-tab="conseiller" style="border: 1px solid rgba(139, 92, 246, 0.4);">🛡️
+                    Conseiller</button>
+                <button class="tab-btn" data-tab="comparative"
+                    style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">⚖️ Comparatif</button>
+
+            </nav>
+
+            <div class="tab-content" id="irpp">
+                <div class="module-header">
+                    <h2>Impôt sur le Revenu (IRPP)</h2>
+                    <p>Calcul selon le barème progressif LF 2026 (8 tranches)</p>
+                </div>
+
+                <details class="glass-card compact-info"
+                    style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); padding: 10px 15px; border-radius: 16px;">
+                    <summary
+                        style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #60a5fa; font-weight: 600; list-style: none;">
+                        <span style="font-size: 1.2em;">ℹ️</span>
+                        <span>Contexte Loi de Finances 2026 (LF 2026)</span>
+                        <span style="margin-left: auto; font-size: 0.8em; opacity: 0.7;">(Afficher)</span>
+                    </summary>
+                    <p style="font-size: 0.9em; opacity: 0.9; margin-top: 10px; color: #cbd5e1; line-height: 1.5;">
+                        Ce simulateur intègre le nouveau barème à 8 tranches de la Loi de Finances 2026.
+                        Les déductions pour "Frais Professionnels" (10%, max 2000 DT) sont appliquées automatiquement.
+                    </p>
+                </details>
+
+                <!-- IRPP Form wil go here -->
+                <div class="module-body" id="irpp-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="is">
+                <div class="module-header">
+                    <h2>Impôt sur les Sociétés (IS)</h2>
+                    <p>Calcul du résultat fiscal et de l'impôt dû</p>
+                </div>
+                <!-- IS Form will go here -->
+                <div class="module-body" id="is-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="tva">
+                <div class="module-header">
+                    <h2>Taxe sur la Valeur Ajoutée (TVA)</h2>
+                    <p>Calcul de la TVA à décaisser ou du crédit</p>
+                </div>
+                <!-- TVA Form will go here -->
+                <div class="module-body" id="tva-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="isf">
+                <div class="module-header">
+                    <h2>Impôt sur la Fortune (IF)</h2>
+                    <p>Déclaration du patrimoine mobilier et immobilier</p>
+                </div>
+                <div class="module-body" id="isf-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="rs">
+                <div class="module-header">
+                    <h2>Retenue à la Source (RS)</h2>
+                    <p>Gestion de la trésorerie et certificats de retenue</p>
+                </div>
+                <div class="module-body" id="rs-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+
+            <div class="tab-content hidden" id="conseiller">
+                <div class="module-header">
+                    <h2>Conseiller Fiscal IA</h2>
+                    <p>Optimisez votre fiscalité avec des conseils personnalisés</p>
+                </div>
+                <!-- Conseiller Form will go here -->
+                <div class="module-body" id="conseiller-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+
+            <div class="tab-content hidden" id="comparative">
+                <div class="module-header">
+                    <h2>Comparatif Fiscal : IRPP vs IS</h2>
+                    <p>Déterminez le régime optimal pour votre activité (Propriétaire vs Société)</p>
+                </div>
+                <div class="module-body" id="comparative-container">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+
+        </div>
+
+        <footer class="main-footer">
+            <div class="official-references"
+                style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+                <h4
+                    style="font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-muted);">
+                    📚 Références Juridiques & Documentation</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; font-size: 0.85em;">
+                    <a href="https://www.iort.gov.tn" target="_blank"
+                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;">🏛️
+                        JORT</a>
+                    <a href="https://finances.gov.tn" target="_blank"
+                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;">🇹🇳
+                        Min. Finances</a>
+                    <a href="methodologie.html" target="_blank"
+                        style="color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px;">📐
+                        Méthodologie</a>
+                </div>
+            </div>
+            <p>⚠️ <strong>Avertissement :</strong> Ces résultats sont indicatifs et ne remplacent pas l'avis d'un
+                expert-comptable.</p>
+            <p style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">Version 2026.1.0 (Beta Académique) | <a href="#"
+                    onclick="alert('Roadmap 2027: Export PDF, API Rest, Intégration IA avancée')"
+                    style="color: inherit; text-decoration: underline;">Vision Future</a></p>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+    <!-- Core Data -->
+    <script src="data/legal-references.js"></script>
+    <script src="js/ai-config.js"></script>
+    <script src="js/ai-service.js"></script>
+
+    <!-- Audit Mode Core Modules -->
+    <script src="js/calculation-context.js"></script>
+    <script src="js/mode-manager.js"></script>
+    <script src="js/rule-engine.js"></script>
+    <script src="js/audit-mode-ui.js"></script>
+
+
+    <!-- Calculation Modules -->
+    <script src="js/irpp.js"></script>
+    <script src="js/is.js"></script>
+    <script src="js/tva.js"></script>
+    <script src="js/isf.js"></script>
+    <script src="js/rs.js"></script>
+    <script src="js/conseiller.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/comparative.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Utilities -->
+    <script src="js/verify_calc.js"></script>
+
+    <!-- Chatbot Widget -->
+    <div id="ai-chat-container" class="ai-chat-widget" style="display: none;">
+        <div class="chat-widget-header">
+            <div class="header-info">
+                <span class="header-icon" style="background: var(--accent);"></span>
+                <div class="header-text">
+                    <strong>Assistant Expert</strong>
+                    <small>Expertise n8n / LF 2026</small>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="close-chat-btn" class="close-btn">&times;</button>
+            </div>
+        </div>
+
+        <div class="chat-widget-body">
+            <div id="chat-messages" class="chat-messages-container">
+                <div class="message system">
+                    <span class="icon">🤖</span>
+                    <div class="msg-text">Bonjour ! Je suis votre assistant fiscal. Posez-moi vos questions sur la Loi
+                        de Finances 2026.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-widget-footer">
+            <div class="input-container">
+                <input type="text" id="chat-input" placeholder="Votre question..." autocomplete="off">
+                <button id="chat-send" class="send-icon">➔</button>
+            </div>
+            <div class="chat-shortcuts">
+                <button class="chat-suggest-btn" data-msg="Quelles sont les tranches de l'IRPP ?">💰 IRPP 2026</button>
+                <button class="chat-suggest-btn" data-msg="Quels sont les avantages ZDR ?">📍 ZDR</button>
+                <button class="chat-suggest-btn" data-msg="C'est quoi le Startup Act ?">💡 Startup Act</button>
+            </div>
+            <div class="quick-actions">
+                <button id="clear-chat-btn" title="Effacer">🗑️</button>
+                <button id="export-chat-btn" title="Exporter">💾</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-floating-bubble" class="ai-bubble">
+        <span class="bubble-icon">💬</span>
+    </div>
+
+</body>
+
+</html>

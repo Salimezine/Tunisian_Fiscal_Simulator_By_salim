@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Méthodologie & Sources - Simulateur Fiscal 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .method-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--text-main);
+            margin-top: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .source-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        a {
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-background">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    <main class="method-container glass-card">
+        <a href="index.html"
+            style="text-decoration: none; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; color: var(--text-muted);">
+            <span>⬅️</span> Retour au Simulateur
+        </a>
+
+        <h1>Méthodologie & Sources</h1>
+        <p style="font-size: 1.1em; opacity: 0.9;">
+            Ce document explicite la démarche scientifique et technique adoptée pour l'élaboration du Simulateur Fiscal
+            Tunisien 2026.
+        </p>
+
+        <h2>1. Cadre Juridique et Sources</h2>
+        <div class="source-card">
+            <h3>📜 Références Officielles</h3>
+            <ul>
+                <li><strong>Loi de Finances 2026 :</strong> Adoption du nouveau barème IRPP à 8 tranches et des
+                    nouvelles mesures pour l'IS.</li>
+                <li><strong>Code de l'IRPP et de l'IS :</strong> Articles 44 (Barème), 40 (Déductions), 49 (Taux IS).
+                </li>
+                <li><strong>JORT :</strong> Journal Officiel de la République Tunisienne n°148.</li>
+            </ul>
+        </div>
+
+        <h2>2. Hypothèses de Calcul</h2>
+        <ul>
+            <li><strong>IRPP :</strong> Les calculs supposent une année fiscale complète (12 mois). Les déductions pour
+                frais professionnels sont plafonnées à 2 000 DT.</li>
+            <li><strong>IS :</strong> Le minimum d'impôt est calculé sur la base du Chiffre d'Affaires TTC déclaré.</li>
+            <li><strong>Arrondis :</strong> Les montants sont arrondis au millime supérieur pour l'impôt dû,
+                conformément à l'usage fiscal.</li>
+        </ul>
+
+        <h2>3. Limites du Simulateur</h2>
+        <p>
+            Bien que rigoureux, ce simulateur ne gère pas :
+        <ul>
+            <li>Les situations complexes de double imposition internationale.</li>
+            <li>Les régimes fiscaux suspensifs très spécifiques.</li>
+            <li>Le détail des retenues à la source sur les marchés publics.</li>
+        </ul>
+        </p>
+
+        <h2>4. Technologies Utilisées</h2>
+        <p>Développement Web Standard (HTML5, CSS3, JavaScript ES6) sans framework lourd pour garantir la pérennité et
+            la facilité d'audit du code.</p>
+
+        <div style="margin-top: 40px; text-align: center; font-size: 0.9em; opacity: 0.6;">
+            Projet Universitaire - ISAAS 2026
+        </div>
+    </main>
+</body>
+
+</html>
