@@ -122,7 +122,7 @@ const SECTOR_OPTIONS = [
         css: 0.04, // Secteur Financier (LF 2026 - Conjoncturel 4%)
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Secteur Financier 40%"
+        group: "Secteur Financier 43%"
     },
     {
         id: "leasing",
@@ -131,7 +131,7 @@ const SECTOR_OPTIONS = [
         css: 0.04, // Secteur Financier
         spec: 0.04,
         min: 0.002,
-        group: "Secteur Financier 40%"
+        group: "Secteur Financier 43%"
     },
     {
         id: "assurance",
@@ -140,7 +140,7 @@ const SECTOR_OPTIONS = [
         css: 0.04, // Secteur Financier
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Secteur Financier 40%"
+        group: "Secteur Financier 43%"
     },
 
     // --- RÉGIME SPÉCIAL : Nouvelles Entreprises ---
@@ -226,7 +226,7 @@ function initIS() {
                 <div><strong>10%</strong> : Agri, Pêche, ZDR, Culture, Recyclage</div>
                 <div><strong>20%</strong> : Droit Commun</div>
                 <div><strong>35%</strong> : Télécoms, Pétrole, Grandes Surfaces, Auto</div>
-                <div><strong>40%</strong> : Banques, Leasing, Assurances</div>
+                <div><strong>43%</strong> : Banques, Leasing, Assurances</div>
             </div>
         </div>
 

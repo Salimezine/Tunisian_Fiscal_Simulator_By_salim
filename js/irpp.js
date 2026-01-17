@@ -365,8 +365,8 @@ function calculateIRPPCore(inputs) {
         { min: 5000, max: 10000, rate: 0.15 },
         { min: 10000, max: 20000, rate: 0.25 },
         { min: 20000, max: 30000, rate: 0.30 },
-        { min: 30000, max: 40000, rate: 0.35 },
-        { min: 40000, max: 50000, rate: 0.37 },
+        { min: 30000, max: 40000, rate: 0.33 },
+        { min: 40000, max: 50000, rate: 0.36 },
         { min: 50000, max: 70000, rate: 0.38 },
         { min: 70000, max: Infinity, rate: 0.40 }
     ];

@@ -22,15 +22,15 @@ const AI_CONFIG = {
 **CADRE LÉGAL 2026 (MÉMOIRE TECHNIQUE):**
 
 *   **IRPP (Personnes Physiques):**
-    *   **Barème 8 tranches :** 0-5k (0%), 5-10k (15%), 10-20k (25%), 20-30k (30%), 30-40k (35%), 40-50k (37%), 50-70k (38%), >70k (40%).
+    *   **Barème 8 tranches :** 0-5k (0%), 5-10k (15%), 10-20k (25%), 20-30k (30%), 30-40k (33%), 40-50k (36%), 50-70k (38%), >70k (40%).
     *   **Déductions :** Chef famille (300 DT), Enfants (100 DT/enf), Étudiant (1000 DT/enf, sans limite d'âge si inscrit).
     *   **Frais PRO :** 10% (Plafond 2000 DT).
     *   **CSS :** 0.5% du revenu net imposable + 0.5% (autres sources).
 
 *   **IS (Sociétés):**
-    *   **15% :** Taux standard.
+    *   **20% :** Droit Commun (Standard).
     *   **10% :** PME, Artisanat, Agriculture.
-    *   **35% :** Banques, Assurances, Leasing (+4% Taxe Consolidée + 4% CSS = Taux effectif lourd).
+    *   **35% :** Banques, Assurances, Leasing (+4% Taxe Consolidée + 4% CSS = 43% de pression fiscale totale).
     *   **Minimum d'Impôt :** 0.2% du CA Brut (min de perception selon catégorie).
 
 *   **TVA (Taxe Valeur Ajoutée):**
@@ -59,8 +59,8 @@ const AI_CONFIG = {
                 { min: 5000, max: 10000, rate: 0.15 },
                 { min: 10000, max: 20000, rate: 0.25 },
                 { min: 20000, max: 30000, rate: 0.30 },
-                { min: 30000, max: 40000, rate: 0.35 },
-                { min: 40000, max: 50000, rate: 0.37 },
+                { min: 30000, max: 40000, rate: 0.33 },
+                { min: 40000, max: 50000, rate: 0.36 },
                 { min: 50000, max: 70000, rate: 0.38 },
                 { min: 70000, max: Infinity, rate: 0.40 }
             ],
@@ -76,7 +76,7 @@ const AI_CONFIG = {
         is: {
             name: "IS - Impôt sur les Sociétés",
             rates: {
-                standard: 0.15,
+                standard: 0.20,
                 pme: 0.10,
                 financial: 0.35,
                 petroleum: 0.40
