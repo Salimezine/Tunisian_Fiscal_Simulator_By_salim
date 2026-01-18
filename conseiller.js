@@ -5,29 +5,53 @@
 const BK_FISCAL = {
     avantages: {
         nouvelles_entreprises: {
-            titre: "Régime des Nouvelles Entreprises",
+            titre: "Régime des Nouvelles Entreprises (Démarreurs)",
             type: "Fiscale",
-            description: "Exonération dégressive sur 4 ans.",
-            loi: "LF 2024-2026",
-            applicable: (data) => data.anneeCreation >= 2024 && !['banque', 'telecom'].includes(data.secteur)
+            description: "Exonération totale d'IS pendant les 2 premières années de production effective, puis 50% de réduction pendant les 2 années suivantes.",
+            loi: "LF 2024 / Code des Investissements",
+            applicable: (data) => data.anneeCreation >= 2024 && !['banque', 'telecom', 'finance'].includes(data.secteur)
         },
         zdr: {
-            titre: "Développement Régional (ZDR)",
-            description: "Exonération totale d'IS (5-10 ans) + Prise en charge CNSS.",
-            loi: "Code d'Incitation",
+            titre: "Développement Régional (ZDR - Zone Intérieure)",
+            description: "Exonération totale d'IS (5 ans Groupe 1, 10 ans Groupe 2). Prise en charge intégrale de la part patronale au CNSS pendant 5 à 10 ans.",
+            loi: "LF 2023-2026 / Décret ZDR",
             applicable: (data) => data.zoneRegionale === true
         },
         startup: {
-            titre: "Startup Act",
-            description: "Prise en charge des charges patronales et exonération IS.",
-            loi: "Loi Startup",
+            titre: "Startup Act (Label Innovation)",
+            description: "Exonération d'IS et de la Contribution Sociale de Solidarité. Prise en charge des charges sociales par l'État. Bourse de fondateur exonérée d'IRPP.",
+            loi: "Loi 2018-20 (Startup Act)",
             applicable: (data) => data.startup === true
         },
         export: {
-            titre: "Régime Exportation Totale",
-            description: "Taux réduit d'IS à 10% après période de franchise.",
-            loi: "Code IRPP/IS",
+            titre: "Régime Exportation 100%",
+            description: "Taux réduit d'IS fixé à 10% pour les bénéfices provenant de l'exportation. Exonération des droits de douane sur les intrants.",
+            loi: "Code IRPP/IS Art. 49",
             applicable: (data) => data.export === true
+        },
+        agricole: {
+            titre: "Investissement Agricole & Pêche",
+            description: "Exonération totale des bénéfices pendant les 10 premières années d'activité pour les projets de catégorie A et B.",
+            loi: "Code des Investissements",
+            applicable: (data) => data.secteur === 'industrie' || data.secteur === 'agriculture' // Note: UI uses industrie as general term for physical prod sometimes
+        },
+        assurance_vie: {
+            titre: "Déduction Assurance Vie (Particuliers)",
+            description: "Les primes payées au titre de contrats d'assurance vie sont déductibles de l'assiette imposable dans la limite de 10 000 DT par an.",
+            loi: "Art. 39 du Code IRPP",
+            applicable: (data) => data.type === 'personne_physique'
+        },
+        cea: {
+            titre: "Compte Épargne en Actions (CEA)",
+            description: "Déduction des montants déposés de l'assiette de l'impôt dans la limite de 100 000 DT par an (sous conditions de détention de 5 ans).",
+            loi: "LF 2024 / Code IRPP",
+            applicable: (data) => data.type === 'personne_physique'
+        },
+        innovation_tech: {
+            titre: "Crédit d'Impôt R&D",
+            description: "Déduction supplémentaire de 50% des dépenses de recherche et développement pour les entreprises technologiques.",
+            loi: "LF 2025",
+            applicable: (data) => data.secteur === 'tech' && data.type === 'societe'
         }
     }
 };
@@ -129,7 +153,20 @@ function initConseiller() {
     document.getElementById('btn-analyser').addEventListener('click', analyserProfil);
 }
 
-function analyserProfil() {
+async function analyserProfil() {
+    const btn = document.getElementById('btn-analyser');
+    const originalText = btn.innerText;
+
+    // Simulate Research Phase
+    btn.disabled = true;
+    btn.innerHTML = '🔍 Recherche dans la base JORT...';
+
+    await new Promise(r => setTimeout(r, 800));
+    btn.innerHTML = '⚖️ Vérification des articles LF 2026...';
+    await new Promise(r => setTimeout(r, 600));
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+
     const data = {
         type: document.getElementById('typeContribuable').value,
         secteur: document.getElementById('secteurIA').value,
@@ -152,8 +189,40 @@ function analyserProfil() {
         </div>
     `;
 
-    if (window.lastCalculation && window.lastCalculation.type === 'IRPP') {
-        document.getElementById('net-val').innerText = new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' }).format(window.lastCalculation.data.netMensuel) + " (Net/m)";
+    const summaryDisplay = document.getElementById('net-val');
+    const labelDisplay = document.querySelector('#simulation-net-display div'); // The small label
+
+    if (window.lastCalculation) {
+        const type = window.lastCalculation.type;
+        const data = window.lastCalculation.data;
+        const formatter = new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' });
+
+        switch (type) {
+            case 'IRPP':
+                labelDisplay.innerText = "ESTIMATION NETTE / MOIS";
+                summaryDisplay.innerText = formatter.format(data.netMensuel);
+                break;
+            case 'IS':
+                labelDisplay.innerText = "IS + CONTRIBUTIONS DÛ";
+                summaryDisplay.innerText = formatter.format(data.totalAPayer || (window.lastCalculation.totalTax));
+                break;
+            case 'TVA':
+                labelDisplay.innerText = "SOLDE TVA DÉTECTÉ";
+                summaryDisplay.innerText = formatter.format(Math.abs(data.solde || 0)) + (data.solde < 0 ? " (Crédit)" : " (Dû)");
+                break;
+            case 'IF':
+                labelDisplay.innerText = "IF (FORTUNE) DÛ";
+                summaryDisplay.innerText = formatter.format(data.isfDu || 0);
+                break;
+            case 'RS':
+                labelDisplay.innerText = "NET À PAYER (APRÈS RS)";
+                summaryDisplay.innerText = formatter.format(data.netAPayer || 0);
+                break;
+            default:
+                summaryDisplay.innerText = "0.000 DT";
+        }
+    } else {
+        summaryDisplay.innerText = "0.000 DT";
     }
 
     // 2. Generate Automated Report
@@ -181,10 +250,22 @@ function analyserProfil() {
         <div class="report-section">
             <h4>⚖️ Obligations & Points de Vigilance</h4>
             <ul style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8; padding-left: 20px;">
-                <li><strong>Déclaration Mensuelle :</strong> À déposer avant le 15 (physique) ou 28 (morale) sous peine de pénalités de retard.</li>
-                <li><strong>CSS :</strong> Application automatique du taux de 0.5% (IRPP) ou 3% (IS) sur le bénéfice net.</li>
-                <li><strong>Facturation :</strong> Passage obligatoire à la facture électronique pour les transactions > 1000 DT en 2026.</li>
+                <li><strong>Déclaration Mensuelle :</strong> À déposer avant le 15 (physique) ou 28 (morale) chaque mois via le portail de la DGI.</li>
+                <li><strong>CSS (Contribution Sociale) :</strong> Vérifiez le calcul automatique (0.5% à 4%) qui s'ajoute à l'impôt de base.</li>
+                <li><strong>Retenue à la Source :</strong> Toute facture de prestation de service doit faire l'objet d'une RS (généralement 10%).</li>
             </ul>
+        </div>
+
+        <div class="report-section">
+            <h4>🛡️ Conseils Proactifs d'Optimisation</h4>
+            <div style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.1);">
+                <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.7; margin: 0; padding-left: 20px;">
+                    ${data.type === 'personne_physique' ? '<li>Considérez l\'ouverture d\'un <strong>Compte Épargne Actions (CEA)</strong> pour réduire votre base imposable jusqu\'à 100 000 DT.</li><li>L\'assurance vie est un excellent levier pour déduire jusqu\'à 10 000 DT par an.</li>' : ''}
+                    ${data.secteur === 'tech' ? '<li>Utilisez le <strong>Crédit d\'Impôt R&D</strong> pour vos dépenses d\'innovation technique.</li>' : ''}
+                    <li><strong>Transparence :</strong> Assurez-vous que vos paiements > 1000 DT sont effectués par virement ou chèque pour rester déductibles.</li>
+                    <li><strong>E-Invoicing :</strong> Préparez vos systèmes pour la compatibilité avec la plateforme <strong>TEJ</strong> dès maintenant.</li>
+                </ul>
+            </div>
         </div>
 
         <div style="margin-top: 40px; padding: 20px; background: rgba(245, 158, 11, 0.05); border-radius: 15px; border: 1px dashed rgba(245, 158, 11, 0.2); text-align: center;">
@@ -257,4 +338,5 @@ function exportDiscussion() {
     a.click();
 }
 
-window.addEventListener('DOMContentLoaded', initConseiller);
+// Initialized via main.js
+// window.addEventListener('DOMContentLoaded', initConseiller);

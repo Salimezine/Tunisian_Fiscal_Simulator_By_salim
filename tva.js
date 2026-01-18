@@ -16,6 +16,11 @@ const TAUX_TVA = [
         description: "Restauration, hébergement, services professionnels, véhicules (conditions)"
     },
     {
+        value: 0.075,
+        label: "7.5% - Nouveau Taux 2026",
+        description: "Nouvelles catégories spécifiques LF 2026"
+    },
+    {
         value: 0,
         label: "0% - Exonéré / Export / Suspension",
         description: "Exportations, médicaments (suspension jusqu'au 31/12/2026)"
@@ -64,29 +69,8 @@ function initTVA() {
     }
 
     container.innerHTML = `
-        <!-- E-Invoicing Alert 2026 -->
-        <div class="glass-card" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); margin-bottom: 20px;">
-            <div style="display:flex; align-items:flex-start; gap:10px;">
-                <span style="font-size:1.5em;">📢</span>
-                <div>
-                    <strong style="color: #93c5fd;">Nouveauté 2026 : Facturation Électronique Obligatoire</strong>
-                    <p style="font-size: 0.85em; opacity: 0.9; margin:5px 0 0 0;">
-                        À partir du <strong>1er Janvier 2026</strong>, la facturation électronique (e-invoicing) devient obligatoire pour <strong>tous les biens et services</strong> soumis à TVA.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <!-- Main Form -->
 
-        <!-- Récapitulatif Taux 2026 -->
-        <div class="glass-card" style="margin-bottom: 20px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
-            <h4 style="color: #34d399; margin-bottom: 10px;">📋 Taux TVA 2026</h4>
-            <div style="font-size: 0.85em; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-                <div><strong>19%</strong> : Taux normal (majorité des biens/services)</div>
-                <div><strong>13%</strong> : Électricité, produits pétroliers</div>
-                <div><strong>7%</strong> : Restauration, hébergement, services pro</div>
-                <div><strong>0%</strong> : Export, médicaments (suspension)</div>
-            </div>
-        </div>
 
         <!-- Section 1: Type d'opération -->
         <div class="form-section">
@@ -438,15 +422,20 @@ function calculateTVA() {
             </button>
         </div>
     `;
-    // Sync with AI
-    if (window.shareWithAI) {
-        window.shareWithAI({
-            module: 'TVA',
-            categorie: categorieName,
+    // LOG & Global Sync
+    window.lastCalculation = {
+        type: 'TVA',
+        totalTax: solde > 0 ? solde : 0,
+        data: {
             baseHT: totalBase,
-            tvaCollectee: tvaCollectee,
-            solde: solde,
-            montantTTC: montantTTC
-        });
+            tvaCollectee,
+            totalDeductible,
+            solde,
+            montantTTC
+        }
+    };
+
+    if (window.shareWithAI) {
+        window.shareWithAI(window.lastCalculation);
     }
 }

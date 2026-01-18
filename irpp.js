@@ -1,14 +1,60 @@
-// IRPP - IMPÔT SUR LE REVENU - LF 2026
-// Version Standalone - Simplifiée avec Mode Inversé
+// IRPP - IMPÔT SUR LE REVENU - MULTI-BARÈME
+// Version 2025 (5 tranches) & 2026 (8 tranches)
+
+let currentFiscalYear = '2026';
+
+window.setYear = function (year) {
+    currentFiscalYear = year;
+    document.querySelectorAll('.year-label').forEach(lbl => {
+        lbl.classList.remove('active');
+        if (lbl.getAttribute('for') === `year${year}`) lbl.classList.add('active');
+    });
+
+    const labelDesc = document.getElementById('irpp-year-desc');
+    if (labelDesc) {
+        labelDesc.textContent = year === '2026' ? 'Barème Progressif 2026 (8 tranches)' : 'Barème Progressif 2025 (5 tranches)';
+    }
+
+    // Recalculate if possible
+    const val = document.getElementById('revenuInput');
+    if (val && val.value) handleIRPPCalculation();
+};
 
 function initIRPP() {
     const container = document.getElementById('irpp-container');
     if (!container) return;
 
     container.innerHTML = `
-        <div style="display: flex; gap: 10px; align-items: center; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 15px; border-radius: 12px; margin-bottom: 20px;">
-             <span style="font-size:1.2em;">📜</span>
-             <span style="font-size: 0.9em; color: #818cf8;">Calcul selon barème progressif à 8 tranches (LF 2026).</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px;">
+            <div style="display: flex; gap: 10px; align-items: center; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 15px; border-radius: 12px; flex: 1;">
+                 <span style="font-size:1.2em;">📜</span>
+                 <span id="irpp-year-desc" style="font-size: 0.85em; color: #818cf8;">Barème Progressif 2026 (8 tranches)</span>
+            </div>
+        </div>
+
+        <!-- NEW: Mon Bilan Dashboard (Quick View) -->
+        <div id="mon-bilan-quick-view" class="glass-card" style="margin-bottom: 25px; padding: 20px; border: 1px solid rgba(16, 185, 129, 0.2); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(99, 102, 241, 0.05));">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.3rem;">📊</span> Mon Bilan Fiscal
+                </h3>
+                <span id="bilan-status" style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; color: #94a3b8;">En attente de calcul</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Revenu Net / Mois</div>
+                    <div id="bilan-net" style="font-size: 1.2rem; font-weight: 800; color: #10b981;">- --- DT</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Impôt Total / An</div>
+                    <div id="bilan-impot" style="font-size: 1.2rem; font-weight: 800; color: #ef4444;">- --- DT</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Taux de Pression</div>
+                    <div id="bilan-taux" style="font-size: 1.2rem; font-weight: 800; color: #f59e0b;">0 %</div>
+                </div>
+            </div>
         </div>
 
         <!-- Mode Toggle -->
@@ -177,6 +223,8 @@ function initIRPP() {
             btnCalc.style.background = "var(--primary)";
         }
     });
+    // Global bridge
+    window.calculateIRPP = handleIRPPCalculation;
 }
 
 function handleIRPPCalculation() {
@@ -346,9 +394,16 @@ function calculateIRPPCore(inputs) {
     let familyDeductions = 0;
     if (inputs.chefFamille) familyDeductions += 300;
 
-    // Child deductions (capped based on rules, implicit for now)
-    const nbEnfantsValides = Math.min(inputs.nbEnfants, 4);
-    familyDeductions += nbEnfantsValides * 100;
+    // Child deductions (Corrected: 150 for 1st, 100 for others)
+    let childDeductions = 0;
+    if (inputs.nbEnfants > 0) {
+        childDeductions += 150; // 1st child
+        if (inputs.nbEnfants > 1) {
+            const extraEnfants = Math.min(inputs.nbEnfants - 1, 3); // Max 4 total
+            childDeductions += extraEnfants * 100;
+        }
+    }
+    familyDeductions += childDeductions;
 
     familyDeductions += inputs.nbEtudiants * 1000;
     familyDeductions += inputs.nbInfirmes * 2000;
@@ -359,8 +414,8 @@ function calculateIRPPCore(inputs) {
     // 4. Taxable Base
     let assietteSoumise = Math.max(0, (netApresAbattement + inputs.opSpecifiqueIrpp) - totalDeductions);
 
-    // 5. IRPP Calculation (8 Brackets - User Provided)
-    const brackets = [
+    // 5. IRPP Calculation (Dynamic Brackets)
+    const brackets2026 = [
         { min: 0, max: 5000, rate: 0.00 },
         { min: 5000, max: 10000, rate: 0.15 },
         { min: 10000, max: 20000, rate: 0.25 },
@@ -370,6 +425,16 @@ function calculateIRPPCore(inputs) {
         { min: 50000, max: 70000, rate: 0.38 },
         { min: 70000, max: Infinity, rate: 0.40 }
     ];
+
+    const brackets2025 = [
+        { min: 0, max: 5000, rate: 0.00 },
+        { min: 5000, max: 20000, rate: 0.26 },
+        { min: 20000, max: 30000, rate: 0.28 },
+        { min: 30000, max: 50000, rate: 0.32 },
+        { min: 50000, max: Infinity, rate: 0.35 }
+    ];
+
+    const brackets = (currentFiscalYear === '2026') ? brackets2026 : brackets2025;
 
     let impotTotal = 0;
     let bracketDetails = [];
@@ -432,6 +497,24 @@ function calculateIRPPCore(inputs) {
 function displayIRPPResults(result, isReverseMode) {
     const resultDiv = document.getElementById('result-irpp');
     const showDetails = result.inputs.showDetails;
+
+    // --- NEW: Update Mon Bilan Quick View ---
+    const qvNet = document.getElementById('bilan-net');
+    const qvImpot = document.getElementById('bilan-impot');
+    const qvTaux = document.getElementById('bilan-taux');
+    const qvStatus = document.getElementById('bilan-status');
+
+    if (qvNet) qvNet.innerText = result.netMensuel.toLocaleString('fr-TN', { maximumFractionDigits: 0 }) + " DT";
+    if (qvImpot) qvImpot.innerText = result.totalRetenue.toLocaleString('fr-TN', { maximumFractionDigits: 0 }) + " DT";
+    if (qvTaux) {
+        const pression = ((result.totalRetenue / result.grossIncome) * 100).toFixed(1);
+        qvTaux.innerText = pression + " %";
+    }
+    if (qvStatus) {
+        qvStatus.innerText = "Simulé (LF " + currentFiscalYear + ")";
+        qvStatus.style.color = "#10b981";
+    }
+
 
     // Header Label & Color
     let headerLabel = isReverseMode ? "Salaire Brut Estimé" : "Net Mensuel Estimé";

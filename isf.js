@@ -161,4 +161,16 @@ function calculateIF() {
             <button onclick="window.print()" class="btn-primary" style="margin-top:15px; background: var(--accent);">📄 Générer Certificat Patrimoine</button>
         </div>
     `;
+
+    // Global Sync
+    window.lastCalculation = {
+        type: 'IF',
+        totalTax: isfDu,
+        data: {
+            patrimoineBrut,
+            patrimoineNet,
+            isfDu
+        }
+    };
+    if (window.shareWithAI) window.shareWithAI(window.lastCalculation);
 }

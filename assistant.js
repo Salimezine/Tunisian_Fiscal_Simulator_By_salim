@@ -42,6 +42,24 @@ function setupChatListeners() {
         });
     });
 
+    const utilBtns = document.querySelectorAll('.input-util-btn');
+    utilBtns.forEach((btn, index) => { // Added index for specific button handling
+        btn.addEventListener('click', () => {
+            // Visual feedback
+            btn.style.filter = 'brightness(1.5)';
+            setTimeout(() => btn.style.filter = '', 200);
+
+            // Specific functionality for buttons
+            if (index === 0) { // Emoji Button
+                const input = document.getElementById('chat-input');
+                input.value += " 😊";
+                input.focus();
+            } else if (index === 1) { // Attachment Button
+                alert("📎 L'analyse de documents (PDF/Image) sera disponible dans la version Pro.");
+            }
+        });
+    });
+
     const clearBtn = document.getElementById('clear-chat-btn');
     if (clearBtn) {
         clearBtn.addEventListener('click', clearChat);
@@ -158,28 +176,31 @@ function addMessage(text, type) {
 function formatChatResponse(text) {
     if (!text) return "";
 
-    // Format bold text
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // 1. Format headers (###)
+    let formatted = text.replace(/^### (.*$)/gm, '<h3 style="color:var(--premium-purple);margin:10px 0 5px 0;font-size:1.1rem;border-bottom:1px solid rgba(168,85,247,0.2);padding-bottom:4px;">$1</h3>');
 
-    // Format code
-    formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
+    // 2. Format bold text (**)
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#60a5fa">$1</strong>');
 
-    // Format links
-    formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    // 3. Format Numbered Lists (1. 2.)
+    formatted = formatted.replace(/^\d+\.\s+(.*$)/gm, '<div style="margin-left:15px;margin-bottom:4px"><strong>$&</strong></div>');
 
-    // Highlight disclaimers with warning style
-    formatted = formatted.replace(
-        /(Cette explication est fournie à des fins éducatives.*?fiscal\.?)/gi,
-        '<div class="chat-disclaimer">⚠️ $1</div>'
-    );
+    // 4. Format Bullet Lists (-)
+    formatted = formatted.replace(/^-\s+(.*$)/gm, '<div style="margin-left:15px;margin-bottom:4px">• $1</div>');
 
-    // Add icon before legal references (look for common patterns)
+    // 5. Format code (`)
+    formatted = formatted.replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;color:#fca5a5">$1</code>');
+
+    // 6. Format links
+    formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:var(--premium-purple);text-decoration:underline">$1</a>');
+
+    // 7. Add icon before legal references
     formatted = formatted.replace(
         /(Article\s+\d+|Code\s+\w+|JORT\s+n°\d+|LF\s+202\d)/gi,
         '📚 <strong>$1</strong>'
     );
 
-    // Format line breaks
+    // 8. Format line breaks (preserving those already in div/h3 etc)
     formatted = formatted.replace(/\n/g, '<br>');
 
     return formatted;
@@ -222,11 +243,21 @@ function exportChat() {
  * Copy message content
  */
 function copyMessage(btn) {
-    const msgText = btn.closest('.msg-text').innerText.replace('📋', '').trim();
+    const parent = btn.closest('.msg-text');
+    // Clone to remove the action div before copying text
+    const clone = parent.cloneNode(true);
+    const actions = clone.querySelector('.message-actions');
+    if (actions) actions.remove();
+
+    const msgText = clone.innerText.trim();
     navigator.clipboard.writeText(msgText).then(() => {
         const originalText = btn.textContent;
         btn.textContent = '✓';
-        setTimeout(() => btn.textContent = originalText, 1500);
+        btn.style.color = '#10b981';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.color = '';
+        }, 1500);
     });
 }
 
@@ -245,27 +276,36 @@ function scrollToBottom() {
  */
 function setupFloatingBubble() {
     const bubble = document.getElementById('ai-floating-bubble');
+    const openBtn = document.getElementById('open-ai-chat');
     const container = document.getElementById('ai-chat-container');
     const closeBtn = document.getElementById('close-chat-btn');
 
-    if (!bubble || !container) return;
+    if (!container) return;
 
-    bubble.addEventListener('click', () => {
-        const isVisible = container.style.display !== 'none';
-        container.style.display = isVisible ? 'none' : 'flex';
+    const toggleChat = () => {
+        const isVisible = container.classList.contains('active') || container.style.display === 'flex';
 
-        if (!isVisible) {
+        if (isVisible) {
+            container.style.display = 'none';
+            container.classList.remove('active');
+        } else {
+            container.style.display = 'flex';
+            container.classList.add('active');
             scrollToBottom();
             const input = document.getElementById('chat-input');
             if (input) input.focus();
         }
-    });
+    };
+
+    if (bubble) bubble.addEventListener('click', toggleChat);
 
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             container.style.display = 'none';
+            container.classList.remove('active');
         });
     }
 }
 
-window.addEventListener('DOMContentLoaded', initAssistant);
+// Initialized via main.js
+// window.addEventListener('DOMContentLoaded', initAssistant);

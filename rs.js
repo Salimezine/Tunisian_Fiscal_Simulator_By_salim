@@ -3,6 +3,11 @@
 // Version Standalone - Simplifiée
 
 const RS_RATES = [
+    { id: 'rs_is_1', label: 'RS 1% (Achats > 1000 DT - Standard)', rate: 0.01, type: 'is_irpp', base: 'HT' },
+    { id: 'rs_is_1_5', label: 'RS 1.5% (Taux Spécifique)', rate: 0.015, type: 'is_irpp', base: 'HT' },
+    { id: 'rs_is_5', label: 'RS 5% (Honoraires Non-Commerciaux IR)', rate: 0.05, type: 'is_irpp', base: 'HT' },
+    { id: 'rs_is_10', label: 'RS 10% (Loyers, Honoraires Non-Commerciaux IS)', rate: 0.10, type: 'is_irpp', base: 'HT' },
+    { id: 'rs_is_15', label: 'RS 15% (Honoraires Spécifiques / Jetons)', rate: 0.15, type: 'is_irpp', base: 'HT' },
     { id: 'rs_tva_25', label: 'RS TVA sur Marchés (25% de la TVA)', rate: 0.25, type: 'tva', base: 'TVA' },
     { id: 'rs_tva_100', label: 'RS TVA sur Marchés avec Non-Résidents (100% TVA)', rate: 1.00, type: 'tva', base: 'TVA' }
 ];
@@ -146,13 +151,17 @@ function calculateRS() {
         </div>
     `;
 
-    // Affichage de l'alerte assiette si base == TTC
-    const warningDiv = document.getElementById('assiette-warning');
-    if (warningDiv) {
-        if (nature.base === 'TTC') {
-            warningDiv.classList.remove('hidden');
-        } else {
-            warningDiv.classList.add('hidden');
+    // Global Sync
+    window.lastCalculation = {
+        type: 'RS',
+        totalTax: rsAmount,
+        data: {
+            brutHT,
+            tvaAmount,
+            brutTTC,
+            rsAmount,
+            netAPayer
         }
-    }
+    };
+    if (window.shareWithAI) window.shareWithAI(window.lastCalculation);
 }

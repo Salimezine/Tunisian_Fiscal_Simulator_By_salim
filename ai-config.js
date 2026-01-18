@@ -148,7 +148,7 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
     },
 
     // Mandatory disclaimer (must appear in every AI response)
-    mandatoryDisclaimer: "Cette explication est fournie à des fins éducatives et de simulation uniquement et ne constitue pas un avis juridique ou fiscal.",
+    mandatoryDisclaimer: "",
 
     // Quick action prompts (educational and user-friendly)
     quickActions: {
@@ -172,8 +172,15 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
 
     // n8n Chatbot Configuration
     n8n: {
-        webhookUrl: "https://simulateur-fiscal.app.n8n.cloud/webhook-test/simulateur-fiscal",
+        webhookUrl: "https://simulateur-fiscal.app.n8n.cloud/webhook/simulateur-fiscal", // Production URL
         enabled: true
+    },
+
+    // UI Transformation Config
+    theme: {
+        modern: true,
+        wizardMode: false,
+        glassIntensity: "high"
     },
 
     // Storage keys

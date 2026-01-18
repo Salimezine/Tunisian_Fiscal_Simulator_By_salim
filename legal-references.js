@@ -25,13 +25,13 @@ const LegalReferenceDatabase = {
                 description: "Barème progressif à 8 tranches",
                 tranches: [
                     { min: 0, max: 5000, rate: 0, description: "Exonération jusqu'à 5 000 DT" },
-                    { min: 5000, max: 10000, rate: 0.26, description: "26% de 5 000 à 10 000 DT" },
-                    { min: 10000, max: 15000, rate: 0.28, description: "28% de 10 000 à 15 000 DT" },
-                    { min: 15000, max: 20000, rate: 0.32, description: "32% de 15 000 à 20 000 DT" },
-                    { min: 20000, max: 30000, rate: 0.35, description: "35% de 20 000 à 30 000 DT" },
-                    { min: 30000, max: 50000, rate: 0.37, description: "37% de 30 000 à 50 000 DT" },
-                    { min: 50000, max: 100000, rate: 0.39, description: "39% de 50 000 à 100 000 DT" },
-                    { min: 100000, max: Infinity, rate: 0.40, description: "40% au-delà de 100 000 DT" }
+                    { min: 5000, max: 10000, rate: 0.15, description: "15% de 5 000 à 10 000 DT" },
+                    { min: 10000, max: 20000, rate: 0.25, description: "25% de 10 000 à 20 000 DT" },
+                    { min: 20000, max: 30000, rate: 0.30, description: "30% de 20 000 à 30 000 DT" },
+                    { min: 30000, max: 40000, rate: 0.33, description: "33% de 30 000 à 40 000 DT" },
+                    { min: 40000, max: 50000, rate: 0.36, description: "36% de 40 000 à 50 000 DT" },
+                    { min: 50000, max: 70000, rate: 0.38, description: "38% de 50 000 à 70 000 DT" },
+                    { min: 70000, max: Infinity, rate: 0.40, description: "40% au-delà de 70 000 DT" }
                 ]
             },
             "2025": {
@@ -159,7 +159,7 @@ const LegalReferenceDatabase = {
                 version: "Loi de Finances 2026",
                 article: "Article 49 du Code IS",
                 url: "https://www.legislation.tn/detailtexte/CodeIRPPIS",
-                standard: 0.15, // 15% standard
+                standard: 0.20, // Corrected: 20% standard LF 2026
                 financial: 0.35, // 35% for financial institutions
                 description: "Taux IS selon secteur d'activité"
             }

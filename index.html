@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulateur Fiscal Tunisien 2026</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/ai-chat-styles.css">
-    <link rel="stylesheet" href="css/ai-chat-widget.css">
-    <link rel="stylesheet" href="css/print.css" media="print">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ai-chat-styles.css">
+    <link rel="stylesheet" href="ai-chat-widget.css">
+    <link rel="stylesheet" href="print.css" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -40,7 +40,7 @@
         <header class="main-header">
             <div class="academic-info"
                 style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center;">
-                <img src="img/isaas_logo.jpg" alt="Logo ISAAS"
+                <img src="isaas_logo.jpg" alt="Logo ISAAS"
                     style="height: 100px; margin-bottom: 15px; background: white; padding: 5px; border-radius: 8px;">
                 <h3 style="font-size: 1.1em; color: var(--text-main); margin-bottom: 5px;">Institut Supérieur
                     d'Administration des Affaires de Sfax</h3>
@@ -58,23 +58,49 @@
 
         <div class="glass-card">
             <nav class="tabs-nav">
-                <button class="tab-btn active" data-tab="irpp">IRPP</button>
-                <button class="tab-btn" data-tab="is">IS (Sociétés)</button>
-                <button class="tab-btn" data-tab="tva">TVA</button>
-                <button class="tab-btn" data-tab="isf">IF (Fortune)</button>
-                <button class="tab-btn" data-tab="rs" style="color: #34d399;">RS (Retenue)</button>
-                <button class="tab-btn" data-tab="conseiller" style="border: 1px solid rgba(139, 92, 246, 0.4);">🛡️
-                    Conseiller</button>
-                <button class="tab-btn" data-tab="comparative"
-                    style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">⚖️ Comparatif</button>
-
+                <button class="tab-btn active" data-tab="irpp">👤 IRPP</button>
+                <button class="tab-btn" data-tab="is">🏢 IS</button>
+                <button class="tab-btn" data-tab="tva">💸 TVA</button>
+                <button class="tab-btn" data-tab="isf">💎 IF</button>
+                <button class="tab-btn" data-tab="rs" style="color: #34d399;">⚡ RS</button>
+                <button class="tab-btn" data-tab="conseiller">🛡️ Expert</button>
+                <button class="tab-btn" data-tab="comparative">⚖️ Comparatif</button>
             </nav>
 
+
+
             <div class="tab-content" id="irpp">
-                <div class="module-header">
-                    <h2>Impôt sur le Revenu (IRPP)</h2>
-                    <p>Calcul selon le barème progressif LF 2026 (8 tranches)</p>
+                <div class="module-header"
+                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+                    <div>
+                        <h2>Impôt sur le Revenu (IRPP)</h2>
+                        <p>Simulateur multi-barèmes (2025-2026)</p>
+                    </div>
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; gap: 5px;">
+                        <input type="radio" name="fiscalYear" id="year2025" value="2025" style="display:none">
+                        <label for="year2025" class="year-label" onclick="setYear('2025')">2025</label>
+                        <input type="radio" name="fiscalYear" id="year2026" value="2026" checked style="display:none">
+                        <label for="year2026" class="year-label active" onclick="setYear('2026')">2026</label>
+                    </div>
                 </div>
+                <style>
+                    .year-label {
+                        padding: 6px 15px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 0.85em;
+                        font-weight: 600;
+                        color: var(--text-muted);
+                        transition: 0.3s;
+                    }
+
+                    .year-label.active {
+                        background: var(--primary);
+                        color: white;
+                        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+                    }
+                </style>
 
                 <details class="glass-card compact-info"
                     style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); padding: 10px 15px; border-radius: 16px;">
@@ -91,8 +117,12 @@
                 </details>
 
                 <!-- IRPP Form wil go here -->
+                <div class="wizard-container hidden" id="irpp-wizard">
+                    <!-- Wizard Steps will be injected here -->
+                </div>
+
                 <div class="module-body" id="irpp-container">
-                    <!-- Dynamic Content -->
+                    <!-- Standard Form for advanced users -->
                 </div>
             </div>
 
@@ -195,43 +225,46 @@
 
 
     <!-- Core Data -->
-    <script src="data/legal-references.js"></script>
-    <script src="js/ai-config.js"></script>
-    <script src="js/ai-service.js"></script>
+    <script src="legal-references.js"></script>
+    <script src="ai-config.js"></script>
+    <script src="ai-service.js"></script>
 
     <!-- Audit Mode Core Modules -->
-    <script src="js/calculation-context.js"></script>
-    <script src="js/mode-manager.js"></script>
-    <script src="js/rule-engine.js"></script>
-    <script src="js/audit-mode-ui.js"></script>
+    <script src="calculation-context.js"></script>
+    <script src="mode-manager.js"></script>
+    <script src="rule-engine.js"></script>
+    <script src="audit-mode-ui.js"></script>
 
 
     <!-- Calculation Modules -->
-    <script src="js/irpp.js"></script>
-    <script src="js/is.js"></script>
-    <script src="js/tva.js"></script>
-    <script src="js/isf.js"></script>
-    <script src="js/rs.js"></script>
-    <script src="js/conseiller.js"></script>
-    <script src="js/assistant.js"></script>
-    <script src="js/comparative.js"></script>
-    <script src="js/main.js"></script>
+    <script src="irpp.js"></script>
+    <script src="is.js"></script>
+    <script src="tva.js"></script>
+    <script src="isf.js"></script>
+    <script src="rs.js"></script>
+    <script src="conseiller.js"></script>
+    <script src="assistant.js"></script>
+    <script src="comparative.js"></script>
+    <script src="wizard.js"></script>
+    <script src="main.js"></script>
 
     <!-- Utilities -->
-    <script src="js/verify_calc.js"></script>
+    <script src="verify_calc.js"></script>
+    <script src="is_algo_2026_strict.js"></script>
 
     <!-- Chatbot Widget -->
     <div id="ai-chat-container" class="ai-chat-widget" style="display: none;">
         <div class="chat-widget-header">
             <div class="header-info">
-                <span class="header-icon" style="background: var(--accent);"></span>
+                <div class="header-status-glow"></div>
                 <div class="header-text">
-                    <strong>Assistant Éducatif</strong>
-                    <small>Non Juridique - LF 2026</small>
+                    <span class="premium-sparkle">✨</span>
+                    <strong>Assistant Fiscal</strong>
                 </div>
             </div>
             <div class="header-actions">
-                <button id="close-chat-btn" class="close-btn">&times;</button>
+                <button class="menu-dots">⋮</button>
+                <button id="close-chat-btn" class="close-btn">×</button>
             </div>
         </div>
 
@@ -246,14 +279,25 @@
         </div>
 
         <div class="chat-widget-footer">
-            <div class="input-container">
-                <input type="text" id="chat-input" placeholder="Votre question..." autocomplete="off">
-                <button id="chat-send" class="send-icon">➔</button>
+            <div class="input-glow-wrapper">
+                <div class="input-container">
+                    <button class="input-util-btn">😊</button>
+                    <input type="text" id="chat-input" placeholder="Tapez votre message..." autocomplete="off">
+                    <button class="input-util-btn">📎</button>
+                    <button id="chat-send" class="send-btn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" stroke="white" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="chat-shortcuts">
                 <button class="chat-suggest-btn" data-msg="Explique-moi comment fonctionne l'IRPP">💰 IRPP</button>
                 <button class="chat-suggest-btn" data-msg="Quels sont les avantages ZDR ?">📍 ZDR</button>
-                <button class="chat-suggest-btn" data-msg="Explique-moi mon résultat de calcul">📊 Mon résultat</button>
+                <button class="chat-suggest-btn" data-msg="Avantages Startup Act ?">🚀 Startup</button>
+                <button class="chat-suggest-btn" data-msg="Régime Exportation ?">🌍 Export</button>
+                <button class="chat-suggest-btn" data-msg="Explique-moi mon résultat de calcul">📊 Mon bilan</button>
             </div>
             <div class="quick-actions">
                 <button id="clear-chat-btn" title="Effacer">🗑️</button>
@@ -262,10 +306,11 @@
         </div>
     </div>
 
+    <!-- AI Floating Bubble (Refined) -->
     <div id="ai-floating-bubble" class="ai-bubble">
-        <span class="bubble-icon">💬</span>
-        <span class="ai-bubble-label">Expliquez-moi</span>
+        <span class="bubble-icon">🤖</span>
     </div>
+
 
 </body>
 

@@ -206,29 +206,8 @@ function initIS() {
     }
 
     container.innerHTML = `
-        <!-- Avertissement LF 2026 -->
-        <div class="glass-card" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); margin-bottom: 20px;">
-            <div style="display:flex; align-items:flex-start; gap:10px;">
-                <span style="font-size:1.5em;">📜</span>
-                <div>
-                    <strong style="color: #fbbf24;">Conformité Loi de Finances 2026</strong>
-                    <p style="font-size: 0.85em; opacity: 0.9; margin:5px 0 0 0;">
-                        Conformément au <strong>JORT n°148</strong>, les <strong>Taxes Consolidées de 4%</strong> pour les secteurs financiers, télécoms et automobiles sont désormais pérennisées. La CSS reste maintenue à titre conjoncturel.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <!-- Main Form -->
 
-        <!-- Récapitulatif Taux 2026 -->
-        <div class="glass-card" style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
-            <h4 style="color: #60a5fa; margin-bottom: 5px;">📋 Taux IS 2026</h4>
-            <div style="font-size: 0.85em; opacity: 0.9; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-                <div><strong>10%</strong> : Agri, Pêche, ZDR, Culture, Recyclage</div>
-                <div><strong>20%</strong> : Droit Commun</div>
-                <div><strong>35%</strong> : Télécoms, Pétrole, Grandes Surfaces, Auto</div>
-                <div><strong>43%</strong> : Banques, Leasing, Assurances</div>
-            </div>
-        </div>
 
         <!-- Section 1: Secteur -->
         <div class="form-section" style="border-left: 4px solid var(--primary);">
@@ -647,14 +626,22 @@ function calculateIS() {
         </div>
     `;
 
-    // LOG
+    // LOG & Global Sync
+    window.lastCalculation = {
+        type: 'IS',
+        totalTax: totalAPayer,
+        data: {
+            resComptable,
+            resFiscal,
+            isDu,
+            cssAmount,
+            specTaxAmount,
+            tclAmount,
+            totalAPayer
+        }
+    };
+
     if (window.shareWithAI) {
-        window.shareWithAI({
-            module: 'IS',
-            secteur: s.label,
-            baseImposable: baseImposable,
-            isDu: isDu,
-            totalAPayer: totalAPayer
-        });
+        window.shareWithAI(window.lastCalculation);
     }
 }
