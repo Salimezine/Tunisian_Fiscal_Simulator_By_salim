@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Erreur initWizard:", e);
     }
 
+    // 4. Initialize UX Preferences (Theme & Language)
+    initPreferences();
+
     // Set Date for Print Footer
     document.body.setAttribute('data-date', new Date().toLocaleDateString('fr-TN'));
 
@@ -112,4 +115,88 @@ window.launchWizard = function () {
         irppWizard.render();
     }
 };
+
+
+/**
+ * =================================================================
+ *  UX ENHANCEMENTS: THEME & I18N
+ * =================================================================
+ */
+
+// 1. Theme Manager
+window.toggleTheme = function () {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Update Icon
+    updateThemeIcon(newTheme);
+};
+
+function updateThemeIcon(theme) {
+    const btn = document.getElementById('theme-toggle');
+    if (btn) {
+        btn.querySelector('span').innerText = theme === 'light' ? '☀️' : '🌙';
+    }
+}
+
+// 2. Language Manager
+window.changeLanguage = function (langCode) {
+    if (!I18N_DATA[langCode]) return;
+
+    // Persist
+    localStorage.setItem('language', langCode);
+
+    // Update DOM Text
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (I18N_DATA[langCode][key]) {
+            // Handle placeholders for inputs, otherwise innerText
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = I18N_DATA[langCode][key];
+            } else {
+                el.innerText = I18N_DATA[langCode][key];
+            }
+        }
+    });
+
+    // Update title attributes (tooltips)
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (I18N_DATA[langCode][key]) {
+            el.setAttribute('title', I18N_DATA[langCode][key]);
+        }
+    });
+
+    // Handle RTL for Arabic
+    if (langCode === 'ar') {
+        document.documentElement.setAttribute('dir', 'rtl');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+    }
+
+    // Refresh Dynamic Modules if needed (re-render Advisor title etc)
+    // For now, static text is updated. Dynamic content often regenerates on click.
+};
+
+function initPreferences() {
+    // Theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    // Language
+    const savedLang = localStorage.getItem('language') || 'fr';
+    const langSelector = document.getElementById('lang-selector');
+    if (langSelector) langSelector.value = savedLang;
+
+    // Defer language change slightly to ensure i18n data is loaded
+    setTimeout(() => {
+        if (typeof I18N_DATA !== 'undefined') {
+            changeLanguage(savedLang);
+        }
+    }, 100);
+}
 

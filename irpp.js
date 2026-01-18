@@ -28,7 +28,7 @@ function initIRPP() {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px;">
             <div style="display: flex; gap: 10px; align-items: center; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 15px; border-radius: 12px; flex: 1;">
                  <span style="font-size:1.2em;">📜</span>
-                 <span id="irpp-year-desc" style="font-size: 0.85em; color: #818cf8;">Barème Progressif 2026 (8 tranches)</span>
+                 <span id="irpp-year-desc" data-i18n="label_year_2026" style="font-size: 0.85em; color: #818cf8;">Barème Progressif 2026 (8 tranches)</span>
             </div>
         </div>
 
@@ -36,22 +36,22 @@ function initIRPP() {
         <div id="mon-bilan-quick-view" class="glass-card" style="margin-bottom: 25px; padding: 20px; border: 1px solid rgba(16, 185, 129, 0.2); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(99, 102, 241, 0.05));">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.3rem;">📊</span> Mon Bilan Fiscal
+                    <span style="font-size: 1.3rem;">📊</span> <span data-i18n="irpp_mon_bilan">Mon Bilan Fiscal</span>
                 </h3>
-                <span id="bilan-status" style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; color: #94a3b8;">En attente de calcul</span>
+                <span id="bilan-status" data-i18n="irpp_status_pending" style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; color: #94a3b8;">En attente de calcul</span>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
                 <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Revenu Net / Mois</div>
-                    <div id="bilan-net" style="font-size: 1.2rem; font-weight: 800; color: #10b981;">- --- DT</div>
+                    <div data-i18n="res_net_estimated" style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Revenu Net / Mois</div>
+                    <div id="bilan-net" style="font-size: 1.2rem; font-weight: 800; color: #10b981;">--- DT</div>
                 </div>
                 <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Impôt Total / An</div>
-                    <div id="bilan-impot" style="font-size: 1.2rem; font-weight: 800; color: #ef4444;">- --- DT</div>
+                    <div data-i18n="res_impot_total" style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Impôt Total / An</div>
+                    <div id="bilan-impot" style="font-size: 1.2rem; font-weight: 800; color: #ef4444;">--- DT</div>
                 </div>
                 <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Taux de Pression</div>
+                    <div data-i18n="res_taux_pression" style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Taux de Pression</div>
                     <div id="bilan-taux" style="font-size: 1.2rem; font-weight: 800; color: #f59e0b;">0 %</div>
                 </div>
             </div>
@@ -60,13 +60,13 @@ function initIRPP() {
         <!-- Mode Toggle -->
         <div class="glass-card" style="margin-bottom: 20px; text-align: center; padding: 10px;">
             <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 10px; font-weight: bold;">
-                <span>Mode Standard (Brut → Net)</span>
+                <span data-i18n="btn_calculate">Calculer (Standard)</span>
                 <div style="position: relative; width: 50px; height: 26px; bg-color: #ccc; border-radius: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
                     <input type="checkbox" id="modeInverse" style="opacity: 0; width: 0; height: 0;">
                     <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 34px;"></span>
                     <span class="knob" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                 </div>
-                <span>Mode Inversé (Net → Brut) <span title="Estimation par itération inverse. Le résultat est approximatif selon la complexité fiscale." style="cursor: help; opacity: 0.7; font-size: 0.8em;">ℹ️</span></span>
+                <span data-i18n="btn_calculate_inverse">Inversé (Net → Brut)</span> <span title="Info" style="cursor: help; opacity: 0.7;">ℹ️</span>
             </label>
              <style>
                 input:checked + .slider { background-color: var(--accent); }
@@ -78,49 +78,53 @@ function initIRPP() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">👤</span>
-                <span>Votre Profil & Revenus</span>
+                <span data-i18n="label_situation">Votre Profil & Revenus</span>
             </div>
 
-            <!-- NOUVEAU: Profil Fiscaux (Recommandation 4) -->
             <div class="flex-row" style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
                 <div class="form-group flex-col-50">
-                    <label>Résidence Fiscale</label>
+                    <label data-i18n="label_residence">Résidence Fiscale</label>
                     <select id="residence" class="form-control">
-                        <option value="resident">Résident (Tunisie)</option>
-                        <option value="non_resident">Non-Résident</option>
+                        <option value="resident" data-i18n="opt_resident">Résident (Tunisie)</option>
+                        <option value="non_resident" data-i18n="opt_non_resident">Non-Résident</option>
                     </select>
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Secteur d'Activité</label>
+                    <label data-i18n="label_sector">Secteur d'Activité</label>
                     <select id="secteur" class="form-control">
-                        <option value="prive">Secteur Privé</option>
-                        <option value="public">Secteur Public</option>
-                        <option value="agricole">Agricole (Exonéré)</option>
+                        <option value="prive" data-i18n="opt_prive">Secteur Privé</option>
+                        <option value="public" data-i18n="opt_public">Secteur Public</option>
+                        <option value="agricole" data-i18n="opt_agricole">Agricole (Exonéré)</option>
                     </select>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>Type de Revenu</label>
-                <select id="typeRevenu" class="form-control">
-                    <option value="salarie">Salarié (Traitements & Salaires)</option>
-                    <option value="retraite">Pension de Retraite</option>
+            <div class="form-group flex-col-50">
+                <label data-i18n="label_situation">Situation Familiale</label>
+                <select id="typeRevenu" class="form-control" onchange="calculerIRPP()">
+                    <option value="celibataire" data-i18n="opt_single">Célibataire</option>
+                    <option value="marie" data-i18n="opt_married">Marié(e)</option>
+                    <option value="divorce" data-i18n="opt_divorced">Divorcé(e)</option>
                 </select>
+            </div>
+            <div class="form-group flex-col-50">
+               <label data-i18n="label_children">Nombre d'enfants</label>
+               <input type="number" id="nbEnfants" class="form-control" value="0" min="0" onchange="calculerIRPP()">
             </div>
 
             <div class="form-group">
-                <label id="labelMontant">Salaire / Pension Brut</label> <!-- Dynamic Label -->
+                <label id="labelMontant" data-i18n="label_salary">Salaire Brut Mensuel (DT)</label>
                 <div class="flex-row">
                     <input type="number" id="revenuInput" class="form-control" placeholder="Ex: 2000" style="flex:2">
                     <select id="frequenceRevenu" class="form-control" style="flex:1">
-                        <option value="annuel">Annuel</option>
-                        <option value="mensuel" selected>Mensuel</option>
+                        <option value="annuel" data-i18n="opt_annual">Annuel</option>
+                        <option value="mensuel" data-i18n="opt_monthly" selected>Mensuel</option>
                     </select>
                 </div>
             </div>
             
             <div class="form-group">
-                <label style="font-size: 0.9em;">Opération Spécifique (+) (Imposable)</label>
+                <label style="font-size: 0.9em;" data-i18n="label_op_specific">Opération Spécifique (+) (Imposable)</label>
                 <input type="number" id="opSpecifiqueIrpp" class="form-control" placeholder="0.00">
             </div>
         </div>
@@ -134,26 +138,26 @@ function initIRPP() {
             
             <div class="checkbox-group">
                 <input type="checkbox" id="cnss" checked>
-                <label for="cnss">Appliquer déduction CNSS/CNRPS (9.18%)</label>
+                <label for="cnss" data-i18n="label_cnss_deduction">Appliquer déduction CNSS/CNRPS (9.18%)</label>
             </div>
-            <div class="help-text">Les frais professionnels (10%, max 2000 DT) sont appliqués automatiquement</div>
+            <div class="help-text" data-i18n="desc_cnss_help">Les frais professionnels (10%, max 2000 DT) sont appliqués automatiquement</div>
         </div>
 
         <!-- Section 3: Situation Familiale -->
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">👨‍👩‍👧‍👦</span>
-                <span>Situation Familiale</span>
+                <span data-i18n="label_situation">Situation Familiale</span>
             </div>
             
             <div class="checkbox-group">
                 <input type="checkbox" id="chefFamille">
-                <label for="chefFamille">Chef de famille (Déduction 300 DT)</label>
+                <label for="chefFamille" data-i18n="label_head_family">Chef de famille (Déduction 300 DT)</label>
             </div>
 
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Enfants à charge (-20 ans)</label>
+                    <label data-i18n="label_kids_charge">Enfants à charge (-20 ans)</label>
                     <select id="nbEnfants" class="form-control">
                         <option value="0">0</option>
                         <option value="1">1</option>
@@ -163,34 +167,34 @@ function initIRPP() {
                     </select>
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Enfants Étudiants (< 25 ans)</label>
+                    <label data-i18n="label_kids_student">Enfants Étudiants (< 25 ans)</label>
                     <input type="number" id="nbEtudiants" class="form-control" value="0" min="0">
                 </div>
             </div>
 
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Enfants handicapés</label>
+                    <label data-i18n="label_kids_handicapped">Enfants handicapés</label>
                     <input type="number" id="nbEnfantsInfirmes" class="form-control" value="0" min="0">
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Parents à charge</label>
+                    <label data-i18n="label_parents_charge">Parents à charge</label>
                     <input type="number" id="nbParents" class="form-control" value="0" min="0">
                 </div>
             </div>
              <div class="form-group">
-                <label style="font-size: 0.9em;">Autres Déductions (-)</label>
+                <label style="font-size: 0.9em;" data-i18n="label_other_deductions">Autres Déductions (-)</label>
                 <input type="number" id="autreDeduction" class="form-control" placeholder="0.00">
             </div>
         </div>
 
         <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
-            <button id="btn-calc-irpp" class="btn-primary" style="flex: 2;">
+            <button id="btn-calc-irpp" class="btn-primary" style="flex: 2;" data-i18n="btn_calculate">
                 Calculer IRPP
             </button>
             <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
                 <input type="checkbox" id="showDetails" style="margin-right: 8px;">
-                <label for="showDetails" style="font-size: 0.9em; cursor: pointer; user-select: none;">Voir détail calcul</label>
+                <label for="showDetails" style="font-size: 0.9em; cursor: pointer; user-select: none;" data-i18n="label_details">Voir détail calcul</label>
             </div>
         </div>
 
@@ -207,22 +211,32 @@ function initIRPP() {
     const btnCalc = document.getElementById('btn-calc-irpp');
 
     modeToggle.addEventListener('change', (e) => {
+        const currentLang = localStorage.getItem('language') || 'fr';
+
         if (e.target.checked) {
             // Mode Inverse
-            labelMontant.textContent = "Salaire / Pension NET Désiré";
+            labelMontant.setAttribute('data-i18n', 'label_salary_inverse');
             labelMontant.style.color = "var(--accent)";
             inputMontant.placeholder = "Ex: 2500 (Net)";
-            btnCalc.textContent = "Calculer le Brut (Simulation Inversée)";
+
+            btnCalc.setAttribute('data-i18n', 'btn_calculate_inverse');
             btnCalc.style.background = "var(--accent)";
         } else {
             // Mode Standard
-            labelMontant.textContent = "Salaire / Pension Brut";
+            labelMontant.setAttribute('data-i18n', 'label_salary');
             labelMontant.style.color = "var(--text-main)";
             inputMontant.placeholder = "Ex: 3500 (Brut)";
-            btnCalc.textContent = "Calculer IRPP";
+
+            btnCalc.setAttribute('data-i18n', 'btn_calculate');
             btnCalc.style.background = "var(--primary)";
         }
+
+        // Trigger translation update if function exists
+        if (typeof changeLanguage === 'function') {
+            changeLanguage(currentLang);
+        }
     });
+
     // Global bridge
     window.calculateIRPP = handleIRPPCalculation;
 }
@@ -494,9 +508,18 @@ function calculateIRPPCore(inputs) {
 /**
  * Display Final Results with Professional Enhancements
  */
+/**
+ * Display Final Results with Professional Enhancements
+ */
 function displayIRPPResults(result, isReverseMode) {
     const resultDiv = document.getElementById('result-irpp');
     const showDetails = result.inputs.showDetails;
+
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
 
     // --- NEW: Update Mon Bilan Quick View ---
     const qvNet = document.getElementById('bilan-net');
@@ -511,44 +534,36 @@ function displayIRPPResults(result, isReverseMode) {
         qvTaux.innerText = pression + " %";
     }
     if (qvStatus) {
-        qvStatus.innerText = "Simulé (LF " + currentFiscalYear + ")";
+        qvStatus.innerText = t("irpp_status_pending").replace("En attente de calcul", "Simulé (LF " + currentFiscalYear + ")").replace("Mazelna ma 7sebnach", "Simulé (LF " + currentFiscalYear + ")").replace("في انتظار الاحتساب", " (LF " + currentFiscalYear + ")"); // Fallback specific logic or simple string
+        // Actually, cleaner to just set a simple localized string or date
+        qvStatus.innerText = "LF " + currentFiscalYear;
         qvStatus.style.color = "#10b981";
     }
 
 
     // Header Label & Color
-    let headerLabel = isReverseMode ? "Salaire Brut Estimé" : "Net Mensuel Estimé";
+    let headerLabel = isReverseMode ? t("res_gross_estimated") : t("res_net_estimated");
+    // Fallback if key missing
+    if (!headerLabel) headerLabel = isReverseMode ? "Salaire Brut Estimé" : "Net Mensuel Estimé";
+
     let headerAmount = isReverseMode ? result.grossIncome.toLocaleString('fr-TN', { maximumFractionDigits: 3 }) : result.netMensuel.toLocaleString('fr-TN', { maximumFractionDigits: 3 });
     let headerColor = isReverseMode ? "var(--warning)" : "var(--success)";
 
     // --- RECOMMANDATION 5: Comparaison avec 2025 ---
-    // Simple simulation of 2025 logic (Approximate for comparison gain)
-    // 2025 had 5 brackets, 2026 has 8. We simulate a "What if"
     let comparisonHtml = '';
     if (!isReverseMode) {
-        // Quick 2025 calc simulation (Simplified)
-        let irpp2025 = 0; // Placeholder calculation
-        // Using old brackets from Legal DB would be better, but doing a quick estimate for UI demo
-        // Let's assume 2025 tax is roughly 5% higher for middle class due to bracket creep
         let gain = 0;
-        let isGain = false;
-
-        // Use Reference DB if available, else static approx
-        if (typeof LegalReferenceDatabase !== 'undefined') {
-            // We could implement a real legacy calc here, but for now we'll emphasize the logic change
-            // Let's assume the previous system tax would be higher.
-            const oldTax = result.irpp * 1.05; // 5% more tax in old system (Hypothesis)
-            gain = oldTax - result.irpp;
-            isGain = true;
-        }
+        // Simple heuristic for demo
+        const oldTax = result.irpp * 1.05;
+        gain = oldTax - result.irpp;
 
         if (gain > 0) {
             comparisonHtml = `
                 <div style="margin-top: 10px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; font-size: 0.85em; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 1.2em;">📉</span>
                     <div>
-                        <strong>Impact Loi de Finances 2026 :</strong>
-                        <span style="color: var(--success);">Gain estimé de ~${(gain / 12).toFixed(3)} DT/mois</span> par rapport au barème 2025.
+                        <strong>Impact LF 2026 :</strong>
+                        <span style="color: var(--success);">Gain ~${(gain / 12).toFixed(3)} DT/${t("opt_monthly").toLowerCase()}</span>
                     </div>
                 </div>
             `;
@@ -560,45 +575,33 @@ function displayIRPPResults(result, isReverseMode) {
     if (showDetails) {
         detailedCalculationHtml = `
             <div class="audit-journal-card" style="margin-top: 15px; padding: 15px; background: #1e1e1e; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #d4d4d4; border: 1px solid #333;">
-                <h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;">📟 Journal de Calcul (Audit)</h4>
+                <h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;">📟 ${t("label_details")} (Audit)</h4>
                 
                 <div style="display: flex; justify-content: space-between;">
-                    <span>(+) Salaire Brut Annuel</span>
+                    <span>(+) ${t("res_gross_annual")}</span>
                     <span>${result.grossIncome.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Cotisations Sociales (9.18%)</span>
+                    <span>(-) CNSS (9.18% / 10.2%)</span>
                     <span>- ${result.cnss.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #555; padding-bottom: 2px; margin-bottom: 2px;">
-                    <span>(=) Salaire Imposable Brut</span>
+                    <span>(=) Brut Imposable</span>
                     <span>${(result.grossIncome - result.cnss).toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Abattement Frais Prof. (10%)</span>
+                    <span>(-) Abattement 10%</span>
                     <span>- ${result.abattement.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Déductions Chef Famille</span>
+                    <span>(-) ${t("label_head_family")}</span>
                     <span>- ${(result.inputs.chefFamille ? 300 : 0).toFixed(3)}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Déductions Enfants (${result.inputs.nbEnfants})</span>
-                    <span>- ${(result.totalDeductions - (result.inputs.chefFamille ? 300 : 0) - result.inputs.autreDeduction).toFixed(3)}</span>
-                </div>
-                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Autres Déductions</span>
-                    <span>- ${result.inputs.autreDeduction.toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; color: #fff; border-top: 1px solid #777; padding-top: 5px;">
-                    <span>(=) Assiette Soumise à l'IRPP</span>
+                    <span>(=) ${t("res_taxable_annual")}</span>
                     <span>${result.assietteSoumise.toFixed(3)}</span>
-                </div>
-
-                <div style="margin-top: 10px; font-style: italic; color: #888;">
-                    * Application du barème 2026 à 8 tranches sur l'assiette.
                 </div>
             </div>
         `;
@@ -607,7 +610,7 @@ function displayIRPPResults(result, isReverseMode) {
     resultDiv.innerHTML = `
         <div class="result-card">
             <div class="result-header">
-                <span>${headerLabel}</span>
+                <h3><span>${headerLabel}</span></h3>
                 <span class="final-amount" style="color: ${headerColor};">${headerAmount} DT</span>
             </div>
             ${comparisonHtml}
@@ -617,70 +620,34 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="background: rgba(255,255,255,0.05); padding:12px; border-radius:8px; margin-bottom:12px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.95em;">
                         <div>
-                            <span style="opacity:0.7">Salaire Brut :</span>
+                            <span style="opacity:0.7">${t("label_salary")} :</span>
                             <strong style="float:right">${result.grossIncome.toLocaleString('fr-TN', { maximumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">CNSS (9.18%) :</span>
+                            <span style="opacity:0.7">CNSS :</span>
                             <strong style="float:right; color: var(--warning)">- ${result.cnss.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">${result.labelAbattement} :</span>
+                            <span style="opacity:0.7">Abattement 10% :</span>
                             <strong style="float:right; color: var(--warning)">- ${result.abattement.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
-                        <div style="grid-column: span 2; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2px;">
-                            <span style="opacity:0.7">Net Imposable de base :</span>
-                            <strong style="float:right">${result.netApresAbattement.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
-                        </div>
-                        <div style="grid-column: span 2; font-size: 0.8em; color: var(--accent); margin-top: 5px;">
-                             * La déduction chef de famille s'applique sur cette base
-                        </div>
                     </div>
                 </div>
 
-                <!-- Section 2: Déductions -->
-                <div style="background: rgba(255,255,255,0.03); padding:12px; border-radius:8px; margin-bottom:12px; border-left: 3px solid var(--primary);">
-                    <small style="opacity:0.6; display:block; margin-bottom:8px; text-transform: uppercase; letter-spacing: 0.5px;">
-                        Déductions et Ajustements 2026
-                        <!-- RECOMMANDATION 2: Source Officielle -->
-                        <span style="float: right; font-size: 0.8em; color: var(--accent);" title="Source Officielle">📜 <a href="https://www.impots.finances.gov.tn" target="_blank" style="color: inherit; text-decoration: underline;">Art. 40 Code IRPP</a></span>
-                    </small>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em;">
-                        ${result.inputs.opSpecifiqueIrpp > 0 ? `
-                        <div style="grid-column: span 2;">
-                            <span style="opacity:0.7">Opération Spécifique (+) :</span>
-                            <strong style="float:right; color: var(--warning)">+ ${result.inputs.opSpecifiqueIrpp.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
-                        </div>` : ''}
-                        
-                        <div style="grid-column: span 2;">
-                            <span style="opacity:0.7">Total Déductions familiales :</span>
-                            <strong style="float:right">- ${result.totalDeductions.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
-                        </div>
-
-                        <div style="grid-column: span 2; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.2); margin-top: 5px;">
-                            <span style="font-weight: 600; color: var(--text-main);">Assiette Imposable Finale :</span>
-                            <strong style="float:right; color: var(--primary); font-size: 1.1em;">${result.assietteSoumise.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Section 3: Détails des Impôts -->
                 <div style="padding: 10px; margin-top:15px; border-top:1px dashed rgba(255,255,255,0.1)">
                     <p style="margin: 5px 0;">
-                        <strong>1. IRPP Dû (Barème Progressif) :</strong> 
+                        <strong>1. IRPP (Barème 2026) :</strong> 
                         <span style="float:right; color:var(--text-main);">${result.irpp.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
-                        <br><span style="font-size:0.75em; opacity:0.6; margin-left:15px;">(Ref: <a href="https://www.impots.finances.gov.tn" target="_blank" style="color: inherit;">Art. 44 Code IRPP / LF 2026</a>)</span>
                     </p>
                     <p style="margin: 5px 0; color: var(--accent);">
-                        <strong>2. CSS (0,5% sur base imposable) :</strong>
+                        <strong>2. CSS (0,5%) :</strong>
                         <span style="float:right">+ ${result.css.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
-                        <br><span style="font-size:0.75em; opacity:0.6; margin-left:15px;">(Incluse dans le calcul du Net - Ref: <a href="#" style="color: inherit;">Art. 58 LF 2026</a>)</span>
                     </p>
                     
                     <div style="margin-top: 15px; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 600;">Net Mensuel ${isReverseMode ? 'Cible' : 'Estimé'} :</span>
+                            <span style="font-weight: 600;">${isReverseMode ? t("label_salary_inverse") : t("res_net_estimated")} :</span>
                             <strong style="color: var(--success); font-size: 1.25em;">${result.netMensuel.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                     </div>
@@ -691,15 +658,15 @@ function displayIRPPResults(result, isReverseMode) {
             </div>
             
             <h4 style="margin: 20px 0 10px 0; display: flex; align-items: center; gap: 8px;">
-                <span class="icon">📈</span> Détail par Tranche (Barème LF 2026)
+                <span class="icon">📈</span> <span>${t("label_detail_tranche")}</span>
             </h4>
             <table class="breakdown-table">
                 <thead>
                     <tr>
-                        <th>Tranche de revenu</th>
-                        <th>Taux</th>
-                        <th style="text-align:right">Base taxable</th>
-                        <th style="text-align:right">Impôt</th>
+                        <th>${t("table_tranche")}</th>
+                        <th>${t("table_taux")}</th>
+                        <th style="text-align:right">${t("table_base")}</th>
+                        <th style="text-align:right">${t("table_impot")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -715,14 +682,14 @@ function displayIRPPResults(result, isReverseMode) {
             </table>
              
             <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
-                <h4 style="margin: 0 0 15px 0; text-align: center;">Répartition de votre revenu</h4>
+                <h4 style="margin: 0 0 15px 0; text-align: center;">${t("res_distribution_header")}</h4>
                 <div style="max-width: 300px; margin: 0 auto;">
                     <canvas id="irppChart"></canvas>
                 </div>
             </div>
 
              <button id="btn-print-irpp" class="btn-primary" style="margin-top:20px; background: var(--accent); width: 100%;">
-                <span class="icon">📄</span> Imprimer la Fiche
+                <span class="icon">📄</span> <span data-i18n="btn_print">Imprimer</span>
              </button>
         </div>
     `;
@@ -752,6 +719,12 @@ function renderIRPPChart(brut, cnss, impot, net) {
     if (!canvas) return; // Guard
     const ctx = canvas.getContext('2d');
 
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     if (irppChartInstance) {
         irppChartInstance.destroy();
     }
@@ -759,7 +732,7 @@ function renderIRPPChart(brut, cnss, impot, net) {
     irppChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Net dans la poche', 'CNSS', 'Impôt (IRPP+CSS)'],
+            labels: [t('res_net_pocket'), 'CNSS', t('result_tax')],
             datasets: [{
                 data: [net, cnss, impot],
                 backgroundColor: [

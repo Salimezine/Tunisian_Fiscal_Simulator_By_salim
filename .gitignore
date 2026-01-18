@@ -1,0 +1,15 @@
+
+# Agent Architecture
+.tmp/
+.env
+credentials.json
+token.json
+__pycache__/
+*.pyc
+
+# Dependencies
+node_modules/
+
+# OS specific
+.DS_Store
+Thumbs.db

@@ -36,8 +36,14 @@ function setupChatListeners() {
 
     suggestions.forEach(s => {
         s.addEventListener('click', () => {
-            const msg = s.getAttribute('data-msg');
-            input.value = msg;
+            const msgKey = s.getAttribute('data-msg-key');
+            if (msgKey) {
+                const t = (key) => {
+                    const lang = localStorage.getItem('language') || 'fr';
+                    return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+                };
+                input.value = t(msgKey);
+            }
             handleUserInput();
         });
     });
@@ -55,7 +61,11 @@ function setupChatListeners() {
                 input.value += " 😊";
                 input.focus();
             } else if (index === 1) { // Attachment Button
-                alert("📎 L'analyse de documents (PDF/Image) sera disponible dans la version Pro.");
+                const t = (key) => {
+                    const lang = localStorage.getItem('language') || 'fr';
+                    return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+                };
+                alert("📎 " + t("msg_attach_pro"));
             }
         });
     });
@@ -126,8 +136,12 @@ async function handleUserInput() {
 }
 
 function handleChatError(error) {
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
     console.error('Chat Error:', error);
-    addMessage(`⚠️ Désolé, une erreur est survenue : ${error.message}`, 'system');
+    addMessage(`⚠️ ${t("msg_error_occurred")}: ${error.message}`, 'system');
 }
 
 /**
@@ -210,14 +224,19 @@ function formatChatResponse(text) {
  * Clear chat history
  */
 function clearChat() {
-    if (!confirm('Effacer la conversation ?')) return;
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
+    if (!confirm(t('msg_confirm_clear'))) return;
 
     const container = document.getElementById('chat-messages');
     if (container) {
         container.innerHTML = `
             <div class="message system">
                 <span class="icon">🤖</span>
-                <div class="msg-text">Bonjour ! Je suis votre assistant fiscal. Comment puis-je vous aider ?</div>
+                <div class="msg-text" data-i18n="chat_welcome">${t('chat_welcome')}</div>
             </div>
         `;
     }

@@ -26,7 +26,7 @@ class AuditModeUI {
       console.error('Initialization failed:', error);
     }
 
-    // Inject Hero Banner - DISABLED (Silent Mode)
+    // Inject Hero Banner - DISABLED (Simplified/Professional View)
     // this.injectAuditHero();
 
     this.initialized = true;

@@ -107,6 +107,17 @@ class AIService {
         this.abortController = new AbortController();
 
         try {
+            // Priority 1: Check if N8n is enabled
+            if (AI_CONFIG.n8n && AI_CONFIG.n8n.enabled) {
+                try {
+                    return await this.callN8NWebhook(userMessage, onChunk, onComplete);
+                } catch (n8nError) {
+                    console.warn("⚠️ N8n unreachable, falling back to Local Expert:", n8nError);
+                    if (onChunk) onChunk("⚠️ *Mode Hors-ligne activé (Réseau indisponible)*\n\n", "⚠️ *Mode Hors-ligne activé (Réseau indisponible)*\n\n");
+                }
+            }
+
+            // Priority 2: Fallback to Local Intelligence (Deterministic)
             // Instant Local Response (Fast & Private)
             const response = this.getLocalResponse(userMessage);
 
@@ -120,10 +131,47 @@ class AIService {
             return response;
 
         } catch (error) {
-            console.error('Local intelligence error:', error);
+            console.error('AI Service Error:', error);
             if (onError) onError(error);
-            return "Une erreur est survenue lors de l'analyse locale.";
+            return "Une erreur critique est survenue.";
         }
+    }
+
+    /**
+     * Call N8n Webhook
+     */
+    async callN8NWebhook(userMessage, onChunk, onComplete) {
+        const webhookUrl = AI_CONFIG.n8n.webhookUrl;
+
+        // Context Preparation
+        const payload = {
+            chatInput: userMessage,
+            fiscalSnapshot: this._getFiscalSnapshot(), // Flattened context
+            chatHistory: this.conversationHistory.slice(-5).map(m => `${m.role}: ${m.content}`).join('\n'), // Last 5 messages
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: this.abortController.signal
+        });
+
+        if (!response.ok) {
+            throw new Error(`N8n Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        // Assuming N8n returns { output: "text response" } or similar structure
+        // Adapt this based on your actual N8n node output
+        const aiResponse = data.output || data.text || data.message || JSON.stringify(data);
+
+        if (onChunk) onChunk(aiResponse, aiResponse);
+        if (onComplete) onComplete(aiResponse);
+
+        this.addToHistory('assistant', aiResponse);
+        return aiResponse;
     }
 
     /**

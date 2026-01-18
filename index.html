@@ -53,18 +53,62 @@
             <h1>Simulateur Fiscal <span class="highlight">Tunisie 2026</span> <span
                     style="font-size: 0.4em; vertical-align: middle; background: var(--success); color: white; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">Officiel
                     JORT 148</span></h1>
-            <p class="subtitle">Expertise Comptable & Juridique - Outil Pédagogique Certifié</p>
+            <p class="subtitle" data-i18n="app_subtitle">Expertise Comptable & Juridique - Outil Pédagogique Certifié
+            </p>
+
+            <!-- Controls: Language & Theme -->
+            <div class="app-controls" style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <select id="lang-selector" class="control-btn" onchange="changeLanguage(this.value)">
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="tn">🇹🇳 Tounsi</option>
+                    <option value="ar">🇦🇪 العربية</option>
+                </select>
+                <button id="theme-toggle" class="control-btn" onclick="toggleTheme()" aria-label="Toggle Theme"
+                    data-i18n-title="btn_toggle_theme">
+                    <span>🌙</span>
+                </button>
+            </div>
+
+            <style>
+                .control-btn {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid var(--glass-border);
+                    color: var(--text-main);
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-family: inherit;
+                    font-size: 0.9em;
+                    transition: 0.2s;
+                }
+
+                .control-btn:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+                select.control-btn {
+                    appearance: none;
+                    text-align: center;
+                }
+
+                select.control-btn option {
+                    background: var(--bg-dark);
+                    color: var(--text-main);
+                }
+            </style>
         </header>
+
+        <script src="i18n-data.js"></script> <!-- Load Translations -->
 
         <div class="glass-card">
             <nav class="tabs-nav">
-                <button class="tab-btn active" data-tab="irpp">👤 IRPP</button>
-                <button class="tab-btn" data-tab="is">🏢 IS</button>
-                <button class="tab-btn" data-tab="tva">💸 TVA</button>
-                <button class="tab-btn" data-tab="isf">💎 IF</button>
-                <button class="tab-btn" data-tab="rs" style="color: #34d399;">⚡ RS</button>
-                <button class="tab-btn" data-tab="conseiller">🛡️ Expert</button>
-                <button class="tab-btn" data-tab="comparative">⚖️ Comparatif</button>
+                <button class="tab-btn active" data-tab="irpp" data-i18n="tab_irpp">👤 IRPP</button>
+                <button class="tab-btn" data-tab="is" data-i18n="tab_is">🏢 IS</button>
+                <button class="tab-btn" data-tab="tva" data-i18n="tab_tva">💸 TVA</button>
+                <button class="tab-btn" data-tab="isf" data-i18n="tab_isf">💎 IF</button>
+                <button class="tab-btn" data-tab="rs" style="color: #34d399;" data-i18n="tab_rs">⚡ RS</button>
+                <button class="tab-btn" data-tab="conseiller" data-i18n="tab_expert">🛡️ Expert</button>
+                <button class="tab-btn" data-tab="comparative" data-i18n="tab_compare">⚖️ Comparatif</button>
             </nav>
 
 
@@ -73,8 +117,8 @@
                 <div class="module-header"
                     style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
                     <div>
-                        <h2>Impôt sur le Revenu (IRPP)</h2>
-                        <p>Simulateur multi-barèmes (2025-2026)</p>
+                        <h2 data-i18n="irpp_title">Impôt sur le Revenu (IRPP)</h2>
+                        <p data-i18n="irpp_subtitle">Simulateur multi-barèmes (2025-2026)</p>
                     </div>
                     <div
                         style="background: rgba(255,255,255,0.05); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; gap: 5px;">
@@ -107,10 +151,12 @@
                     <summary
                         style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #60a5fa; font-weight: 600; list-style: none;">
                         <span style="font-size: 1.2em;">ℹ️</span>
-                        <span>Contexte Loi de Finances 2026 (LF 2026)</span>
-                        <span style="margin-left: auto; font-size: 0.8em; opacity: 0.7;">(Afficher)</span>
+                        <span data-i18n="context_lf2026">Contexte Loi de Finances 2026 (LF 2026)</span>
+                        <span style="margin-left: auto; font-size: 0.8em; opacity: 0.7;"
+                            data-i18n="context_show">(Afficher)</span>
                     </summary>
-                    <p style="font-size: 0.9em; opacity: 0.9; margin-top: 10px; color: #cbd5e1; line-height: 1.5;">
+                    <p style="font-size: 0.9em; opacity: 0.9; margin-top: 10px; color: #cbd5e1; line-height: 1.5;"
+                        data-i18n="context_desc">
                         Ce simulateur intègre le nouveau barème à 8 tranches de la Loi de Finances 2026.
                         Les déductions pour "Frais Professionnels" (10%, max 2000 DT) sont appliquées automatiquement.
                     </p>
@@ -128,8 +174,8 @@
 
             <div class="tab-content hidden" id="is">
                 <div class="module-header">
-                    <h2>Impôt sur les Sociétés (IS)</h2>
-                    <p>Calcul du résultat fiscal et de l'impôt dû</p>
+                    <h2 data-i18n="is_title">Impôt sur les Sociétés (IS)</h2>
+                    <p data-i18n="is_subtitle">Calcul du résultat fiscal et de l'impôt dû</p>
                 </div>
                 <!-- IS Form will go here -->
                 <div class="module-body" id="is-container">
@@ -139,8 +185,8 @@
 
             <div class="tab-content hidden" id="tva">
                 <div class="module-header">
-                    <h2>Taxe sur la Valeur Ajoutée (TVA)</h2>
-                    <p>Calcul de la TVA à décaisser ou du crédit</p>
+                    <h2 data-i18n="tva_title">Taxe sur la Valeur Ajoutée (TVA)</h2>
+                    <p data-i18n="tva_subtitle">Calcul de la TVA à décaisser ou du crédit</p>
                 </div>
                 <!-- TVA Form will go here -->
                 <div class="module-body" id="tva-container">
@@ -150,8 +196,8 @@
 
             <div class="tab-content hidden" id="isf">
                 <div class="module-header">
-                    <h2>Impôt sur la Fortune (IF)</h2>
-                    <p>Déclaration du patrimoine mobilier et immobilier</p>
+                    <h2 data-i18n="isf_title">Impôt sur la Fortune (IF)</h2>
+                    <p data-i18n="isf_subtitle">Déclaration du patrimoine mobilier et immobilier</p>
                 </div>
                 <div class="module-body" id="isf-container">
                     <!-- Dynamic Content -->
@@ -160,8 +206,8 @@
 
             <div class="tab-content hidden" id="rs">
                 <div class="module-header">
-                    <h2>Retenue à la Source (RS)</h2>
-                    <p>Gestion de la trésorerie et certificats de retenue</p>
+                    <h2 data-i18n="rs_title">Retenue à la Source (RS)</h2>
+                    <p data-i18n="rs_subtitle">Gestion de la trésorerie et certificats de retenue</p>
                 </div>
                 <div class="module-body" id="rs-container">
                     <!-- Dynamic Content -->
@@ -171,8 +217,8 @@
 
             <div class="tab-content hidden" id="conseiller">
                 <div class="module-header">
-                    <h2>Conseiller Fiscal IA</h2>
-                    <p>Optimisez votre fiscalité avec des conseils personnalisés</p>
+                    <h2 data-i18n="expert_title">Conseiller Fiscal IA</h2>
+                    <p data-i18n="expert_desc">Optimisez votre fiscalité avec des conseils personnalisés</p>
                 </div>
                 <!-- Conseiller Form will go here -->
                 <div class="module-body" id="conseiller-container">
@@ -183,8 +229,9 @@
 
             <div class="tab-content hidden" id="comparative">
                 <div class="module-header">
-                    <h2>Comparatif Fiscal : IRPP vs IS</h2>
-                    <p>Déterminez le régime optimal pour votre activité (Propriétaire vs Société)</p>
+                    <h2 data-i18n="compare_title">Comparatif Fiscal : IRPP vs IS</h2>
+                    <p data-i18n="compare_subtitle">Déterminez le régime optimal pour votre activité (Propriétaire vs
+                        Société)</p>
                 </div>
                 <div class="module-body" id="comparative-container">
                     <!-- Dynamic Content -->
@@ -259,7 +306,7 @@
                 <div class="header-status-glow"></div>
                 <div class="header-text">
                     <span class="premium-sparkle">✨</span>
-                    <strong>Assistant Fiscal</strong>
+                    <strong data-i18n="chat_title">Assistant Fiscal</strong>
                 </div>
             </div>
             <div class="header-actions">
@@ -272,8 +319,8 @@
             <div id="chat-messages" class="chat-messages-container">
                 <div class="message system">
                     <span class="icon">🤖</span>
-                    <div class="msg-text">Bonjour ! Je suis votre assistant éducatif. Posez-moi vos questions sur vos
-                        résultats fiscaux.</div>
+                    <div class="msg-text" data-i18n="chat_welcome">Bonjour ! Je suis votre assistant fiscal expert.
+                    </div>
                 </div>
             </div>
         </div>
@@ -282,7 +329,8 @@
             <div class="input-glow-wrapper">
                 <div class="input-container">
                     <button class="input-util-btn">😊</button>
-                    <input type="text" id="chat-input" placeholder="Tapez votre message..." autocomplete="off">
+                    <input type="text" id="chat-input" placeholder="Tapez votre message..." data-i18n="chat_placeholder"
+                        autocomplete="off">
                     <button class="input-util-btn">📎</button>
                     <button id="chat-send" class="send-btn">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -293,11 +341,16 @@
                 </div>
             </div>
             <div class="chat-shortcuts">
-                <button class="chat-suggest-btn" data-msg="Explique-moi comment fonctionne l'IRPP">💰 IRPP</button>
-                <button class="chat-suggest-btn" data-msg="Quels sont les avantages ZDR ?">📍 ZDR</button>
-                <button class="chat-suggest-btn" data-msg="Avantages Startup Act ?">🚀 Startup</button>
-                <button class="chat-suggest-btn" data-msg="Régime Exportation ?">🌍 Export</button>
-                <button class="chat-suggest-btn" data-msg="Explique-moi mon résultat de calcul">📊 Mon bilan</button>
+                <button class="chat-suggest-btn" data-msg-key="chat_suggest_irpp"><span data-i18n="shortcut_irpp">💰
+                        IRPP</span></button>
+                <button class="chat-suggest-btn" data-msg-key="chat_suggest_zdr"><span data-i18n="shortcut_zdr">📍
+                        ZDR</span></button>
+                <button class="chat-suggest-btn" data-msg-key="chat_suggest_startup"><span
+                        data-i18n="shortcut_startup">🚀 Startup</span></button>
+                <button class="chat-suggest-btn" data-msg-key="chat_suggest_export"><span data-i18n="shortcut_export">🌍
+                        Export</span></button>
+                <button class="chat-suggest-btn" data-msg-key="chat_suggest_bilan"><span data-i18n="shortcut_bilan">📊
+                        Mon bilan</span></button>
             </div>
             <div class="quick-actions">
                 <button id="clear-chat-btn" title="Effacer">🗑️</button>

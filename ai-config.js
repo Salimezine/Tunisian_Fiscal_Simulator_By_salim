@@ -125,8 +125,8 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         isf: {
             name: "IF - Impôt sur la Fortune",
             rates: [
-                { min: 2000000, max: 4000000, rate: 0.005 },
-                { min: 4000000, max: Infinity, rate: 0.010 }
+                { min: 3000000, max: 5000000, rate: 0.005 },
+                { min: 5000000, max: Infinity, rate: 0.010 }
             ]
         }
     },

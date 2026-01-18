@@ -1,219 +1,222 @@
 // IS - IMPÔT SUR LES SOCIÉTÉS - LF 2026
+
+// I18N Keys for Sectors and Groups
 const SECTOR_OPTIONS = [
     // --- TAUX 10% (Activités Spécifiques) ---
     {
         id: "agri",
-        label: "Agriculture & Pêche",
+        lang_key: "sect_agri",
         is: 0.10,
         css: 0.03,
         spec: 0,
         min: 0.001,
-        group: "Taux Réduit 10%"
+        group_key: "group_10"
     },
     {
         id: "artisanat",
-        label: "Artisanat",
+        lang_key: "sect_artisanat",
         is: 0.10,
         css: 0.03,
         spec: 0,
         min: 0.001,
-        group: "Taux Réduit 10%"
+        group_key: "group_10"
     },
     {
         id: "zdr",
-        label: "Zone de Développement Régional (ZDR)",
+        lang_key: "sect_zdr",
         is: 0.10,
         css: 0.03,
         spec: 0,
         min: 0.001,
-        group: "Taux Réduit 10%"
+        group_key: "group_10"
     },
     {
         id: "culture",
-        label: "Activités Culturelles",
+        lang_key: "sect_culture",
         is: 0.10,
         css: 0.03,
         spec: 0,
         min: 0.001,
-        group: "Taux Réduit 10%"
+        group_key: "group_10"
     },
     {
         id: "recyclage",
-        label: "Tri, Collecte & Recyclage",
+        lang_key: "sect_recycling",
         is: 0.10,
         css: 0.03,
         spec: 0,
         min: 0.001,
-        group: "Taux Réduit 10%"
+        group_key: "group_10"
     },
 
     // --- TAUX 20% (Droit Commun) ---
     {
         id: "commun",
-        label: "Commerce, Industrie, Services (Droit Commun)",
+        lang_key: "sect_common",
         is: 0.20,
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Taux Standard 20%"
+        group_key: "group_20"
     },
 
     // --- TAUX 35% (Haute Rentabilité) ---
     {
         id: "telecom",
-        label: "Télécommunications",
+        lang_key: "sect_telecom",
         is: 0.35,
         css: 0.03,
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
     {
         id: "petrole",
-        label: "Services Pétroliers",
+        lang_key: "sect_oil",
         is: 0.35,
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
     {
         id: "grandes_surfaces",
-        label: "Grandes Surfaces & Hypermarchés",
+        lang_key: "sect_hyper",
         is: 0.35,
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
     {
         id: "auto",
-        label: "Concessionnaires Automobiles",
+        lang_key: "sect_auto",
         is: 0.35,
         css: 0.03,
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
     {
         id: "franchise",
-        label: "Franchises (Faible Intégration Locale)",
+        lang_key: "sect_franchise",
         is: 0.35,
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
     {
         id: "investissement",
-        label: "Sociétés d'Investissement",
+        lang_key: "sect_invest",
         is: 0.35,
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Taux Majoré 35%"
+        group_key: "group_35"
     },
 
     // --- TAUX 40% (Secteur Financier) ---
     {
         id: "banque",
-        label: "Banques & Établissements Financiers",
+        lang_key: "sect_bank",
         is: 0.35, // Rate often 35% but sector 40% total
         css: 0.04, // Secteur Financier (LF 2026 - Conjoncturel 4%)
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Secteur Financier 43%"
+        group_key: "group_fin"
     },
     {
         id: "leasing",
-        label: "Leasing & Affacturage",
+        lang_key: "sect_leasing",
         is: 0.35,
         css: 0.04, // Secteur Financier
         spec: 0.04,
         min: 0.002,
-        group: "Secteur Financier 43%"
+        group_key: "group_fin"
     },
     {
         id: "assurance",
-        label: "Assurances & Réassurances",
+        lang_key: "sect_insurance",
         is: 0.35,
         css: 0.04, // Secteur Financier
         spec: 0.04, // Taxe Consolidée 4% (LF 2026)
         min: 0.002,
-        group: "Secteur Financier 43%"
+        group_key: "group_fin"
     },
 
     // --- RÉGIME SPÉCIAL : Nouvelles Entreprises ---
     {
         id: "nouvelle_1",
-        label: "🆕 Nouvelle Entreprise - 1ère Année (Exonération 100%)",
+        lang_key: "sect_new_1",
         is: 0.00,
         css: 0,
         spec: 0,
         min: 0,
-        group: "Nouvelles Entreprises (2024-2025)"
+        group_key: "group_new"
     },
     {
         id: "nouvelle_2",
-        label: "🆕 Nouvelle Entreprise - 2ème Année (Exonération 75%)",
+        lang_key: "sect_new_2",
         is: 0.05, // 20% * 25% = 5% effectif
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Nouvelles Entreprises (2024-2025)"
+        group_key: "group_new"
     },
     {
         id: "nouvelle_3",
-        label: "🆕 Nouvelle Entreprise - 3ème Année (Exonération 50%)",
+        lang_key: "sect_new_3",
         is: 0.10, // 20% * 50% = 10% effectif
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Nouvelles Entreprises (2024-2025)"
+        group_key: "group_new"
     },
     {
         id: "nouvelle_4",
-        label: "🆕 Nouvelle Entreprise - 4ème Année (Exonération 25%)",
+        lang_key: "sect_new_4",
         is: 0.15, // 20% * 75% = 15% effectif
         css: 0.03,
         spec: 0,
         min: 0.002,
-        group: "Nouvelles Entreprises (2024-2025)"
+        group_key: "group_new"
     }
 ];
-
-// Minimum de la Taxe Consolidée 4% (Supprimé pour conformité stricte LF 2026 - Calcul sur Bénéfice)
-// const MIN_TAXE_CONSOLIDEE = 10000;
 
 function initIS() {
     const container = document.getElementById('is-container');
 
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     // Group options by category
     let groups = {};
     SECTOR_OPTIONS.forEach(s => {
-        if (!groups[s.group]) groups[s.group] = [];
-        groups[s.group].push(s);
+        if (!groups[s.group_key]) groups[s.group_key] = [];
+        groups[s.group_key].push(s);
     });
 
     // Generate grouped options HTML
     let optionsHtml = '';
-    for (const [groupName, sectors] of Object.entries(groups)) {
-        optionsHtml += `<optgroup label="${groupName}">`;
+    for (const [groupKey, sectors] of Object.entries(groups)) {
+        optionsHtml += `<optgroup label="${t(groupKey)}">`;
         sectors.forEach(s => {
-            optionsHtml += `<option value="${s.id}">${s.label}</option>`;
+            optionsHtml += `<option value="${s.id}">${t(s.lang_key)}</option>`;
         });
         optionsHtml += `</optgroup>`;
     }
 
     container.innerHTML = `
         <!-- Main Form -->
-
-
         <!-- Section 1: Secteur -->
         <div class="form-section" style="border-left: 4px solid var(--primary);">
             <div class="section-title">
                 <span class="icon">🏢</span>
-                <span>Secteur d'Activité</span>
+                <span data-i18n="label_sector">Secteur d'Activité</span>
             </div>
             
             <div class="form-group">
@@ -231,18 +234,18 @@ function initIS() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">📊</span>
-                <span>Résultats Financiers</span>
+                <span data-i18n="label_financial_results">Résultats Financiers</span>
             </div>
             
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Résultat Comptable (DT)</label>
-                    <input type="number" id="resComptable" class="form-control" placeholder="Bénéfice ou Perte (+/-)">
+                    <label data-i18n="label_accounting_result">Résultat Comptable (DT)</label>
+                    <input type="number" id="resComptable" class="form-control" data-i18n="placeholder_benefit_loss" placeholder="Bénéfice ou Perte (+/-)">
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Chiffre d'Affaires TTC (DT)</label>
-                    <input type="number" id="caTtc" class="form-control" placeholder="Pour calcul Minimum d'Impôt">
-                    <div class="help-text">Base du minimum d'impôt</div>
+                    <label data-i18n="label_turnover_ttc">Chiffre d'Affaires TTC (DT)</label>
+                    <input type="number" id="caTtc" class="form-control" data-i18n="placeholder_min_tax_base" placeholder="Pour calcul Minimum d'Impôt">
+                    <div class="help-text" data-i18n="help_min_tax_base">Base du minimum d'impôt</div>
                 </div>
             </div>
         </div>
@@ -251,23 +254,23 @@ function initIS() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">⚖️</span>
-                <span>Ajustements Fiscaux</span>
+                <span data-i18n="label_fiscal_adjustments">Ajustements Fiscaux</span>
             </div>
             
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Réintégrations (+)</label>
-                    <div class="info-bubble" style="font-size: 0.75em; color: var(--warning); margin-bottom: 5px;">
+                    <label data-i18n="label_reintegrations">Réintégrations (+)</label>
+                    <div class="info-bubble" style="font-size: 0.75em; color: var(--warning); margin-bottom: 5px;" data-i18n="help_reintegrations">
                         Charges non déductibles (amendes, dons excessifs, etc.)
                     </div>
                     <input type="number" id="reintegrations" class="form-control" value="0">
                     
-                    <label style="margin-top:10px; display:block">Opération Spécifique (+)</label>
+                    <label style="margin-top:10px; display:block" data-i18n="label_op_specific">Opération Spécifique (+)</label>
                     <input type="number" id="opSpecifiqueIs" class="form-control" placeholder="0.00">
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Déductions (-)</label>
-                    <div class="info-bubble" style="font-size: 0.75em; color: var(--success); margin-bottom: 5px;">
+                    <label data-i18n="label_deductions">Déductions (-)</label>
+                    <div class="info-bubble" style="font-size: 0.75em; color: var(--success); margin-bottom: 5px;" data-i18n="help_deductions">
                         Produits non imposables, reports déficitaires
                     </div>
                     <input type="number" id="deductions" class="form-control" value="0">
@@ -276,12 +279,12 @@ function initIS() {
         </div>
 
         <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
-            <button id="btn-calc-is" class="btn-primary" style="flex: 2;">
+            <button id="btn-calc-is" class="btn-primary" style="flex: 2;" data-i18n="btn_calculate_is">
                 <span class="icon">📊</span> Calculer IS 2026
             </button>
             <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
                 <input type="checkbox" id="showDetailsIS" style="margin-right: 8px;">
-                <label for="showDetailsIS" style="font-size: 0.9em; cursor: pointer; user-select: none;">Voir détail calcul</label>
+                <label for="showDetailsIS" style="font-size: 0.9em; cursor: pointer; user-select: none;" data-i18n="label_details">Voir détail calcul</label>
             </div>
         </div>
         <div id="result-is"></div>
@@ -305,11 +308,17 @@ function updateSectorInfo() {
     const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
     if (!s) return;
 
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     const infoDiv = document.getElementById('taux-info');
 
-    let infoText = `<strong>Taux applicables 2026 :</strong> IS <span class="highlight">${(s.is * 100).toFixed(0)}%</span>`;
+    let infoText = `<strong>${t("label_rates_2026")} :</strong> IS <span class="highlight">${(s.is * 100).toFixed(0)}%</span>`;
 
-    if (s.css > 0) infoText += ` | CSS (conj.) <span class="highlight">${(s.css * 100).toFixed(0)}%</span>`;
+    if (s.css > 0) infoText += ` | CSS <span class="highlight">${(s.css * 100).toFixed(0)}%</span>`;
     if (s.spec > 0) infoText += ` | Taxe Consolidée <span class="highlight">${(s.spec * 100).toFixed(0)}%</span>`;
     if (s.min > 0) infoText += ` | Min. Impôt <span class="highlight">${(s.min * 100).toFixed(1)}%</span> CA`;
 
@@ -334,7 +343,7 @@ function updateSectorInfo() {
             <div class="form-section" style="border-left: 4px solid var(--success); background: rgba(16, 185, 129, 0.05);">
                 <div class="section-title">
                     <span class="icon">📍</span>
-                    <span>Détails Zone de Développement Régional (ZDR)</span>
+                    <span>${t("label_zdr_details")}</span>
                 </div>
                 
                 <div class="flex-row">
@@ -373,6 +382,12 @@ function updateSectorInfo() {
 }
 
 function calculateIS() {
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     // Inputs
     const sectorId = document.getElementById('secteurActivite').value;
     const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
@@ -463,23 +478,23 @@ function calculateIS() {
     if (showDetails) {
         detailedCalculationHtml = `
             <div class="audit-journal-card" style="margin-top: 15px; padding: 15px; background: #1e1e1e; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #d4d4d4; border: 1px solid #333;">
-                <h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;">📟 Journal de Calcul (Audit IS)</h4>
+                <h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;">📟 ${t("label_details")} (Audit IS)</h4>
                 
                 <div style="display: flex; justify-content: space-between;">
-                    <span>(+) Résultat Comptable</span>
+                    <span>(+) ${t("label_accounting_result")}</span>
                     <span>${resComptable.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(+) Réintégrations</span>
+                    <span>(+) ${t("label_reintegrations")}</span>
                     <span>+ ${reintegrations.toFixed(3)}</span>
                 </div>
                  <div style="display: flex; justify-content: space-between; color: #10b981;">
-                    <span>(-) Déductions</span>
+                    <span>(-) ${t("label_deductions")}</span>
                     <span>- ${deductions.toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; color: #fff; border-top: 1px solid #777; padding-top: 5px;">
-                    <span>(=) Résultat Fiscal (Assiette)</span>
+                    <span>(=) ${t("res_fiscal_result")}</span>
                     <span>${resFiscal.toFixed(3)}</span>
                 </div>
 
@@ -489,7 +504,7 @@ function calculateIS() {
                         <span>= ${isCalcule.toFixed(3)}</span>
                     </div>
                      <div style="display: flex; justify-content: space-between;">
-                        <span>(vs) Minimum d'Impôt (${(s.min * 100).toFixed(1)}% CA)</span>
+                        <span>(vs) Minimum (${(s.min * 100).toFixed(1)}% CA)</span>
                         <span>= ${minImpot.toFixed(3)}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-weight:bold; color: #fbbf24;">
@@ -497,12 +512,6 @@ function calculateIS() {
                         <span>${isDu.toFixed(3)}</span>
                     </div>
                 </div>
-                
-                ${cssAmount > 0 ? `
-                <div style="display: flex; justify-content: space-between; color: #ef4444;">
-                    <span>(+) CSS (${(s.css * 100).toFixed(0)}% Assiette)</span>
-                    <span>+ ${cssAmount.toFixed(3)}</span>
-                </div>` : ''}
             </div>
         `;
     }
@@ -517,19 +526,19 @@ function calculateIS() {
                         <strong style="float:right">${resComptable.toLocaleString('fr-TN')} DT</strong>
                     </div>
                     <div>
-                        <span style="opacity:0.7">Réintégrations (+) :</span>
+                        <span style="opacity:0.7">${t("label_reintegrations")} :</span>
                         <strong style="float:right; color: var(--warning)">+ ${reintegrations.toLocaleString('fr-TN')} DT</strong>
                     </div>
                     <div>
-                        <span style="opacity:0.7">Op. Spécifique (+) :</span>
+                        <span style="opacity:0.7">${t("label_op_specific")} :</span>
                         <strong style="float:right; color: var(--warning)">+ ${opSpecifiqueIs.toLocaleString('fr-TN')} DT</strong>
                     </div>
                     <div>
-                        <span style="opacity:0.7">Déductions (-) :</span>
+                        <span style="opacity:0.7">${t("label_deductions")} :</span>
                         <strong style="float:right; color: var(--success)">- ${deductions.toLocaleString('fr-TN')} DT</strong>
                     </div>
                     <div style="grid-column: span 2; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2px;">
-                        <span style="font-weight: 600;">= Résultat Fiscal :</span>
+                        <span style="font-weight: 600;">= ${t("res_fiscal_result")} :</span>
                         <strong style="float:right; color: var(--text-main); font-size: 1.1em;">${resFiscal.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                     </div>
                 </div>
@@ -548,7 +557,7 @@ function calculateIS() {
                         <strong style="float:right">${isCalcule.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                     </div>
                     <div>
-                        <span style="opacity:0.7" data-tooltip="Impôt Minimum Forfaitaire (IMF) calculé sur le Chiffre d'Affaires.">Min. d'Impôt (${(s.min * 100).toFixed(1)}%) :</span>
+                        <span style="opacity:0.7" data-tooltip="Impôt Minimum Forfaitaire (IMF).">Min. Impôt (${(s.min * 100).toFixed(1)}%) :</span>
                         <strong style="float:right">${minImpot.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                     </div>
                     <div style="grid-column: span 2; padding: 5px 0; color: var(--primary); font-weight: 600;">
@@ -560,7 +569,6 @@ function calculateIS() {
                     <div style="grid-column: span 2;">
                         <span style="opacity:0.7">CSS (Conjoncturelle) (${(s.css * 100)}%) :</span>
                         <strong style="float:right">+ ${cssAmount.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
-                        <br><span style="font-size:0.75em; opacity: 0.5; float:right;">(<a href="https://www.impots.finances.gov.tn" target="_blank" style="color: inherit;">Art. 58 LF 2026</a>)</span>
                     </div>` : ''}
                     
                     ${s.spec > 0 ? `
@@ -570,7 +578,7 @@ function calculateIS() {
                     </div>` : ''}
 
                     <div style="border-top: 1px dotted rgba(255,255,255,0.1); padding-top: 5px; grid-column: span 2;">
-                        <span style="opacity:0.7" data-tooltip="Taxe aux Collectivités Locales (0,2% du CA Local).">TCL (0.2% CA) :</span>
+                        <span style="opacity:0.7">TCL (0.2% CA) :</span>
                         <strong style="float:right">+ ${tclAmount.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                     </div>
                 </div>
@@ -611,18 +619,9 @@ function calculateIS() {
             </div>
             ${detailsHtml}
             
-            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 0.85em; opacity: 0.8;">
-                <p><strong>📌 Notes Fiscales 2026 :</strong></p>
-                <ul style="font-size: 0.85em; padding-left: 15px; margin-top: 5px;">
-                    ${sectorId === 'zdr' ? `
-                        <li style="color:var(--success)">Exonération totale d'IS pendant les premières années en ZDR (<a href="#" style="color:inherit">Art. 23 Code Incit. Invest.</a>).</li>
-                        <li>Après exonération, le taux est fixé à 10%.</li>
-                    ` : ''}
-                    <li>CSS maintenue à titre conjoncturel (3% et 4% selon secteur) - <span style="opacity:0.7">Loi de Finances</span>.</li>
-                    <li>Minimum d'impôt applicable même en cas d'exonération d'IS.</li>
-                </ul>
-            </div>
-            <button onclick="window.print()" class="btn-primary" style="margin-top:20px; background: var(--accent);">🖨️ Imprimer Simulation</button>
+            <button onclick="window.print()" class="btn-primary" style="margin-top:20px; background: var(--accent);">
+                <span class="icon">🖨️</span> <span data-i18n="btn_print">Imprimer Simulation</span>
+            </button>
         </div>
     `;
 

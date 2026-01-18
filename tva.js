@@ -1,55 +1,62 @@
 // TVA - TAXE SUR LA VALEUR AJOUTÉE - LF 2026
+
 const TAUX_TVA = [
     {
         value: 0.19,
-        label: "19% - Taux Standard",
-        description: "Majorité des biens et services"
+        lang_key: "tva_rate_19",
+        description_key: "desc_rate_19"
     },
     {
         value: 0.13,
-        label: "13% - Taux Intermédiaire",
-        description: "Électricité basse tension, produits pétroliers, certains équipements"
+        lang_key: "tva_rate_13",
+        description_key: "desc_rate_13"
     },
     {
         value: 0.07,
-        label: "7% - Taux Réduit",
-        description: "Restauration, hébergement, services professionnels, véhicules (conditions)"
+        lang_key: "tva_rate_7",
+        description_key: "desc_rate_7"
     },
     {
         value: 0.075,
-        label: "7.5% - Nouveau Taux 2026",
-        description: "Nouvelles catégories spécifiques LF 2026"
+        lang_key: "tva_rate_7_5", // New rate logic if applicable
+        description_key: "desc_rate_7_5"
     },
     {
         value: 0,
-        label: "0% - Exonéré / Export / Suspension",
-        description: "Exportations, médicaments (suspension jusqu'au 31/12/2026)"
+        lang_key: "tva_rate_0",
+        description_key: "desc_rate_0"
     }
 ];
 
 // Catégories de produits/services avec taux suggéré
 const CATEGORIES_TVA = [
-    { id: "standard", label: "Biens et Services (Droit Commun)", taux: 0.19 },
-    { id: "electricite", label: "Électricité Basse Tension", taux: 0.13 },
-    { id: "petrole", label: "Produits Pétroliers", taux: 0.13 },
-    { id: "equipements", label: "Équipements Spécifiques", taux: 0.13 },
-    { id: "restauration", label: "Restauration", taux: 0.07 },
-    { id: "hebergement", label: "Hébergement / Hôtellerie", taux: 0.07 },
-    { id: "services_pro", label: "Services Professionnels Libéraux", taux: 0.07 },
-    { id: "vehicules", label: "Véhicules Importés (Résidents)", taux: 0.07 },
-    { id: "recharge_elec", label: "Recharge Véhicules Électriques (Nouveau 2026)", taux: 0.07 },
-    { id: "immo_social", label: "Logement social/économique (< 400 DT)", taux: 0.07 },
-    { id: "immo_standing", label: "Logement standing (> 400 DT)", taux: 0.19 },
-    { id: "medicaments", label: "Médicaments (Suspension 2026)", taux: 0 },
-    { id: "export", label: "Exportations", taux: 0 },
-    { id: "exonere", label: "Produits Exonérés", taux: 0 }
+    { id: "standard", lang_key: "cat_standard", taux: 0.19 },
+    { id: "electricite", lang_key: "cat_elec", taux: 0.13 },
+    { id: "petrole", lang_key: "cat_petrole", taux: 0.13 },
+    { id: "equipements", lang_key: "cat_equip", taux: 0.13 },
+    { id: "restauration", lang_key: "cat_resto", taux: 0.07 },
+    { id: "hebergement", lang_key: "cat_hotel", taux: 0.07 },
+    { id: "services_pro", lang_key: "cat_transport", taux: 0.07 },
+    { id: "vehicules", lang_key: "cat_cars", taux: 0.07 },
+    { id: "recharge_elec", lang_key: "cat_elec_charge", taux: 0.07 },
+    { id: "immo_social", lang_key: "cat_immo_soc", taux: 0.07 },
+    { id: "immo_standing", lang_key: "cat_immo_lux", taux: 0.19 },
+    { id: "medicaments", lang_key: "cat_meds", taux: 0 },
+    { id: "export", lang_key: "cat_export", taux: 0 },
+    { id: "exonere", lang_key: "cat_exempt", taux: 0 }
 ];
 
 function initTVA() {
     const container = document.getElementById('tva-container');
 
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     // Generate Options for rate selector
-    let tauxOptionsHtml = TAUX_TVA.map(t => `<option value="${t.value}">${t.label}</option>`).join('');
+    let tauxOptionsHtml = TAUX_TVA.map(tn => `<option value="${tn.value}">${t(tn.lang_key)}</option>`).join('');
 
     // Group categories by tax rate
     const groupedCategories = {};
@@ -61,30 +68,30 @@ function initTVA() {
 
     let categoriesHtml = '';
     for (const [rate, categories] of Object.entries(groupedCategories)) {
-        categoriesHtml += `<optgroup label="Taux ${rate}">`;
+        // Translate "Taux X%"? Maybe just assume rate is number.
+        // Or "Rate X%"
+        categoriesHtml += `<optgroup label="${t("label_rate")} ${rate}">`;
         categories.forEach(c => {
-            categoriesHtml += `<option value="${c.id}" data-taux="${c.taux}">${c.label}</option>`;
+            categoriesHtml += `<option value="${c.id}" data-taux="${c.taux}">${t(c.lang_key)}</option>`;
         });
         categoriesHtml += `</optgroup>`;
     }
 
     container.innerHTML = `
         <!-- Main Form -->
-
-
         <!-- Section 1: Type d'opération -->
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">🏷️</span>
-                <span>Type d'Opération</span>
+                <span data-i18n="label_operation_type">Type d'Opération</span>
             </div>
             
             <div class="form-group">
-                <label>Catégorie de Produit/Service</label>
+                <label data-i18n="label_category">Catégorie de Produit/Service</label>
                 <select id="categorieTva" class="form-control">
                     ${categoriesHtml}
                 </select>
-                <div class="help-text" id="categorie-info">Le taux sera automatiquement suggéré</div>
+                <div class="help-text" id="categorie-info" data-i18n="help_auto_rate">Le taux sera automatiquement suggéré</div>
             </div>
         </div>
 
@@ -92,24 +99,24 @@ function initTVA() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">💳</span>
-                <span>TVA Collectée (Ventes)</span>
+                <span data-i18n="label_tva_collected">TVA Collectée (Ventes)</span>
             </div>
             
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Chiffre d'Affaires HT (Base Imposable)</label>
-                    <input type="number" id="baseHt" class="form-control" placeholder="Montant HT">
+                    <label data-i18n="label_turnover_ht">Chiffre d'Affaires HT (Base Imposable)</label>
+                    <input type="number" id="baseHt" class="form-control" data-i18n="placeholder_amount_ht" placeholder="Montant HT">
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Opération Spécifique (+) </label>
+                    <label data-i18n="label_op_specific">Opération Spécifique (+) </label>
                     <input type="number" id="opSpecifiqueTva" class="form-control" placeholder="0.000">
-                    <div class="help-text">Opérations additive à la base imposable</div>
+                    <div class="help-text" data-i18n="help_op_specific">Opérations additive à la base imposable</div>
                 </div>
             </div>
 
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Taux de TVA</label>
+                    <label data-i18n="label_tva_rate">Taux de TVA</label>
                     <select id="tauxTva" class="form-control">
                         ${tauxOptionsHtml}
                     </select>
@@ -117,15 +124,15 @@ function initTVA() {
                 <div class="form-group flex-col-50" style="display:flex; align-items:center; padding-top:25px;">
                     <label style="cursor:pointer; display:flex; align-items:center; gap:10px;">
                         <input type="checkbox" id="checkSuspension" style="width:20px; height:20px;">
-                        <span>Vente en Suspension</span>
+                        <span data-i18n="label_suspension">Vente en Suspension</span>
                     </label>
                 </div>
             </div>
 
             <div id="suspension-details" class="form-group hidden" style="margin-top: -10px; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">
-                 <label style="font-size:0.9em;">N° Attestation / Bon de Commande</label>
+                 <label style="font-size:0.9em;" data-i18n="label_cert_num">N° Attestation / Bon de Commande</label>
                  <input type="text" id="numAttestation" class="form-control" placeholder="Ex: 2026/00123">
-                 <div class="help-text" style="color: var(--success);">✅ Attestation requise pour justifier la suspension</div>
+                 <div class="help-text" style="color: var(--success);" data-i18n="help_cert_required">✅ Attestation requise pour justifier la suspension</div>
             </div>
 
             <!-- Warning Immobilière -->
@@ -146,34 +153,34 @@ function initTVA() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">🧾</span>
-                <span>TVA Déductible (Achats)</span>
+                <span data-i18n="label_tva_deductible">TVA Déductible (Achats)</span>
             </div>
             
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label>Sur Immobilisations</label>
+                    <label data-i18n="label_on_assets">Sur Immobilisations</label>
                     <input type="number" id="tvaImmobilisation" class="form-control" placeholder="0.00">
-                    <div class="help-text">Équipements, véhicules, locaux...</div>
+                    <div class="help-text" data-i18n="help_assets">Équipements, véhicules, locaux...</div>
                 </div>
                 <div class="form-group flex-col-50">
-                    <label>Sur Achats / Exploitation</label>
+                    <label data-i18n="label_on_purchases">Sur Achats / Exploitation</label>
                     <input type="number" id="tvaExploitation" class="form-control" placeholder="0.00">
-                    <div class="help-text">Marchandises, fournitures, services...</div>
+                    <div class="help-text" data-i18n="help_purchases">Marchandises, fournitures, services...</div>
                 </div>
             </div>
              
              <div class="form-group">
-                <label>Crédit de TVA Antérieur (Report)</label>
+                <label data-i18n="label_prev_credit">Crédit de TVA Antérieur (Report)</label>
                 <input type="number" id="reportTva" class="form-control" placeholder="0.00">
             </div>
 
             <div class="form-group" style="margin-top:20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:15px;">
-                <div class="info-bubble" style="background: rgba(16, 185, 129, 0.05); border-color: var(--success); font-size: 0.8em;">
+                <div class="info-bubble" style="background: rgba(16, 185, 129, 0.05); border-color: var(--success); font-size: 0.8em;" data-i18n="info_prorata">
                     ℹ️ <strong>Note sur le Prorata :</strong> La déduction est calculée sur la base du CA HT. Une régularisation annuelle (et sur immobilisations) est obligatoire conformément aux articles 9 et 9 bis du Code de la TVA.
                 </div>
                 <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
                     <input type="checkbox" id="checkProrata" style="width:18px; height:18px;">
-                    <span>Appliquer la règle du Prorata (Assujetti Mixte)</span>
+                    <span data-i18n="label_apply_prorata">Appliquer la règle du Prorata (Assujetti Mixte)</span>
                 </label>
                 <div id="prorata-input-container" class="hidden" style="margin-top:10px;">
                     <div style="display:flex; gap:10px;">
@@ -194,7 +201,7 @@ function initTVA() {
             </div>
         </div>
 
-        <button id="btn-calc-tva" class="btn-primary" style="background: var(--primary);">
+        <button id="btn-calc-tva" class="btn-primary" style="background: var(--primary);" data-i18n="btn_calc_tva">
             <span class="icon">🧮</span> Calculer Déclaration TVA
         </button>
         <div id="result-tva"></div>
@@ -223,7 +230,7 @@ function initTVA() {
 
         if (category) {
             document.getElementById('categorie-info').innerHTML =
-                `<span style="color: var(--primary);">Taux suggéré : ${(suggestedRate * 100).toFixed(0)}%</span>`;
+                `<span style="color: var(--primary);">${t("label_rate_suggested")} : ${(suggestedRate * 100).toFixed(0)}%</span>`;
         }
 
         updatePreview();
@@ -268,6 +275,12 @@ function initTVA() {
 }
 
 function calculateTVA() {
+    // I18N Helper
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
     // 1. Collectée
     const base = parseFloat(document.getElementById('baseHt').value) || 0;
     const opSpec = parseFloat(document.getElementById('opSpecifiqueTva').value) || 0;
@@ -278,7 +291,9 @@ function calculateTVA() {
 
     // Get selected category
     const categorieSelect = document.getElementById('categorieTva');
-    const categorieName = categorieSelect.options[categorieSelect.selectedIndex].text;
+    const categorieId = categorieSelect.value;
+    const selectedCategory = CATEGORIES_TVA.find(c => c.id === categorieId);
+    const categorieName = selectedCategory ? t(selectedCategory.lang_key) : "";
 
     let tvaCollectee = 0;
     if (!isSuspended) {
@@ -317,19 +332,16 @@ function calculateTVA() {
     let isCredit = false;
 
     if (solde > 0) {
-        message = "TVA À PAYER (Net à verser au Trésor)";
+        message = t("res_tva_payable"); // "TVA À PAYER"
         amount = solde;
     } else if (solde < 0) {
-        message = "CRÉDIT DE TVA (À reporter sur déclaration suivante)";
+        message = t("res_tva_credit"); // "CRÉDIT DE TVA"
         amount = Math.abs(solde);
         isCredit = true;
     } else {
         message = "SOLDE NUL";
         amount = 0;
     }
-
-    // Get rate label
-    const tauxLabel = TAUX_TVA.find(t => t.value === taux)?.label || `${(taux * 100).toFixed(0)}%`;
 
     const resultDiv = document.getElementById('result-tva');
     resultDiv.innerHTML = `
@@ -344,15 +356,15 @@ function calculateTVA() {
             <div style="margin-bottom: 20px;">
                 <!-- Détail Opération -->
                 <div style="background: rgba(255,255,255,0.05); padding:12px; border-radius:6px; margin-bottom:12px;">
-                    <p style="margin:0 0 8px 0; color: var(--text-muted); font-size:0.85em;">🏷️ Catégorie : <strong style="color:var(--text-main)">${categorieName}</strong></p>
+                    <p style="margin:0 0 8px 0; color: var(--text-muted); font-size:0.85em;">🏷️ ${t("label_category")} : <strong style="color:var(--text-main)">${categorieName}</strong></p>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em;">
                         <div>
-                            <span style="opacity:0.7">Base HT :</span>
+                            <span style="opacity:0.7">${t("label_base_ht")} :</span>
                             <strong style="float:right">${base.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">Op. Spécifique :</span>
+                            <span style="opacity:0.7">${t("label_op_specific")} :</span>
                             <strong style="float:right; color: var(--warning)">+ ${opSpec.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
@@ -360,7 +372,7 @@ function calculateTVA() {
                             <strong style="float:right">${totalBase.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">Taux :</span>
+                            <span style="opacity:0.7">${t("label_tva_rate")} :</span>
                             <strong style="float:right; color: var(--primary)">${isSuspended ? '0% (Suspension)' : (taux * 100).toFixed(0) + '%'}</strong>
                         </div>
                         <div>
@@ -376,10 +388,10 @@ function calculateTVA() {
 
                 <!-- Collectée vs Déductible -->
                 <div style="padding:10px;">
-                    <p style="margin:5px 0;"><strong>+ TVA Collectée :</strong> <span style="float:right; color:var(--warning); font-weight:bold;">${tvaCollectee.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span></p>
+                    <p style="margin:5px 0;"><strong>+ ${t("label_tva_collected")} :</strong> <span style="float:right; color:var(--warning); font-weight:bold;">${tvaCollectee.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span></p>
                     
                     <div style="margin: 10px 0; padding-left: 15px; border-left: 2px solid rgba(255,255,255,0.1);">
-                        <p style="margin:5px 0; font-size: 0.9em;"><strong>– TVA Déductible Net :</strong> <span style="float:right; color:var(--success); font-weight:bold;">${totalDeductible.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span></p>
+                        <p style="margin:5px 0; font-size: 0.9em;"><strong>– ${t("label_tva_deductible")} :</strong> <span style="float:right; color:var(--success); font-weight:bold;">${totalDeductible.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span></p>
                         <ul style="font-size:0.85em; opacity:0.8; padding-left:15px; margin: 5px 0;">
                             <li>Brut (Immo + Exp) : ${tvaRecuperableBrute.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
                             ${prorata < 1 ? `
@@ -418,7 +430,7 @@ function calculateTVA() {
             </div>
 
             <button onclick="window.print()" class="btn-primary" style="margin-top:15px; background: var(--accent);">
-               📄 Imprimer la Déclaration
+               📄 ${t("btn_print")}
             </button>
         </div>
     `;
