@@ -173,7 +173,7 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
     // n8n Chatbot Configuration
     n8n: {
         webhookUrl: "https://simulateur-fiscal.app.n8n.cloud/webhook/simulateur-fiscal", // Production URL
-        enabled: true
+        enabled: false
     },
 
     // UI Transformation Config

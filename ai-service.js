@@ -101,65 +101,19 @@ class AIService {
     /**
      * Send message to Google Gemini API with streaming
      */
-    /**
-     * Send message to AI Provider (N8N or Local)
-     */
     async sendMessage(userMessage, onChunk = null, onComplete = null, onError = null) {
         // Add user message to history
         this.addToHistory('user', userMessage);
         this.abortController = new AbortController();
 
-        // 1. Check if N8N is enabled
-        if (AI_CONFIG.n8n.enabled) {
-            try {
-                // Prepare Payload
-                const historyStr = this.conversationHistory
-                    .slice(-6) // Last 6 messages for context
-                    .map(m => `${m.role}: ${m.content}`)
-                    .join('\n');
-
-                const snapshot = this._getFiscalSnapshot();
-
-                const payload = {
-                    chatInput: userMessage,
-                    chatHistory: historyStr,
-                    fiscalSnapshot: snapshot
-                };
-
-                // Fetch from N8N
-                const response = await fetch(AI_CONFIG.n8n.webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: this.abortController.signal
-                });
-
-                if (!response.ok) throw new Error(`N8N Error: ${response.status}`);
-
-                const data = await response.json();
-
-                // Assuming N8N returns { output: "text" } or just the JSON
-                const aiText = data.output || data.text || data.message || JSON.stringify(data);
-
-                if (onComplete) onComplete(aiText);
-                this.addToHistory('assistant', aiText);
-                return aiText;
-
-            } catch (error) {
-                console.warn("N8N Unreachable, falling back to Local Expert:", error);
-                // Fallback will proceed below
-            }
-        }
-
-        // 2. Local Fallback (Original Logic)
         try {
-            // Instant Local Response
+            // Instant Local Response (Fast & Private)
             const response = this.getLocalResponse(userMessage);
 
-            // Simulate reflection time
-            await new Promise(resolve => setTimeout(resolve, 600));
+            // Simulate brief "typing" for UX
+            await new Promise(resolve => setTimeout(resolve, 800));
 
-            if (onChunk) onChunk(response, response); // Simulate chunk
+            if (onChunk) onChunk(response, response);
             if (onComplete) onComplete(response);
 
             this.addToHistory('assistant', response);
@@ -168,7 +122,7 @@ class AIService {
         } catch (error) {
             console.error('Local intelligence error:', error);
             if (onError) onError(error);
-            return "Une erreur est survenue (Mode Local).";
+            return "Une erreur est survenue lors de l'analyse locale.";
         }
     }
 
