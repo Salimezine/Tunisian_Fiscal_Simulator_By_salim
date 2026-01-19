@@ -142,22 +142,33 @@ function updateThemeIcon(theme) {
     }
 }
 
+// Helper for JS-side translation
+window.t = function (key) {
+    const lang = localStorage.getItem('language') || 'fr';
+    const data = window.I18N_DATA || {};
+    return (data[lang] && data[lang][key]) || key;
+};
+
 // 2. Language Manager
 window.changeLanguage = function (langCode) {
-    if (!I18N_DATA[langCode]) return;
+    if (!window.I18N_DATA || !window.I18N_DATA[langCode]) return;
 
     // Persist
     localStorage.setItem('language', langCode);
 
-    // Update DOM Text
+    // Update DOM Text for elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (I18N_DATA[langCode][key]) {
-            // Handle placeholders for inputs, otherwise innerText
+        const translation = window.I18N_DATA[langCode][key];
+
+        if (translation) {
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                el.placeholder = I18N_DATA[langCode][key];
+                el.placeholder = translation;
+            } else if (el.tagName === 'SELECT') {
+                // For selects, we might want to translate the label if it's a placeholder-like first option
+                // But usually we translate the options themselves
             } else {
-                el.innerText = I18N_DATA[langCode][key];
+                el.innerText = translation;
             }
         }
     });
@@ -165,20 +176,19 @@ window.changeLanguage = function (langCode) {
     // Update title attributes (tooltips)
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
-        if (I18N_DATA[langCode][key]) {
-            el.setAttribute('title', I18N_DATA[langCode][key]);
+        if (window.I18N_DATA[langCode][key]) {
+            el.setAttribute('title', window.I18N_DATA[langCode][key]);
         }
     });
 
     // Handle RTL for Arabic
     if (langCode === 'ar') {
         document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('rtl-mode');
     } else {
         document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('rtl-mode');
     }
-
-    // Refresh Dynamic Modules if needed (re-render Advisor title etc)
-    // For now, static text is updated. Dynamic content often regenerates on click.
 };
 
 function initPreferences() {

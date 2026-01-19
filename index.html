@@ -27,8 +27,9 @@
             <div class="legal-content">
                 <span class="icon">⚠️</span>
                 <div>
-                    <strong>Avertissement Légal</strong>
-                    <p>Ce simulateur est un outil pédagogique et informatif développé dans un cadre universitaire. Il ne
+                    <strong data-i18n="label_legal_warning">Avertissement Légal</strong>
+                    <p data-i18n="msg_legal_warning">Ce simulateur est un outil pédagogique et informatif développé dans
+                        un cadre universitaire. Il ne
                         remplace ni les textes législatifs officiels ni les consultations auprès de l'administration
                         fiscale tunisienne ou d'un expert-comptable.</p>
                 </div>
@@ -42,16 +43,21 @@
                 style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center;">
                 <img src="isaas_logo.jpg" alt="Logo ISAAS"
                     style="height: 100px; margin-bottom: 15px; background: white; padding: 5px; border-radius: 8px;">
-                <h3 style="font-size: 1.1em; color: var(--text-main); margin-bottom: 5px;">Institut Supérieur
+                <h3 style="font-size: 1.1em; color: var(--text-main); margin-bottom: 5px;"
+                    data-i18n="label_academic_inst">Institut Supérieur
                     d'Administration des Affaires de Sfax</h3>
-                <p style="font-size: 0.95em; color: var(--text-muted);">Licence coconstruite en comptabilité :
-                    <strong>Assistant Comptable Auditeur Interne</strong>
+                <p style="font-size: 0.95em; color: var(--text-muted);">
+                    <span data-i18n="label_academic_degree">Licence coconstruite en comptabilité :</span>
+                    <strong data-i18n="label_academic_role">Assistant Comptable Auditeur Interne</strong>
                 </p>
-                <p style="font-size: 0.95em; color: var(--primary); margin-top: 5px;">Réalisé par : <strong>Mouhamed
-                        Salim Ezzine</strong></p>
+                <p style="font-size: 0.95em; color: var(--primary); margin-top: 5px;">
+                    <span data-i18n="label_author">Réalisé par :</span> <strong>Mouhamed Salim Ezzine</strong>
+                </p>
             </div>
-            <h1>Simulateur Fiscal <span class="highlight">Tunisie 2026</span> <span
-                    style="font-size: 0.4em; vertical-align: middle; background: var(--success); color: white; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">Officiel
+            <h1 data-i18n="app_title">Simulateur Fiscal <span class="highlight" data-i18n="app_highlight">Tunisie
+                    2026</span> <span
+                    style="font-size: 0.4em; vertical-align: middle; background: var(--success); color: white; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;"
+                    data-i18n="label_official_jort">Officiel
                     JORT 148</span></h1>
             <p class="subtitle" data-i18n="app_subtitle">Expertise Comptable & Juridique - Outil Pédagogique Certifié
             </p>
@@ -244,26 +250,33 @@
         <footer class="main-footer">
             <div class="official-references"
                 style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-                <h4
-                    style="font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-muted);">
+                <h4 style="font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-muted);"
+                    data-i18n="label_footer_refs">
                     📚 Références Juridiques & Documentation</h4>
                 <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; font-size: 0.85em;">
                     <a href="https://www.iort.gov.tn" target="_blank"
-                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;">🏛️
+                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;"
+                        data-i18n="label_jort">🏛️
                         JORT</a>
                     <a href="https://finances.gov.tn" target="_blank"
-                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;">🇹🇳
+                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;"
+                        data-i18n="label_min_fin">🇹🇳
                         Min. Finances</a>
                     <a href="methodologie.html" target="_blank"
-                        style="color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px;">📐
+                        style="color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px;"
+                        data-i18n="label_methodology">📐
                         Méthodologie</a>
                 </div>
             </div>
-            <p>⚠️ <strong>Avertissement :</strong> Ces résultats sont indicatifs et ne remplacent pas l'avis d'un
+            <p data-i18n="msg_footer_warning">⚠️ <strong>Avertissement :</strong> Ces résultats sont indicatifs et ne
+                remplacent pas l'avis d'un
                 expert-comptable.</p>
-            <p style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">Version 2026.1.0 (Beta Académique) | <a href="#"
-                    onclick="alert('Roadmap 2027: Export PDF, API Rest, Intégration IA avancée')"
-                    style="color: inherit; text-decoration: underline;">Vision Future</a></p>
+            <p style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">
+                <span data-i18n="label_version">Version</span> 2026.1.0 (Beta Académique) |
+                <a href="#" onclick="alert('Roadmap 2027: Export PDF, API Rest, Intégration IA avancée')"
+                    style="color: inherit; text-decoration: underline;" data-i18n="label_vision_future">Vision
+                    Future</a>
+            </p>
         </footer>
     </main>
 

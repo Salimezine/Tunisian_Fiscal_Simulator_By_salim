@@ -137,14 +137,14 @@ function initTVA() {
 
             <!-- Warning Immobilière -->
             <div id="immo-warning" class="hidden" style="margin-top: 10px; padding: 12px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 3px solid var(--warning); font-size: 0.85em; color: var(--warning);">
-                ⚠️ <strong>Réserve Juridique :</strong> Le taux réduit de 7 % s’applique exclusivement aux logements neufs destinés à l’habitation (surface < 100m² ou convention sociale), vendus par des promoteurs immobiliers, dont le prix n’excède pas 400 000 DT.
+                ${t("msg_immo_legal_warning")}
             </div>
             
             <div style="text-align:right; font-size: 0.9em; margin-top:5px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px;">
-                <span>Montant TTC : </span>
+                <span>${t("label_ttc_amount")} : </span>
                 <strong id="preview-ttc" style="color:var(--text-main);">0.000 DT</strong>
                 <br>
-                <span>TVA Facturée : </span>
+                <span>${t("label_tva_invoiced")} : </span>
                 <strong id="preview-tva" style="color:var(--primary);">0.000 DT</strong>
             </div>
         </div>
@@ -247,7 +247,7 @@ function initTVA() {
 
         if (isSuspended) {
             details.classList.remove('hidden');
-            document.getElementById('preview-tva').textContent = "0.000 DT (Suspendue)";
+            document.getElementById('preview-tva').textContent = "0.000 DT (" + t("label_suspension") + ")";
             document.getElementById('preview-tva').style.color = "var(--success)";
             document.getElementById('preview-ttc').textContent = totalBase.toLocaleString('fr-TN', { minimumFractionDigits: 3 }) + " DT";
         } else {
@@ -320,7 +320,7 @@ function calculateTVA() {
 
     // Calcul de la fraction de régularisation si variation > 5% (simulé ici dans le détail)
     const typeBien = document.getElementById('typeBienRegul')?.value || 'equip';
-    const fraction = (typeBien === 'immo') ? '1/10ème' : '1/5ème';
+    const fraction = (typeBien === 'immo') ? t("label_fraction_10th") : t("label_fraction_5th");
 
     const totalDeductible = tvaRecuperableNette + report;
 
@@ -339,7 +339,7 @@ function calculateTVA() {
         amount = Math.abs(solde);
         isCredit = true;
     } else {
-        message = "SOLDE NUL";
+        message = t("label_tva_balance_null");
         amount = 0;
     }
 
@@ -368,19 +368,19 @@ function calculateTVA() {
                             <strong style="float:right; color: var(--warning)">+ ${opSpec.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">Total Base :</span>
+                            <span style="opacity:0.7">${t("label_total_base")} :</span>
                             <strong style="float:right">${totalBase.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
                             <span style="opacity:0.7">${t("label_tva_rate")} :</span>
-                            <strong style="float:right; color: var(--primary)">${isSuspended ? '0% (Suspension)' : (taux * 100).toFixed(0) + '%'}</strong>
+                            <strong style="float:right; color: var(--primary)">${isSuspended ? '0% (' + t("label_suspension") + ')' : (taux * 100).toFixed(0) + '%'}</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">TVA Facturée :</span>
+                            <span style="opacity:0.7">${t("label_tva_invoiced")} :</span>
                             <strong style="float:right; color: var(--primary)">${tvaCollectee.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">Montant TTC :</span>
+                            <span style="opacity:0.7">${t("label_ttc_amount")} :</span>
                             <strong style="float:right">${montantTTC.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                     </div>
@@ -393,16 +393,16 @@ function calculateTVA() {
                     <div style="margin: 10px 0; padding-left: 15px; border-left: 2px solid rgba(255,255,255,0.1);">
                         <p style="margin:5px 0; font-size: 0.9em;"><strong>– ${t("label_tva_deductible")} :</strong> <span style="float:right; color:var(--success); font-weight:bold;">${totalDeductible.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span></p>
                         <ul style="font-size:0.85em; opacity:0.8; padding-left:15px; margin: 5px 0;">
-                            <li>Brut (Immo + Exp) : ${tvaRecuperableBrute.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
+                            <li>${t("label_gross_taxable")} (Immo + Exp) : ${tvaRecuperableBrute.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
                             ${prorata < 1 ? `
                             <li style="color:var(--warning)">Réduction Prorata : - ${(tvaRecuperableBrute * (1 - prorata)).toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
-                            <li style="font-size:0.85em; opacity:0.7;">Note : Régularisation sur base de ${fraction} annuelle.</li>` : ''}
-                            <li>Report antérieur : ${report.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
+                            <li style="font-size:0.85em; opacity:0.7;">${t("msg_regul_note").replace("{{fraction}}", fraction)}</li>` : ''}
+                            <li>${t("label_prev_credit")} : ${report.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</li>
                         </ul>
                     </div>
                     
                     <p style="margin:10px 0 0 0; padding-top:10px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 1.05em;">
-                        <strong>= Solde :</strong> 
+                        <strong>= ${t("label_solde")} :</strong> 
                         <span style="float:right; font-weight:bold; color: ${isCredit ? 'var(--success)' : 'var(--warning)'}">
                             ${isCredit ? '(' : ''}${amount.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT${isCredit ? ')' : ''}
                         </span>
@@ -412,20 +412,20 @@ function calculateTVA() {
                 ${isSuspended ? `
                 <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 3px solid var(--success);">
                     <p style="font-size:0.9em; color: var(--success); margin: 0;">
-                        ✅ Opération en suspension de TVA (Art. 11/13 du Code TVA)
-                        ${numAttestation ? `<br><span style="opacity:0.8">N° Attestation : <strong>${numAttestation}</strong></span>` : ''}
+                        ${t("msg_tva_suspension_legal")}
+                        ${numAttestation ? `<br><span style="opacity:0.8">${t("label_cert_short")} <strong>${numAttestation}</strong></span>` : ''}
                     </p>
                 </div>
                 ` : ''}
             </div>
 
-            <div style="margin-top: 15px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; font-size: 0.85em;">
-                <p style="margin: 0 0 5px 0;"><strong>📌 Rappels LF 2026 :</strong></p>
+            <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; font-size: 0.85em;">
+                <p style="margin: 0 0 5px 0;"><strong>📌 ${t("label_rappels_lf2026")} :</strong></p>
                 <ul style="margin: 0; padding-left: 15px; opacity: 0.85;">
                     <li>Taux : 19% (normal), 13% (intermédiaire), 7% (réduit), 0% (export/exonéré)</li>
-                    <li><strong>Facturation électronique (Art. 53) :</strong> Utilisation obligatoire de <strong>TTN / El Fatoora</strong>.</li>
-                    <li><strong>Sanctions :</strong> Papier au lieu d'électronique (100-500 DT/facture), non-conformité (250-10 000 DT).</li>
-                    <li>Suspension TVA médicaments (équivalent local) jusqu'au 31/12/2026</li>
+                    <li><strong>${t("label_e_invoicing_title")} :</strong> ${t("msg_e_invoicing_desc")}</li>
+                    <li><strong>${t("label_sanctions")} :</strong> ${t("msg_sanctions_desc")}</li>
+                    <li>${t("label_suspension_meds")}</li>
                 </ul>
             </div>
 

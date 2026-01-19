@@ -113,10 +113,10 @@ function initIRPP() {
             </div>
 
             <div class="form-group">
-                <label id="labelMontant" data-i18n="label_salary">Salaire Brut Mensuel (DT)</label>
+                <label id="labelMontant" data-i18n="label_salary_monthly">Salaire Brut Mensuel (DT)</label>
                 <div class="flex-row">
                     <input type="number" id="revenuInput" class="form-control" placeholder="Ex: 2000" style="flex:2">
-                    <select id="frequenceRevenu" class="form-control" style="flex:1">
+                    <select id="frequenceRevenu" class="form-control" style="flex:1" onchange="updateSalaryLabel()">
                         <option value="annuel" data-i18n="opt_annual">Annuel</option>
                         <option value="mensuel" data-i18n="opt_monthly" selected>Mensuel</option>
                     </select>
@@ -211,31 +211,46 @@ function initIRPP() {
     const btnCalc = document.getElementById('btn-calc-irpp');
 
     modeToggle.addEventListener('change', (e) => {
-        const currentLang = localStorage.getItem('language') || 'fr';
+        updateSalaryLabel();
 
+        const btnCalc = document.getElementById('btn-calc-irpp');
         if (e.target.checked) {
-            // Mode Inverse
-            labelMontant.setAttribute('data-i18n', 'label_salary_inverse');
-            labelMontant.style.color = "var(--accent)";
-            inputMontant.placeholder = "Ex: 2500 (Net)";
-
             btnCalc.setAttribute('data-i18n', 'btn_calculate_inverse');
             btnCalc.style.background = "var(--accent)";
         } else {
-            // Mode Standard
-            labelMontant.setAttribute('data-i18n', 'label_salary');
-            labelMontant.style.color = "var(--text-main)";
-            inputMontant.placeholder = "Ex: 3500 (Brut)";
-
             btnCalc.setAttribute('data-i18n', 'btn_calculate');
             btnCalc.style.background = "var(--primary)";
         }
 
-        // Trigger translation update if function exists
+        // Trigger translation update
         if (typeof changeLanguage === 'function') {
+            const currentLang = localStorage.getItem('language') || 'fr';
             changeLanguage(currentLang);
         }
     });
+
+    // Initial label set
+    window.updateSalaryLabel = function () {
+        const isInverse = document.getElementById('modeInverse').checked;
+        const frequence = document.getElementById('frequenceRevenu').value;
+        const labelMontant = document.getElementById('labelMontant');
+
+        let key = "label_salary_monthly";
+        if (isInverse) {
+            key = (frequence === 'annuel') ? "label_salary_inverse_annual" : "label_salary_inverse_monthly";
+            labelMontant.style.color = "var(--accent)";
+        } else {
+            key = (frequence === 'annuel') ? "label_salary_annual" : "label_salary_monthly";
+            labelMontant.style.color = "var(--text-main)";
+        }
+
+        labelMontant.setAttribute('data-i18n', key);
+
+        // Immediate update of text
+        if (typeof t === 'function') {
+            labelMontant.textContent = t(key);
+        }
+    };
 
     // Global bridge
     window.calculateIRPP = handleIRPPCalculation;
@@ -396,10 +411,10 @@ function calculateIRPPCore(inputs) {
 
     if (typeRevenu === 'retraite') {
         abattement = revenuApresCnss * 0.25; // 25% Abatement
-        labelAbattement = "Abattement Retraite (25%)";
+        labelAbattement = "label_abattement_retraite";
     } else {
         abattement = Math.min(revenuApresCnss * 0.10, 2000); // 10% capped at 2000
-        labelAbattement = "Frais Professionnels (10%, Max 2000 DT)";
+        labelAbattement = "label_abattement_pro";
     }
 
     let netApresAbattement = revenuApresCnss - abattement;
@@ -518,7 +533,8 @@ function displayIRPPResults(result, isReverseMode) {
     // I18N Helper
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
-        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+        const data = window.I18N_DATA || {};
+        return (data[lang] && data[lang][key]) || key;
     };
 
     // --- NEW: Update Mon Bilan Quick View ---
@@ -534,10 +550,8 @@ function displayIRPPResults(result, isReverseMode) {
         qvTaux.innerText = pression + " %";
     }
     if (qvStatus) {
-        qvStatus.innerText = t("irpp_status_pending").replace("En attente de calcul", "Simulé (LF " + currentFiscalYear + ")").replace("Mazelna ma 7sebnach", "Simulé (LF " + currentFiscalYear + ")").replace("في انتظار الاحتساب", " (LF " + currentFiscalYear + ")"); // Fallback specific logic or simple string
-        // Actually, cleaner to just set a simple localized string or date
-        qvStatus.innerText = "LF " + currentFiscalYear;
-        qvStatus.style.color = "#10b981";
+        qvStatus.innerText = (result.inputs.salary > 0) ? "LF " + currentFiscalYear : t("irpp_status_pending");
+        qvStatus.style.color = (result.inputs.salary > 0) ? "#10b981" : "#94a3b8";
     }
 
 
@@ -562,8 +576,8 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="margin-top: 10px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; font-size: 0.85em; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 1.2em;">📉</span>
                     <div>
-                        <strong>Impact LF 2026 :</strong>
-                        <span style="color: var(--success);">Gain ~${(gain / 12).toFixed(3)} DT/${t("opt_monthly").toLowerCase()}</span>
+                        <strong>${t("res_impact_lf2026")} :</strong>
+                        <span style="color: var(--success);">${t("res_gain")} ~${(gain / 12).toFixed(3)} DT/${t("opt_monthly").toLowerCase()}</span>
                     </div>
                 </div>
             `;
@@ -586,12 +600,12 @@ function displayIRPPResults(result, isReverseMode) {
                     <span>- ${result.cnss.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #555; padding-bottom: 2px; margin-bottom: 2px;">
-                    <span>(=) Brut Imposable</span>
+                    <span>(=) ${t("label_gross_taxable")}</span>
                     <span>${(result.grossIncome - result.cnss).toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Abattement 10%</span>
+                    <span>(-) ${t(result.labelAbattement)}</span>
                     <span>- ${result.abattement.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
@@ -620,7 +634,7 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="background: rgba(255,255,255,0.05); padding:12px; border-radius:8px; margin-bottom:12px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.95em;">
                         <div>
-                            <span style="opacity:0.7">${t("label_salary")} :</span>
+                            <span style="opacity:0.7">${t("res_gross_annual")} :</span>
                             <strong style="float:right">${result.grossIncome.toLocaleString('fr-TN', { maximumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
@@ -628,7 +642,7 @@ function displayIRPPResults(result, isReverseMode) {
                             <strong style="float:right; color: var(--warning)">- ${result.cnss.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                         <div>
-                            <span style="opacity:0.7">Abattement 10% :</span>
+                            <span style="opacity:0.7">${t(result.labelAbattement)} :</span>
                             <strong style="float:right; color: var(--warning)">- ${result.abattement.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
                     </div>
@@ -637,11 +651,11 @@ function displayIRPPResults(result, isReverseMode) {
                 <!-- Section 3: Détails des Impôts -->
                 <div style="padding: 10px; margin-top:15px; border-top:1px dashed rgba(255,255,255,0.1)">
                     <p style="margin: 5px 0;">
-                        <strong>1. IRPP (Barème 2026) :</strong> 
+                        <strong>1. ${t("label_irpp_bracket")} :</strong> 
                         <span style="float:right; color:var(--text-main);">${result.irpp.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     <p style="margin: 5px 0; color: var(--accent);">
-                        <strong>2. CSS (0,5%) :</strong>
+                        <strong>2. ${t("label_css_short")} :</strong>
                         <span style="float:right">+ ${result.css.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     
