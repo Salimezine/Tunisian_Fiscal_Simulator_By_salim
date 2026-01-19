@@ -702,11 +702,23 @@ function displayIRPPResults(result, isReverseMode) {
                 </div>
             </div>
 
-             <button id="btn-print-irpp" class="btn-primary" style="margin-top:20px; background: var(--accent); width: 100%;">
-                <span class="icon">📄</span> <span data-i18n="btn_print">Imprimer</span>
-             </button>
+             <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="btn-explain-irpp" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
+                    <span class="icon">🤖</span> <span data-i18n="label_explain_results">Expliquez-moi mes résultats 🤖</span>
+                </button>
+                <button id="btn-print-irpp" class="btn-primary" style="flex: 1; background: var(--accent);">
+                    <span class="icon">📄</span> <span data-i18n="btn_print">Imprimer</span>
+                </button>
+             </div>
         </div>
     `;
+
+    // Explain
+    document.getElementById('btn-explain-irpp').addEventListener('click', () => {
+        if (window.askAssistant) {
+            window.askAssistant(t("chat_suggest_bilan"));
+        }
+    });
 
     // Print
     document.getElementById('btn-print-irpp').addEventListener('click', () => window.print());

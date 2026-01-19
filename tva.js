@@ -429,11 +429,20 @@ function calculateTVA() {
                 </ul>
             </div>
 
-            <button onclick="window.print()" class="btn-primary" style="margin-top:15px; background: var(--accent);">
-               📄 ${t("btn_print")}
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="btn-explain-tva" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
+                    <span class="icon">🤖</span> <span data-i18n="label_explain_results">${t("label_explain_results")}</span>
+                </button>
+                <button onclick="window.print()" class="btn-primary" style="flex: 1; background: var(--accent);">
+                    <span class="icon">📄</span> <span data-i18n="btn_print">${t("btn_print")}</span>
+                </button>
+            </div>
         </div>
     `;
+
+    document.getElementById('btn-explain-tva').addEventListener('click', () => {
+        if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
+    });
     // LOG & Global Sync
     window.lastCalculation = {
         type: 'TVA',

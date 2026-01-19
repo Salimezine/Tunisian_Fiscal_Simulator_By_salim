@@ -152,9 +152,12 @@ function calculateRS() {
                 </div>
             </div>
 
-            <div style="margin-top:20px; text-align:center;">
-                <button onclick="window.print()" class="btn-primary" style="background: var(--accent); font-size: 0.9em; padding: 10px;">
-                    <span class="icon">📄</span> <span data-i18n="btn_gen_cert">${t('btn_gen_cert')}</span>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="btn-explain-rs" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
+                    <span class="icon">🤖</span> <span data-i18n="label_explain_results">${t("label_explain_results")}</span>
+                </button>
+                <button onclick="window.print()" class="btn-primary" style="flex: 1; background: var(--accent);">
+                    <span class="icon">📄</span> <span data-i18n="btn_print">${t("btn_print")}</span>
                 </button>
             </div>
             
@@ -172,6 +175,11 @@ function calculateRS() {
             </div>
         </div>
     `;
+
+    document.getElementById('btn-explain-rs').addEventListener('click', () => {
+        if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
+    });
+
 
     // Global Sync
     window.lastCalculation = {

@@ -467,11 +467,20 @@ function calculateIS() {
             </div>
             ${detailsHtml}
             
-            <button onclick="window.print()" class="btn-primary" style="margin-top:20px; background: var(--accent);">
-                <span class="icon">🖨️</span> <span data-i18n="btn_print">${t("btn_print")}</span>
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="btn-explain-is" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
+                    <span class="icon">🤖</span> <span data-i18n="label_explain_results">${t("label_explain_results")}</span>
+                </button>
+                <button onclick="window.print()" class="btn-primary" style="flex: 1; background: var(--accent);">
+                    <span class="icon">🖨️</span> <span data-i18n="btn_print">${t("btn_print")}</span>
+                </button>
+            </div>
         </div>
     `;
+
+    document.getElementById('btn-explain-is').addEventListener('click', () => {
+        if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
+    });
 
     // LOG & Global Sync
     window.lastCalculation = {

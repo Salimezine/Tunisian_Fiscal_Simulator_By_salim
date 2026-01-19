@@ -15,10 +15,10 @@
     width: 420px;
     height: 650px;
     max-height: 80vh;
-    background: rgba(15, 23, 42, 0.85);
+    background: var(--chat-bg, rgba(15, 23, 42, 0.9));
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
     border-radius: 32px;
     box-shadow: var(--premium-shadow), var(--premium-glow);
     z-index: 1000;
@@ -54,7 +54,7 @@
 /* Header Upgraded */
 .chat-widget-header {
     padding: 24px 28px;
-    background: linear-gradient(to right, rgba(168, 85, 247, 0.2), rgba(99, 102, 241, 0.2));
+    background: linear-gradient(to right, rgba(168, 85, 247, 0.8), rgba(99, 102, 241, 0.8));
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-between;
@@ -243,9 +243,9 @@
 }
 
 .message.assistant .msg-text {
-    background: rgba(30, 41, 59, 0.6);
-    color: #f1f5f9;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--assistant-msg-bg, rgba(30, 41, 59, 0.6));
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
     border-bottom-left-radius: 4px;
 }
 
@@ -259,8 +259,41 @@
 /* Footer & Input Upgrade */
 .chat-widget-footer {
     padding: 24px;
-    background: rgba(15, 23, 42, 0.98);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--chat-footer-bg, rgba(15, 23, 42, 0.98));
+    border-top: 1px solid var(--glass-border);
+}
+
+:root {
+    --chat-bg: rgba(15, 23, 42, 0.9);
+    --assistant-msg-bg: rgba(30, 41, 59, 0.6);
+    --chat-footer-bg: rgba(15, 23, 42, 0.98);
+    --chat-input-bg: #0f172a;
+}
+
+[data-theme="light"] {
+    --chat-bg: rgba(255, 255, 255, 0.95);
+    --assistant-msg-bg: #f1f5f9;
+    --chat-footer-bg: #ffffff;
+    --chat-input-bg: #f8fafc;
+}
+
+[data-theme="light"] .message.assistant .msg-text {
+    color: #1e293b;
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .input-container {
+    background: var(--chat-input-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] #chat-input {
+    color: #1e293b;
+}
+
+[data-theme="light"] .header-text strong {
+    color: white;
+    /* Keep header text white as gradient is darkish */
 }
 
 .input-glow-wrapper {

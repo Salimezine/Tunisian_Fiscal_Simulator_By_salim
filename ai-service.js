@@ -184,7 +184,7 @@ class AIService {
 
         // Keywords matching with high detail
         if (query.includes("irpp") || query.includes("impôt sur le revenu") || query.includes("salaire")) {
-            response = `### 👤 Focus Approfondi IRPP (LF 2026)
+            response = `### 📊 Focus Approfondi IRPP (LF 2025-2026)
 
 Le calcul de l'IRPP en 2026 repose sur un **barème progressif à 8 tranches**, conçu pour favoriser l'équité fiscale :
 
@@ -285,7 +285,7 @@ Un cadre unique pour les entreprises innovantes labellisées :
 
         } else if (query.includes("bilan") || query.includes("résultat") || query.includes("mon calcul")) {
             const snapshot = this._getFiscalSnapshot();
-            response = `### 📊 Diagnostic de votre Simulation
+            response = `### 📝 Diagnostic de votre Simulation
 
 Sur la base des données saisies dans le simulateur :
 

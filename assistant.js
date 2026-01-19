@@ -17,6 +17,24 @@ function initAssistant() {
 }
 
 /**
+ * Global bridge to ask a question to the assistant
+ */
+window.askAssistant = function (message) {
+    const container = document.getElementById('ai-chat-container');
+    if (container && (container.style.display === 'none' || !container.classList.contains('active'))) {
+        // Toggle chat visible
+        container.style.display = 'flex';
+        container.classList.add('active');
+    }
+
+    const input = document.getElementById('chat-input');
+    if (input) {
+        input.value = message;
+        handleUserInput();
+    }
+};
+
+/**
  * Setup chat input listeners
  */
 function setupChatListeners() {
@@ -170,7 +188,7 @@ function addMessage(text, type) {
     const formattedText = type === 'system' ? formatChatResponse(text) : text;
 
     msgDiv.innerHTML = `
-        <span class="icon">${type === 'system' ? '🤖' : '👤'}</span>
+        <span class="icon">${type === 'system' ? '🌟' : '👤'}</span>
         <div class="msg-text">
             ${formattedText}
             ${type === 'system' ? `

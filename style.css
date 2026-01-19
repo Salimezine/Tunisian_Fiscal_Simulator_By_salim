@@ -26,6 +26,8 @@
 
     --warning: #f59e0b;
     --danger: #ef4444;
+    --control-bg: rgba(255, 255, 255, 0.1);
+    --control-bg-hover: rgba(255, 255, 255, 0.2);
 }
 
 /* Light Theme Variables */
@@ -42,6 +44,8 @@
     --text-muted: #64748b;
     /* Slate 500 */
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --control-bg: rgba(30, 41, 59, 0.1);
+    --control-bg-hover: rgba(30, 41, 59, 0.2);
 }
 
 /* RTL Support for Arabic */
@@ -248,10 +252,18 @@ body {
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    flex-wrap: wrap;
-    /* Allow wrapping on small screens */
-    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Hide scrollbar for cleaner look */
+    justify-content: flex-start;
+    padding: 12px;
     backdrop-filter: blur(10px);
+}
+
+.tabs-nav::-webkit-scrollbar {
+    display: none;
 }
 
 [data-theme="light"] .tabs-nav {
@@ -291,6 +303,36 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
+.control-btn {
+    background: var(--control-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.control-btn:hover {
+    background: var(--control-bg-hover);
+}
+
+select.control-btn {
+    appearance: none;
+    text-align: center;
+}
+
+select.control-btn option {
+    background: var(--bg-dark);
+    color: var(--text-main);
+}
+
 .tab-btn.active {
     background: var(--primary-gradient);
     color: white;
@@ -301,13 +343,14 @@ body {
 /* RTL Adjustments */
 [dir="rtl"] .tabs-nav {
     flex-direction: row-reverse;
-    /* Ensure logical flow */
+    justify-content: flex-start;
 }
 
 [dir="rtl"] .tab-btn {
-    font-family: 'Tahoma', 'Segoe UI', sans-serif;
-    font-size: 0.9rem;
-    /* Arabic fonts can be larger */
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.85rem;
+    min-width: 130px;
+    flex: 0 0 auto;
 }
 
 /* Form inputs in RTL */

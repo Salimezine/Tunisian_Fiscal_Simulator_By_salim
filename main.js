@@ -58,6 +58,11 @@ function switchTab(targetId) {
     // Auto-scroll to top
     window.scrollTo(0, 0);
 
+    // Ensure active tab is visible in scrollable nav
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
     // Special logic for Wizard initiation in IRPP
     const wizardContainer = document.getElementById('irpp-wizard');
     const irppContainer = document.getElementById('irpp-container');

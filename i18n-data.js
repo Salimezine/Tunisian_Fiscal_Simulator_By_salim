@@ -95,6 +95,8 @@ window.I18N_DATA = {
         "label_irpp_bracket": "IRPP (Barème 2026)",
         "label_css_short": "CSS (0,5%)",
         "res_gross_annual": "Salaire Brut Annuel",
+        "label_explain_results": "Expliquez-moi mes résultats 🤖",
+        "result_tax": "Impôts & Taxes",
 
         // IS
         "is_title": "Impôt sur les Sociétés (IS)",
@@ -507,7 +509,7 @@ window.I18N_DATA = {
         "res_gross_estimated": "Brut / Chhar (Taqribi)",
         "res_net_pocket": "Net fi Jibek",
         "res_impot_total": "Total l'impôt / 3am",
-        "res_taux_pression": "Kbas 3lik",
+        "res_taux_pression": "Pression Fiscale",
         "table_tranche": "Tranche mta3 flous",
         "table_taux": "Taux",
         "table_base": "Mnine lwin",
@@ -523,6 +525,7 @@ window.I18N_DATA = {
         "label_irpp_bracket": "IRPP (Barème 2026)",
         "label_css_short": "CSS (0,5%)",
         "res_gross_annual": "Chahriya Brut fi 3am",
+        "label_explain_results": "Fahhemni el resultats 🤖",
 
         // IS
         "is_title": "Dhariba 3al Chariket (IS)",
@@ -858,7 +861,8 @@ window.I18N_DATA = {
         "msg_wizard_finish": "Anzal 3al bouton bech tkharej el bilan mta3ek.",
         "btn_back": "Erja3",
         "btn_continue": "Kamal",
-        "btn_finish": "A7seb w fassarli 🚀"
+        "btn_finish": "A7seb w fassarli 🚀",
+        "result_tax": "El Hada w Dhrayeb"
     },
     // ---------------------- ARABIC (AR) ----------------------
     "ar": {
@@ -952,6 +956,7 @@ window.I18N_DATA = {
         "label_irpp_bracket": "الضريبة (جدول 2026)",
         "label_css_short": "المساهمة (0,5%)",
         "res_gross_annual": "الدخل الخام السنوي",
+        "label_explain_results": "اشرح لي النتائج 🤖",
 
         // IS
         "is_title": "الضريبة على الشركات",
@@ -1291,6 +1296,7 @@ window.I18N_DATA = {
         "msg_wizard_finish": "اضغط على الزر أدناه لإصدار ملخصك الجبائي.",
         "btn_back": "رجوع",
         "btn_continue": "مواصلة",
-        "btn_finish": "احتساب وتحليل 🚀"
+        "btn_finish": "احتساب وتحليل 🚀",
+        "result_tax": "الضرائب والأداءات"
     }
 };
