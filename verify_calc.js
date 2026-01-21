@@ -1,37 +1,28 @@
 
-function verifyIRPP() {
-    console.log("--- VÉRIFICATION CALCUL IRPP (Cas: 2500 DT/mois, Chef, 1 Enfant, 1 Etudiant) ---");
+function calculateIRPP(scenario) {
+    console.log(`\n--- VÉRIFICATION: ${scenario.name} ---`);
+    console.log(`Données: ${scenario.brutMensuel} DT/mois, Chef: ${scenario.chef}, Enfants: ${scenario.enfants}, Etudiants: ${scenario.etudiants}`);
 
-    // Données
-    const brutMensuel = 2500;
-    const brutAnnuel = brutMensuel * 12;
-    console.log(`1. Brut Annuel: ${brutAnnuel.toFixed(3)}`);
-
+    const brutAnnuel = scenario.brutMensuel * 12;
     // CNSS (9.18% du Brut)
     const cnss = brutAnnuel * 0.0918;
-    console.log(`2. CNSS (9.18% de ${brutAnnuel}): ${cnss.toFixed(3)}`);
-
     const brutFiscal = brutAnnuel - cnss;
-    console.log(`3. Brut Fiscal (Après CNSS): ${brutFiscal.toFixed(3)}`);
 
     // Frais Pros (10% du Brut Fiscal, Max 2000)
     const fraisProTheorique = brutFiscal * 0.10;
     const fraisPro = Math.min(fraisProTheorique, 2000);
-    console.log(`4. Frais Pros (10% de ${brutFiscal.toFixed(3)}, Max 2000): ${fraisPro.toFixed(3)}`);
 
     // Net Imposable Intermédiaire
     const netInter = brutFiscal - fraisPro;
 
     // Déductions
-    const deducChef = 300;
-    const deducEnfant = 100; // 1 enfant
-    const deducEtudiant = 1000; // 1 étudiant
+    const deducChef = scenario.chef ? 300 : 0;
+    const deducEnfant = scenario.enfants * 100;
+    const deducEtudiant = scenario.etudiants * 1000;
     const totalDeduc = deducChef + deducEnfant + deducEtudiant;
-    console.log(`5. Déductions Famille: ${totalDeduc.toFixed(3)}`);
 
     // Assiette
     const assiette = Math.max(0, netInter - totalDeduc);
-    console.log(`6. Assiette Imposable: ${assiette.toFixed(3)}`);
 
     // IRPP (Barème 2026)
     const BAREME = [
@@ -46,24 +37,36 @@ function verifyIRPP() {
     ];
 
     let irpp = 0;
-    console.log("--- Détail Barème ---");
     BAREME.forEach(tranche => {
         if (assiette > tranche.min) {
             const effectiveMax = (tranche.max === Infinity) ? assiette : tranche.max;
             const base = Math.max(0, Math.min(assiette, effectiveMax) - tranche.min);
             const tax = base * tranche.rate;
             irpp += tax;
-            if (base > 0) console.log(`   Tranche ${tranche.min}-${tranche.max}: ${base.toFixed(3)} * ${tranche.rate} = ${tax.toFixed(3)}`);
         }
     });
-    console.log(`7. IRPP Dû: ${irpp.toFixed(3)}`);
 
     // CSS (0.5% de l'Assiette, pas de l'impôt)
     const css = assiette * 0.005;
-    console.log(`8. CSS (0.5% de ${assiette.toFixed(3)}): ${css.toFixed(3)}`);
-
     const total = irpp + css;
-    console.log(`9. Total Impôt à Payer: ${total.toFixed(3)}`);
+
+    // Net Mensuel
+    const netAnnuel = brutAnnuel - cnss - total;
+    const netMensuel = netAnnuel / 12;
+
+    console.log(`> Brut Annuel: ${brutAnnuel.toFixed(3)}`);
+    console.log(`> Assiette: ${assiette.toFixed(3)}`);
+    console.log(`> IRPP Dû: ${irpp.toFixed(3)}`);
+    console.log(`> CSS: ${css.toFixed(3)}`);
+    console.log(`> Total Impôt: ${total.toFixed(3)}`);
+    console.log(`> Net Mensuel: ${netMensuel.toFixed(3)}`);
 }
 
-verifyIRPP();
+const scenarios = [
+    { name: "Cas Standard", brutMensuel: 2500, chef: true, enfants: 1, etudiants: 1 },
+    { name: "Salaire Modeste (SMIG+)", brutMensuel: 600, chef: false, enfants: 0, etudiants: 0 },
+    { name: "Haut Revenu", brutMensuel: 10000, chef: true, enfants: 2, etudiants: 0 },
+    { name: "Famille Nombreuse", brutMensuel: 3500, chef: true, enfants: 4, etudiants: 0 }
+];
+
+scenarios.forEach(calculateIRPP);
