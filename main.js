@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { initConseiller(); } catch (e) { console.error("Erreur initConseiller:", e); }
     try { initAssistant(); } catch (e) { console.error("Erreur initAssistant:", e); }
     try { initComparative(); } catch (e) { console.error("Erreur initComparative:", e); }
+    try { initAutoEntrepreneur(); } catch (e) { console.error("Erreur initAutoEntrepreneur:", e); }
 
     // 3. Initialize Wizard
     try {

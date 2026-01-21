@@ -1,0 +1,26 @@
+{
+  "version": "2026.1",
+  "auto_entrepreneur": {
+    "label": "Régime Auto-Entrepreneur (Tunisie)",
+    "rates": {
+      "income_tax": 0.005,
+      "income_tax_description": "0.5% du Chiffre d'Affaires Annuel",
+      "social_security": 0.075,
+      "social_security_base": "2/3 du SMIG/SMAG",
+      "smig_2026_estimated": 480.000
+    },
+    "thresholds": {
+      "max_turnover_services": 75000,
+      "max_turnover_commercial": 75000
+    },
+    "exemptions": {
+      "first_year": true,
+      "first_year_description": "Exonération totale la première année d'activité (Contribution Unique + Charges Sociales prises en charge par l'État)"
+    }
+  },
+  "sources": [
+    "Décret-loi n° 2020-33",
+    "Loi de Finances 2026"
+  ],
+  "last_updated": "2026-01-21"
+}

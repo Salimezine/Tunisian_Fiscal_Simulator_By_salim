@@ -257,6 +257,18 @@ const LegalReferenceDatabase = {
         }
     },
 
+    // ==================== Auto-Entrepreneur (Nouveau Régime) ====================
+
+    autoEntrepreneur: {
+        jsonSource: "data/autaux.json",
+        description: "Régime fiscal simplifié pour les entrepreneurs individuels (Contribution Unique)",
+        regulations: {
+            base: "Décret-loi n° 2020-33",
+            updates: ["Loi de Finances 2023", "Loi de Finances 2026"]
+        },
+        note: "Les taux et seuils sont définis dans le fichier JSON externe pour faciliter les mises à jour."
+    },
+
     // ==================== ISF (Impôt sur la Fortune) ====================
 
     isf: {

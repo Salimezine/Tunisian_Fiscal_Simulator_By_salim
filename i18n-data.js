@@ -27,6 +27,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ RS",
         "tab_expert": "🛡️ Expert",
         "tab_compare": "⚖️ Comparatif",
+        "tab_auto_entrepreneur": "👤 Auto-Ent.",
 
         // Common
         "btn_calculate": "Calculer",
@@ -431,7 +432,18 @@ window.I18N_DATA = {
         "msg_wizard_finish": "Cliquez sur le bouton ci-dessous pour générer votre bilan complet.",
         "btn_back": "Retour",
         "btn_continue": "Continuer",
-        "btn_finish": "Calculer & Analyser 🚀"
+        "btn_finish": "Calculer & Analyser 🚀",
+
+        // Auto-Entrepreneur
+        "auto_entrepreneur_title": "Régime Auto-Entrepreneur",
+        "auto_entrepreneur_subtitle": "Contribution Unique (Loi de Finances 2026)",
+        "label_turnover_annual": "Chiffre d'Affaires Annuel (DT)",
+        "label_ae_activity": "Type d'Activité",
+        "opt_services": "Services",
+        "opt_commerce": "Commerce / Industrie",
+        "res_ae_tax": "Contribution Unique à Payer",
+        "res_ae_social": "Charges Sociales (CNSS)",
+        "ae_threshold_warning": "Attention : Le chiffre d'affaires dépasse le plafond de 75 000 DT."
     },
     // ---------------------- TUNISIAN (TN) ----------------------
     "tn": {
@@ -457,6 +469,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ الخصم",
         "tab_expert": "🛡️ الخبير",
         "tab_compare": "⚖️ مقارنة",
+        "tab_auto_entrepreneur": "👤 Auto-Ent.",
 
         // Common
         "btn_calculate": "A7seb",
@@ -862,6 +875,17 @@ window.I18N_DATA = {
         "btn_back": "Erja3",
         "btn_continue": "Kamal",
         "btn_finish": "A7seb w fassarli 🚀",
+
+        // Auto-Entrepreneur
+        "auto_entrepreneur_title": "Régime Auto-Entrepreneur",
+        "auto_entrepreneur_subtitle": "Contribution Unique (LF 2026)",
+        "label_turnover_annual": "Chiffre d'Affaires fil 3am (DT)",
+        "label_ae_activity": "Chnouwa tekhdem ?",
+        "opt_services": "Services",
+        "opt_commerce": "Commerce / Industrie",
+        "res_ae_tax": "Contribution Unique elli tkhallesha",
+        "res_ae_social": "Charges Sociales (CNSS)",
+        "ae_threshold_warning": "Balek: CA فات 75 malyoun (Plafond).",
         "result_tax": "El Hada w Dhrayeb"
     },
     // ---------------------- ARABIC (AR) ----------------------
@@ -888,6 +912,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ الخصم من المورد",
         "tab_expert": "🛡️ خبير جبائي",
         "tab_compare": "⚖️ مقارنة أنظمة",
+        "tab_auto_entrepreneur": "👤 المبادر الذاتي",
 
         // Common
         "btn_calculate": "احتساب",
@@ -1297,6 +1322,17 @@ window.I18N_DATA = {
         "btn_back": "رجوع",
         "btn_continue": "مواصلة",
         "btn_finish": "احتساب وتحليل 🚀",
-        "result_tax": "الضرائب والأداءات"
+        "result_tax": "الضرائب والأداءات",
+
+        // Auto-Entrepreneur
+        "auto_entrepreneur_title": "نظام المبادر الذاتي",
+        "auto_entrepreneur_subtitle": "المساهمة الوحيدة (قانون المالية 2026)",
+        "label_turnover_annual": "رقم المعاملات السنوي (د.ت)",
+        "label_ae_activity": "نوع النشاط",
+        "opt_services": "خدمات",
+        "opt_commerce": "تجارة / صناعة",
+        "res_ae_tax": "المساهمة الوحيدة المستوجبة",
+        "res_ae_social": "التغطية الاجتماعية (CNSS)",
+        "ae_threshold_warning": "تنبيه: رقم المعاملات تجاوز السقف القانوني (75,000 د.ت)."
     }
 };
