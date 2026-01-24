@@ -12,6 +12,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- PWA Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon" href="isaas_logo.jpg">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW registered!', reg))
+                    .catch(err => console.log('SW registration failed: ', err));
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -22,16 +37,15 @@
     </div>
 
     <main class="container">
-        <!-- 1️⃣ Avertissement Légal (Indispensable) -->
+        <!-- 1️⃣ Avertissement Légal -->
         <div id="legal-warning" class="legal-banner">
             <div class="legal-content">
                 <span class="icon">⚠️</span>
                 <div>
                     <strong data-i18n="label_legal_warning">Avertissement Légal</strong>
                     <p data-i18n="msg_legal_warning">Ce simulateur est un outil pédagogique et informatif développé dans
-                        un cadre universitaire. Il ne
-                        remplace ni les textes législatifs officiels ni les consultations auprès de l'administration
-                        fiscale tunisienne ou d'un expert-comptable.</p>
+                        un cadre universitaire. Il ne remplace ni les textes législatifs officiels ni les consultations
+                        auprès de l'administration fiscale tunisienne ou d'un expert-comptable.</p>
                 </div>
                 <button onclick="document.getElementById('legal-warning').style.display='none'"
                     class="close-btn">×</button>
@@ -44,8 +58,7 @@
                 <img src="isaas_logo.jpg" alt="Logo ISAAS"
                     style="height: 100px; margin-bottom: 15px; background: white; padding: 5px; border-radius: 8px;">
                 <h3 style="font-size: 1.1em; color: var(--text-main); margin-bottom: 5px;"
-                    data-i18n="label_academic_inst">Institut Supérieur
-                    d'Administration des Affaires de Sfax</h3>
+                    data-i18n="label_academic_inst">Institut Supérieur d'Administration des Affaires de Sfax</h3>
                 <p style="font-size: 0.95em; color: var(--text-muted);">
                     <span data-i18n="label_academic_degree">Licence coconstruite en comptabilité :</span>
                     <strong data-i18n="label_academic_role">Assistant Comptable Auditeur Interne</strong>
@@ -57,8 +70,7 @@
             <h1 data-i18n="app_title">Simulateur Fiscal <span class="highlight" data-i18n="app_highlight">Tunisie
                     2026</span> <span
                     style="font-size: 0.4em; vertical-align: middle; background: var(--success); color: white; padding: 4px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;"
-                    data-i18n="label_official_jort">Officiel
-                    JORT 148</span></h1>
+                    data-i18n="label_official_jort">Officiel JORT 148</span></h1>
             <p class="subtitle" data-i18n="app_subtitle">Expertise Comptable & Juridique - Outil Pédagogique Certifié
             </p>
 
@@ -74,11 +86,9 @@
                     <span>🌙</span>
                 </button>
             </div>
-
-
         </header>
 
-        <script src="i18n-data.js"></script> <!-- Load Translations -->
+        <script src="i18n-data.js"></script>
 
         <div class="glass-card">
             <nav class="tabs-nav">
@@ -93,107 +103,57 @@
                 <button class="tab-btn" data-tab="comparative" data-i18n="tab_compare">⚖️ Comparatif</button>
             </nav>
 
-
-
             <div class="tab-content" id="irpp">
                 <div class="module-header"
-                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                     <div>
                         <h2 data-i18n="irpp_title">Impôt sur le Revenu (IRPP)</h2>
-                        <p data-i18n="irpp_subtitle">Simulateur multi-barèmes (2025-2026)</p>
+                        <p data-i18n="irpp_subtitle">Barème progressif JORT 148</p>
                     </div>
-                    <div
+                    <!-- Year Toggle -->
+                    <div class="year-toggle-container"
                         style="background: rgba(255,255,255,0.05); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; gap: 5px;">
                         <input type="radio" name="fiscalYear" id="year2025" value="2025" style="display:none">
-                        <label for="year2025" class="year-label" onclick="setYear('2025')">2025</label>
+                        <label for="year2025" class="year-label" onclick="setYear('2025')"
+                            style="padding: 6px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; color: var(--text-muted); transition: 0.3s;">2025</label>
                         <input type="radio" name="fiscalYear" id="year2026" value="2026" checked style="display:none">
-                        <label for="year2026" class="year-label active" onclick="setYear('2026')">2026</label>
+                        <label for="year2026" class="year-label active" onclick="setYear('2026')"
+                            style="padding: 6px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); transition: 0.3s;">2026</label>
                     </div>
                 </div>
-                <style>
-                    .year-label {
-                        padding: 6px 15px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-size: 0.85em;
-                        font-weight: 600;
-                        color: var(--text-muted);
-                        transition: 0.3s;
-                    }
-
-                    .year-label.active {
-                        background: var(--primary);
-                        color: white;
-                        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-                    }
-                </style>
-
-                <details class="glass-card compact-info"
-                    style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); padding: 10px 15px; border-radius: 16px;">
-                    <summary
-                        style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #60a5fa; font-weight: 600; list-style: none;">
-                        <span style="font-size: 1.2em;">ℹ️</span>
-                        <span data-i18n="context_lf2026">Contexte Loi de Finances 2026 (LF 2026)</span>
-                        <span style="margin-left: auto; font-size: 0.8em; opacity: 0.7;"
-                            data-i18n="context_show">(Afficher)</span>
-                    </summary>
-                    <p style="font-size: 0.9em; opacity: 0.9; margin-top: 10px; color: #cbd5e1; line-height: 1.5;"
-                        data-i18n="context_desc">
-                        Ce simulateur intègre le nouveau barème à 8 tranches de la Loi de Finances 2026.
-                        Les déductions pour "Frais Professionnels" (10%, max 2000 DT) sont appliquées automatiquement.
-                    </p>
-                </details>
-
-                <!-- IRPP Form wil go here -->
-                <div class="wizard-container hidden" id="irpp-wizard">
-                    <!-- Wizard Steps will be injected here -->
-                </div>
-
-                <div class="module-body" id="irpp-container">
-                    <!-- Standard Form for advanced users -->
-                </div>
+                <div class="module-body" id="irpp-container"></div>
             </div>
 
             <div class="tab-content hidden" id="is">
                 <div class="module-header">
                     <h2 data-i18n="is_title">Impôt sur les Sociétés (IS)</h2>
-                    <p data-i18n="is_subtitle">Calcul du résultat fiscal et de l'impôt dû</p>
+                    <p data-i18n="is_subtitle">Calculateur de l'IS et du Minimum d'Impôt</p>
                 </div>
-                <!-- IS Form will go here -->
-                <div class="module-body" id="is-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="is-container"></div>
             </div>
 
             <div class="tab-content hidden" id="tva">
                 <div class="module-header">
                     <h2 data-i18n="tva_title">Taxe sur la Valeur Ajoutée (TVA)</h2>
-                    <p data-i18n="tva_subtitle">Calcul de la TVA à décaisser ou du crédit</p>
+                    <p data-i18n="tva_subtitle">Déclaration Mensuelle (Loi de Finances 2026)</p>
                 </div>
-                <!-- TVA Form will go here -->
-                <div class="module-body" id="tva-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="tva-container"></div>
             </div>
 
             <div class="tab-content hidden" id="isf">
                 <div class="module-header">
-                    <h2 data-i18n="isf_title">Impôt sur la Fortune (IF)</h2>
-                    <p data-i18n="isf_subtitle">Déclaration du patrimoine mobilier et immobilier</p>
+                    <h2 data-i18n="isf_title">Impôt sur la Fortune Immobilière (IF)</h2>
+                    <p data-i18n="isf_subtitle">Patrimoine Immobilier (Seuil > 2M DT)</p>
                 </div>
-                <div class="module-body" id="isf-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="isf-container"></div>
             </div>
 
             <div class="tab-content hidden" id="rs">
                 <div class="module-header">
                     <h2 data-i18n="rs_title">Retenue à la Source (RS)</h2>
-                    <p data-i18n="rs_subtitle">Gestion de la trésorerie et certificats de retenue</p>
+                    <p data-i18n="rs_subtitle">Marchés Publics, Honoraires et Loyers</p>
                 </div>
-                <div class="module-body" id="rs-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="rs-container"></div>
             </div>
 
             <div class="tab-content hidden" id="auto_entrepreneur">
@@ -201,103 +161,56 @@
                     <h2 data-i18n="auto_entrepreneur_title">Régime Auto-Entrepreneur</h2>
                     <p data-i18n="auto_entrepreneur_subtitle">Contribution Unique (LF 2026)</p>
                 </div>
-                <div class="module-body" id="ae-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="ae-container"></div>
             </div>
 
-
+            <!-- Expert AI Tab -->
             <div class="tab-content hidden" id="conseiller">
                 <div class="module-header">
                     <h2 data-i18n="expert_title">Conseiller Fiscal IA</h2>
                     <p data-i18n="expert_desc">Optimisez votre fiscalité avec des conseils personnalisés</p>
                 </div>
-                <!-- Conseiller Form will go here -->
-                <div class="module-body" id="conseiller-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="conseiller-container"></div>
             </div>
 
-
-            <div class="tab-content hidden" id="comparative">
+            <!-- Comparative Tab -->
+            <div id="comparative" class="tab-content hidden">
                 <div class="module-header">
                     <h2 data-i18n="compare_title">Comparatif Fiscal : IRPP vs IS</h2>
-                    <p data-i18n="compare_subtitle">Déterminez le régime optimal pour votre activité (Propriétaire vs
-                        Société)</p>
+                    <p data-i18n="compare_subtitle">Déterminez le régime optimal pour votre activité</p>
                 </div>
-                <div class="module-body" id="comparative-container">
-                    <!-- Dynamic Content -->
-                </div>
+                <div class="module-body" id="comparative-container"></div>
             </div>
-
-
         </div>
 
         <footer class="main-footer">
-            <div class="official-references"
-                style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-                <h4 style="font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-muted);"
-                    data-i18n="label_footer_refs">
-                    📚 Références Juridiques & Documentation</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; font-size: 0.85em;">
-                    <a href="https://www.iort.gov.tn" target="_blank"
-                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;"
-                        data-i18n="label_jort">🏛️
-                        JORT</a>
-                    <a href="https://finances.gov.tn" target="_blank"
-                        style="color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 5px;"
-                        data-i18n="label_min_fin">🇹🇳
-                        Min. Finances</a>
-                    <a href="methodologie.html" target="_blank"
-                        style="color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px;"
-                        data-i18n="label_methodology">📐
-                        Méthodologie</a>
-                </div>
-            </div>
             <p data-i18n="msg_footer_warning">⚠️ <strong>Avertissement :</strong> Ces résultats sont indicatifs et ne
-                remplacent pas l'avis d'un
-                expert-comptable.</p>
+                remplacent pas l'avis d'un expert-comptable.</p>
             <p style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">
-                <span data-i18n="label_version">Version</span> 2026.1.0 (Beta Académique) |
-                <a href="#" onclick="alert('Roadmap 2027: Export PDF, API Rest, Intégration IA avancée')"
-                    style="color: inherit; text-decoration: underline;" data-i18n="label_vision_future">Vision
-                    Future</a>
+                <span data-i18n="label_version">Version</span> 2026.1.0 (Édition Épurée)
             </p>
         </footer>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
-    <!-- Core Data -->
     <script src="legal-references.js"></script>
     <script src="ai-config.js"></script>
     <script src="ai-service.js"></script>
-
-    <!-- Audit Mode Core Modules -->
     <script src="calculation-context.js"></script>
     <script src="mode-manager.js"></script>
     <script src="rule-engine.js"></script>
     <script src="audit-mode-ui.js"></script>
-
-
-    <!-- Calculation Modules -->
     <script src="irpp.js"></script>
     <script src="is.js"></script>
     <script src="tva.js"></script>
     <script src="isf.js"></script>
     <script src="rs.js"></script>
     <script src="auto-entrepreneur.js"></script>
-    <script src="conseiller.js"></script>
     <script src="assistant.js"></script>
+    <script src="conseiller.js"></script>
     <script src="comparative.js"></script>
     <script src="wizard.js"></script>
     <script src="main.js"></script>
-
-    <!-- Utilities -->
-    <script src="verify_calc.js"></script>
-    <script src="is_algo_2026_strict.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Chatbot Widget -->
     <div id="ai-chat-container" class="ai-chat-widget" style="display: none;">
@@ -305,66 +218,55 @@
             <div class="header-info">
                 <div class="header-status-glow"></div>
                 <div class="header-text">
-                    <span class="premium-sparkle">✨</span>
                     <strong data-i18n="chat_title">Assistant Fiscal</strong>
                 </div>
             </div>
-            <div class="header-actions">
-                <button class="menu-dots">⋮</button>
-                <button id="close-chat-btn" class="close-btn">×</button>
-            </div>
+            <button id="close-chat-btn" class="close-btn">×</button>
         </div>
-
         <div class="chat-widget-body">
             <div id="chat-messages" class="chat-messages-container">
                 <div class="message system">
                     <span class="icon">🤖</span>
-                    <div class="msg-text" data-i18n="chat_welcome">Bonjour ! Je suis votre assistant fiscal expert.
-                    </div>
+                    <div class="msg-text" data-i18n="chat_welcome">Bonjour ! Je suis votre assistant fiscal.</div>
                 </div>
             </div>
         </div>
-
         <div class="chat-widget-footer">
-            <div class="input-glow-wrapper">
-                <div class="input-container">
-                    <button class="input-util-btn">😊</button>
-                    <input type="text" id="chat-input" placeholder="Tapez votre message..." data-i18n="chat_placeholder"
-                        autocomplete="off">
-                    <button class="input-util-btn">📎</button>
-                    <button id="chat-send" class="send-btn">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" stroke="white" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
-                </div>
+            <!-- Categorized Tabs INSIDE Chat -->
+            <div class="chat-tabs-nav">
+                <button class="chat-tab-btn active" onclick="switchChatTab('math')">📊 Calculs</button>
+                <button class="chat-tab-btn" onclick="switchChatTab('biz')">🏢 Business</button>
+                <button class="chat-tab-btn" onclick="switchChatTab('misc')">ℹ️ Autre</button>
             </div>
-            <div class="chat-shortcuts">
-                <button class="chat-suggest-btn" data-msg-key="chat_suggest_irpp"><span data-i18n="shortcut_irpp">💰
-                        IRPP</span></button>
-                <button class="chat-suggest-btn" data-msg-key="chat_suggest_zdr"><span data-i18n="shortcut_zdr">📍
-                        ZDR</span></button>
-                <button class="chat-suggest-btn" data-msg-key="chat_suggest_startup"><span
-                        data-i18n="shortcut_startup">🚀 Startup</span></button>
-                <button class="chat-suggest-btn" data-msg-key="chat_suggest_export"><span data-i18n="shortcut_export">🌍
-                        Export</span></button>
-                <button class="chat-suggest-btn" data-msg-key="chat_suggest_bilan"><span data-i18n="shortcut_bilan">📊
-                        Mon bilan</span></button>
+
+            <!-- TAB: Calculs -->
+            <div id="shortcuts-math" class="chat-shortcuts">
+                <button class="chat-suggest-btn" data-msg-key="action_explain_irpp">💰 IRPP</button>
+                <button class="chat-suggest-btn" data-msg-key="action_explain_is">🏢 IS</button>
+                <button class="chat-suggest-btn" data-msg-key="action_explain_tva">💸 TVA</button>
             </div>
-            <div class="quick-actions">
-                <button id="clear-chat-btn" title="Effacer">🗑️</button>
-                <button id="export-chat-btn" title="Exporter">💾</button>
+
+            <!-- TAB: Business -->
+            <div id="shortcuts-biz" class="chat-shortcuts hidden">
+                <button class="chat-suggest-btn" data-msg-key="action_explain_startup">🚀 Startup</button>
+                <button class="chat-suggest-btn" data-msg-key="action_explain_rs">⚡ RS</button>
+            </div>
+
+            <!-- TAB: Autre -->
+            <div id="shortcuts-misc" class="chat-shortcuts hidden">
+                <button class="chat-suggest-btn" data-msg-key="action_calendar">📅 Échéances</button>
+            </div>
+
+            <div class="input-container">
+                <input type="text" id="chat-input" placeholder="Posez une question..." data-i18n="chat_placeholder">
+                <button id="chat-send" class="send-btn">🚀</button>
             </div>
         </div>
     </div>
 
-    <!-- AI Floating Bubble (Refined) -->
     <div id="ai-floating-bubble" class="ai-bubble">
-        <span class="bubble-icon">🤖</span>
+        <span class="bubble-icon">💬</span>
     </div>
-
-
 </body>
 
 </html>

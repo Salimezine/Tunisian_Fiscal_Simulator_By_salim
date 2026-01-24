@@ -10,7 +10,7 @@
  * - DGI Tunisia: https://www.impots.finances.gov.tn
  */
 
-const LegalReferenceDatabase = {
+window.LegalReferenceDatabase = {
 
     // ==================== IRPP (Impôt sur le Revenu des Personnes Physiques) ====================
 

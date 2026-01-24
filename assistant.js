@@ -17,6 +17,31 @@ function initAssistant() {
 }
 
 /**
+ * Switch categories of shortcuts inside chat
+ */
+window.switchChatTab = function (tab) {
+    const tabs = ['math', 'biz', 'misc'];
+    const target = tab || 'misc';
+
+    // Toggle containers
+    tabs.forEach(t => {
+        const el = document.getElementById(`shortcuts-${t}`);
+        if (el) el.classList.toggle('hidden', t !== target);
+    });
+
+    // Update active button state
+    const btns = document.querySelectorAll('.chat-tab-btn');
+    btns.forEach(btn => {
+        const label = btn.innerText.toLowerCase();
+        btn.classList.toggle('active',
+            (target === 'math' && label.includes('calcul')) ||
+            (target === 'biz' && label.includes('business')) ||
+            (target === 'misc' && label.includes('autre'))
+        );
+    });
+};
+
+/**
  * Global bridge to ask a question to the assistant
  */
 window.askAssistant = function (message) {
@@ -54,15 +79,11 @@ function setupChatListeners() {
 
     suggestions.forEach(s => {
         s.addEventListener('click', () => {
-            const msgKey = s.getAttribute('data-msg-key');
-            if (msgKey) {
-                const t = (key) => {
-                    const lang = localStorage.getItem('language') || 'fr';
-                    return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
-                };
-                input.value = t(msgKey);
+            const actionKey = s.getAttribute('data-msg-key');
+            if (actionKey && AI_CONFIG.quickActions[actionKey]) {
+                input.value = AI_CONFIG.quickActions[actionKey];
+                handleUserInput();
             }
-            handleUserInput();
         });
     });
 

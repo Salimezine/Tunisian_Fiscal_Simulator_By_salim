@@ -702,14 +702,38 @@ function displayIRPPResults(result, isReverseMode) {
                 </div>
             </div>
 
+            <!-- NEW: Fiscal Pressure Curve -->
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                <h4 style="margin: 0 0 15px 0; text-align: center;">📈 Courbe de Pression Fiscale</h4>
+                <div style="height: 250px;">
+                    <canvas id="pressureChart"></canvas>
+                </div>
+                <p style="font-size: 0.8em; opacity: 0.7; text-align: center; margin-top: 10px;">
+                    Cette courbe montre comment votre taux d'imposition augmente avec vos revenus (Progressivité de l'impôt).
+                </p>
+            </div>
+
              <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button id="btn-explain-irpp" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
                     <span class="icon">🤖</span> <span data-i18n="label_explain_results">Expliquez-moi mes résultats 🤖</span>
                 </button>
                 <button id="btn-print-irpp" class="btn-primary" style="flex: 1; background: var(--accent);">
-                    <span class="icon">📄</span> <span data-i18n="btn_print">Imprimer</span>
+                    <span class="icon">🖨️</span> <span data-i18n="btn_print">Imprimer</span>
                 </button>
              </div>
+
+             <!-- NEW: Export Buttons -->
+             <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="btn-export-pdf" class="btn-secondary" style="flex: 1; border: 1px solid var(--primary); color: var(--primary);">
+                    <span class="icon">📄</span> PDF
+                </button>
+                <button id="btn-export-excel" class="btn-secondary" style="flex: 1; border: 1px solid #10b981; color: #10b981;">
+                    <span class="icon">📊</span> Excel
+                </button>
+             </div>
+
+             <!-- NEW: Optimization Suggestions -->
+             <div id="optimization-suggestions"></div>
         </div>
     `;
 
@@ -722,6 +746,18 @@ function displayIRPPResults(result, isReverseMode) {
 
     // Print
     document.getElementById('btn-print-irpp').addEventListener('click', () => window.print());
+
+    // Exports
+    document.getElementById('btn-export-pdf').addEventListener('click', () => {
+        if (window.FiscalExport) window.FiscalExport.generatePDF(result, 'IRPP');
+    });
+
+    document.getElementById('btn-export-excel').addEventListener('click', () => {
+        if (window.FiscalExport) window.FiscalExport.generateExcel(result, 'IRPP');
+    });
+
+    // Run Optimization Check
+    checkOptimization(result);
 
     // Chart
     renderIRPPChart(result.grossIncome, result.cnss, result.totalRetenue, (result.grossIncome - result.cnss - result.totalRetenue));
@@ -793,4 +829,176 @@ function renderIRPPChart(brut, cnss, impot, net) {
             maintainAspectRatio: false
         }
     });
+
+    // Render Pressure Chart
+    renderPressureChart(brut);
+}
+
+let pressureChartInstance = null;
+function renderPressureChart(currentGross) {
+    const canvas = document.getElementById('pressureChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // Generate Data Points
+    const points = [];
+    const labels = [];
+    const maxRange = Math.max(currentGross * 1.5, 60000); // At least 60k or 1.5x current
+    const steps = 10;
+
+    // Simulations for curve
+    for (let i = 0; i <= steps; i++) {
+        const simGross = (maxRange / steps) * i;
+        if (simGross === 0) {
+            points.push(0);
+            labels.push("0");
+            continue;
+        }
+
+        // Quick simulation (simplified mostly for curve shape)
+        // We reuse the core logic but need a lightweight version or just call core
+        // calling core is safer but we need inputs.
+        // Let's make a mock input object
+        const mockInputs = {
+            grossIncome: simGross,
+            typeRevenu: 'salarie',
+            applyCNSS: true,
+            chefFamille: false,
+            nbEnfants: 0,
+            nbEtudiants: 0,
+            nbInfirmes: 0,
+            nbParents: 0,
+            opSpecifiqueIrpp: 0,
+            autreDeduction: 0
+        };
+        const res = calculateIRPPCore(mockInputs);
+        const rate = (res.totalRetenue / simGross) * 100;
+        points.push(rate.toFixed(1)); // %
+        labels.push((simGross / 1000).toFixed(0) + "k");
+    }
+
+    if (pressureChartInstance) {
+        pressureChartInstance.destroy();
+    }
+
+    // Current User Point
+    const currentRate = ((window.lastCalculation.totalTax / currentGross) * 100).toFixed(1);
+
+    pressureChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Pression Fiscale (%)',
+                data: points,
+                borderColor: '#3b82f6', // Blue
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            },
+            {
+                label: 'Votre Position',
+                data: labels.map((l, i) => {
+                    // Try to place the point exactly on the X axis where user is
+                    // ChartJS categorical axis makes this tricky, simpler approach:
+                    // Just dataset with one point? 
+                    // Better: Annotation or mixed scatter. 
+                    // For simplicity: We won't plot a second dataset for the point in this quick version
+                    // unless we use scatter.
+                    // Instead: We rely on the tooltip of the main curve.
+                    return null;
+                }),
+                // ...
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false },
+                annotation: {
+                    // Requires plugin, skipping complex annotations
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `Pression: ${context.raw}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Taux Imposition (%)', color: '#94a3b8' },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                x: {
+                    title: { display: true, text: 'Revenu Brut (DT)', color: '#94a3b8' },
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+/**
+ * Check for Fiscal Optimization
+ */
+function checkOptimization(result) {
+    const container = document.getElementById('optimization-suggestions');
+    if (!container) return;
+
+    container.innerHTML = ''; // Clear
+
+    const suggestions = [];
+    const t = (key) => (window.I18N_DATA && window.I18N_DATA['fr'] && window.I18N_DATA['fr'][key]) || key; // Helper simple
+
+    // Rule 1: CEA (Compte Epargne Actions)
+    // If Net Annual > 20k and Tax > 1000, suggest CEA
+    if (result.netMensuel * 12 > 20000 && result.irpp > 1000) {
+        const potentialSave = Math.min(result.irpp, 500); // Rough estimate
+        suggestions.push({
+            icon: '📉',
+            title: 'Compte Épargne en Actions (CEA)',
+            text: `Vous pouvez déduire jusqu'à 20 000 DT par an. Gain d'impôt estimé : jusqu'à 35% du montant versé.`
+        });
+    }
+
+    // Rule 2: Assurance Vie
+    if (result.netMensuel * 12 > 15000) {
+        suggestions.push({
+            icon: '🛡️',
+            title: 'Assurance Vie',
+            text: `Déduction possible jusqu'à 10 000 DT / an. Utile pour préparer la retraite et réduire l'assiette imposable.`
+        });
+    }
+
+    if (suggestions.length > 0) {
+        let html = `
+            <div style="margin-top: 25px; padding: 15px; border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.1); border-radius: 12px;">
+                <h4 style="margin: 0 0 10px 0; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                    ⚡ Pistes d'Optimisation Fiscale
+                </h4>
+        `;
+
+        suggestions.forEach(s => {
+            html += `
+                <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+                    <span style="font-size: 1.2em;">${s.icon}</span>
+                    <div>
+                        <strong style="color: #fbbf24;">${s.title}</strong>
+                        <p style="margin: 2px 0; font-size: 0.9em; opacity: 0.8;">${s.text}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        container.innerHTML = html;
+    }
 }

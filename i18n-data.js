@@ -44,7 +44,7 @@ window.I18N_DATA = {
         "irpp_title": "Impôt sur le Revenu (IRPP)",
         "irpp_subtitle": "Simulateur multi-barèmes (2025-2026)",
         "irpp_mon_bilan": "📊 Mon Bilan Fiscal",
-        "irpp_status_pending": "En attente de calcul",
+        "irpp_status_pending": "---",
         "label_salary": "Salaire Brut Mensuel (DT)",
         "label_salary_monthly": "Salaire Brut Mensuel (DT)",
         "label_salary_annual": "Salaire Brut Annuel (DT)",
@@ -141,8 +141,16 @@ window.I18N_DATA = {
         "label_is_min_impot": "Minimum d'Impôt (IMF)",
         "label_is_du_retenu": "IS Dû Retenu",
         "label_tcl_ca": "TCL (0.2% CA)",
+        "label_reinvested_amount": "Montant Réinvesti (Dégrèvement)",
+        "help_reinvest_limit": "Réduit l'impôt jusqu'au seuil de 20% du bénéfice.",
+        "label_tax_credit": "Crédit d'Impôt",
+        "help_tax_credit": "Déduction directe de l'IS dû (ex: R&D).",
         "btn_calc_is": "Calculer IS 2026",
         "res_is_pay": "Total à Payer (IS + Contributions)",
+        "label_comparative_analysis": "🎁 Analyse d'Impact Fiscal",
+        "label_standard_mode": "Régime Standard",
+        "label_optimized_mode": "Optimisé (Avec avantages)",
+        "msg_you_save": "Vous économisez",
 
         "sect_culture": "Culture & Loisirs",
         "sect_recycling": "Recyclage & Environnement",
@@ -330,6 +338,8 @@ window.I18N_DATA = {
         "cb_zdr": "Zone Régionale (ZDR)",
         "cb_startup": "Label Startup",
         "cb_export": "Exportateur",
+        "cb_extension": "Extension Activité",
+        "warn_multiple_advantages": "Plusieurs avantages cochés : seul le plus favorable sera appliqué (non-cumul légal).",
         "btn_start_audit": "Lancer l'Audit Automatique",
         "label_current_context": "CONTEXTE ACTUEL",
         "label_net_estimation": "ESTIMATION NETTE",
@@ -391,6 +401,8 @@ window.I18N_DATA = {
         "status_synced": "Synchronisé !",
         "status_failed": "Échec",
         "status_retry": "Ressayer",
+        "label_best_option": "🏆 Meilleure Option LF 2026",
+        "msg_best_option_prefix": "D'après notre analyse, le régime le plus avantageux est :",
 
         // Chat
         "chat_title": "Assistant Fiscal",
@@ -443,7 +455,24 @@ window.I18N_DATA = {
         "opt_commerce": "Commerce / Industrie",
         "res_ae_tax": "Contribution Unique à Payer",
         "res_ae_social": "Charges Sociales (CNSS)",
-        "ae_threshold_warning": "Attention : Le chiffre d'affaires dépasse le plafond de 75 000 DT."
+        "ae_threshold_warning": "Attention : Le chiffre d'affaires dépasse le plafond de 75 000 DT.",
+
+        // Comparative (Extended)
+        "compare_main_title": "📊 IRPP vs IS : Quel régime choisir ?",
+        "compare_subtitle_main": "Déterminez le régime optimal pour votre activité",
+        "label_est_profit": "Bénéfice Net Estimé (Annuel)",
+        "label_manager_salary": "Salaire Gérant (Mensuel)",
+        "btn_run_compare": "Lancer la Comparaison",
+        "compare_evolution_title": "📅 Évolution Fiscale (2025 vs 2026)",
+        "compare_evolution_desc": "Simulez l'impact du nouveau barème 2026 sur vos revenus.",
+        "label_annual_taxable_income": "Revenu Annuel Imposable",
+        "btn_compare_history": "Comparer",
+        "res_compare_advantageous": "Résultat : {{best}} est plus avantageux",
+        "res_irpp_direct": "IRPP Direct",
+        "res_is_dividends": "IS + Dividendes",
+        "label_potential_saving": "Économie potentielle :",
+        "label_buy_power_gain": "🔥 Gain de pouvoir d'achat :",
+        "label_fiscal_pressure_increase": "Légère augmentation de la pression fiscale."
     },
     // ---------------------- TUNISIAN (TN) ----------------------
     "tn": {
@@ -486,7 +515,7 @@ window.I18N_DATA = {
         "irpp_title": "Dhariba 3al Chahriya (IRPP)",
         "irpp_subtitle": "Calculateur barème jdid (2025-2026)",
         "irpp_mon_bilan": "📊 Bilan mta3ek",
-        "irpp_status_pending": "Mazelna ma 7sebnach",
+        "irpp_status_pending": "---",
         "label_salary": "Salaire Brut (Chahriya)",
         "label_salary_monthly": "Salaire Brut (Chahriya)",
         "label_salary_annual": "Salaire Brut (Fel 3am)",
@@ -582,8 +611,16 @@ window.I18N_DATA = {
         "label_is_min_impot": "A9al 7aja IS",
         "label_is_du_retenu": "IS Dû",
         "label_tcl_ca": "TCL (0.2% CA)",
+        "label_reinvested_amount": "Flous 3awedt estathmartha",
+        "help_reinvest_limit": "Tna9es l'impot ama max 20% mel rbe7.",
+        "label_tax_credit": "Crédit d'impôt (Tna7i mel IS)",
+        "help_tax_credit": "Direct mel IS (Formation, R&D).",
         "btn_calc_is": "A7seb IS 2026",
         "res_is_pay": "Total el kol (IS + CSS)",
+        "label_comparative_analysis": "🎁 Chouf el far9 (Comparatif)",
+        "label_standard_mode": "Régime 3adi",
+        "label_optimized_mode": "Optimisé (Bel Avantages)",
+        "msg_you_save": "Rbe7t",
 
         "sect_culture": "Thajafa w Jaw",
         "sect_recycling": "Recyclage",
@@ -833,6 +870,8 @@ window.I18N_DATA = {
         "status_synced": "Mchat !",
         "status_failed": "Echec",
         "status_retry": "N3awed",
+        "label_best_option": "🏆 Ahsen 7aja LF 2026",
+        "msg_best_option_prefix": "7asb ma choufna, ahsen regime lik howa :",
 
         // Chat
         "chat_title": "Assistant Fiscal Dhki",
@@ -886,7 +925,24 @@ window.I18N_DATA = {
         "res_ae_tax": "Contribution Unique elli tkhallesha",
         "res_ae_social": "Charges Sociales (CNSS)",
         "ae_threshold_warning": "Balek: CA فات 75 malyoun (Plafond).",
-        "result_tax": "El Hada w Dhrayeb"
+        "result_tax": "El Hada w Dhrayeb",
+
+        // Comparative (Extended)
+        "compare_main_title": "📊 مقارنة : IRPP والا IS ؟",
+        "compare_subtitle_main": "Chouf ana regime khir le lik",
+        "label_est_profit": "Rbe7 el kol fil 3am (Bénéfice)",
+        "label_manager_salary": "Chahrit el Gerant (Kol chhar)",
+        "btn_run_compare": "Abda el Mo9arna",
+        "compare_evolution_title": "📅 Chnouwa tbadal (2025 vs 2026)",
+        "compare_evolution_desc": "Chouf el barème jdid chnouya badal fi chahritik.",
+        "label_annual_taxable_income": "Madkhoul fil 3am",
+        "btn_compare_history": "Mo9arna",
+        "res_compare_advantageous": "Résultat : طلب الـ {{best}} هو الأنسب",
+        "res_irpp_direct": "IRPP Direct",
+        "res_is_dividends": "IS + Dividendes",
+        "label_potential_saving": "Erbe7 mta3ek :",
+        "label_buy_power_gain": "🔥 Gain fi pouvoir d'achat :",
+        "label_fiscal_pressure_increase": "Ziyada sghira fil dhariba."
     },
     // ---------------------- ARABIC (AR) ----------------------
     "ar": {
@@ -929,7 +985,7 @@ window.I18N_DATA = {
         "irpp_title": "الضريبة على دخل الأشخاص الطبيعيين",
         "irpp_subtitle": "محاكاة حسب الجدول الجديد (2025-2026)",
         "irpp_mon_bilan": "📊 ملخصي الجبائي",
-        "irpp_status_pending": "في انتظار الاحتساب",
+        "irpp_status_pending": "---",
         "label_salary": "الراتب الخام الشهري (د.ت)",
         "label_salary_monthly": "الراتب الخام الشهري (د.ت)",
         "label_salary_annual": "الراتب الخام السنوي (د.ت)",
@@ -1025,8 +1081,16 @@ window.I18N_DATA = {
         "label_is_min_impot": "الحد الأدنى للضريبة",
         "label_is_du_retenu": "الضريبة المستوجبة",
         "label_tcl_ca": "المعلوم على المؤسسات (0.2%)",
+        "label_reinvested_amount": "المبلغ المعاد استثماره (طرح)",
+        "help_reinvest_limit": "تخفيض الضريبة في حدود 20% من الربح.",
+        "label_tax_credit": "اعتماد جبائي (Crédit d'impôt)",
+        "help_tax_credit": "يطرح مباشرة من الضريبة المستوجبة.",
         "btn_calc_is": "احتساب ضريبة الشركات 2026",
         "res_is_pay": "المجموع للدفع (ضريبة + مساهمات)",
+        "label_comparative_analysis": "🎁 تحليل الأثر الجبائي",
+        "label_standard_mode": "النظام العادي",
+        "label_optimized_mode": "النظام مع الامتيازات",
+        "msg_you_save": "مقتصد",
 
         "sect_culture": "الثقافة والترفيه",
         "sect_recycling": "الرسكلة والبيئة",
@@ -1280,6 +1344,8 @@ window.I18N_DATA = {
         "status_synced": "تم !",
         "status_failed": "فشل",
         "status_retry": "إعادة",
+        "label_best_option": "🏆 الخيار الأمثل (قانون 2026)",
+        "msg_best_option_prefix": "حسب تحليلنا، النظام الأنسب لك هو:",
 
         // Chat
         "chat_title": "المساعد الجبائي",
@@ -1333,6 +1399,23 @@ window.I18N_DATA = {
         "opt_commerce": "تجارة / صناعة",
         "res_ae_tax": "المساهمة الوحيدة المستوجبة",
         "res_ae_social": "التغطية الاجتماعية (CNSS)",
-        "ae_threshold_warning": "تنبيه: رقم المعاملات تجاوز السقف القانوني (75,000 د.ت)."
+        "ae_threshold_warning": "تنبيه: رقم المعاملات تجاوز السقف القانوني (75,000 د.ت).",
+
+        // Comparative (Extended)
+        "compare_main_title": "📊 مقارنة الأنظمة: IRPP أو IS؟",
+        "compare_subtitle_main": "حدد النظام الضريبي الأمثل لنشاطك",
+        "label_est_profit": "الربح الصافي السنوي التقديري",
+        "label_manager_salary": "جراية المسير (شهرية)",
+        "btn_run_compare": "بدء المقارنة",
+        "compare_evolution_title": "📅 التطور الجبائي (2025 مقابل 2026)",
+        "compare_evolution_desc": "حاكِ تأثير الجدول الجديد لعام 2026 على مداخيلك.",
+        "label_annual_taxable_income": "الدخل السنوي الخام الخاضع للضريبة",
+        "btn_compare_history": "مقارنة",
+        "res_compare_advantageous": "النتيجة : طلب الـ {{best}} هو الأنسب",
+        "res_irpp_direct": "الضريبة المباشرة (IRPP)",
+        "res_is_dividends": "ضريبة الشركات + الأرباح",
+        "label_potential_saving": "الإدخار الجبائي الممكن :",
+        "label_buy_power_gain": "🔥 زيادة في القدرة الشرائية :",
+        "label_fiscal_pressure_increase": "ارتفاع طفيف في الضغط الجبائي."
     }
 };

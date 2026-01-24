@@ -175,143 +175,135 @@ class AIService {
     }
 
     /**
-     * LOCAL KNOWLEDGE ENGINE (Standalone)
-     * Replaces Gemini/n8n with immediate deterministic responses based on JORT 148
+     * LOCAL KNOWLEDGE ENGINE (Standalone & RAG-ready)
      */
     getLocalResponse(userMessage) {
         const query = userMessage.toLowerCase();
         let response = "";
 
-        // Keywords matching with high detail
-        if (query.includes("irpp") || query.includes("impôt sur le revenu") || query.includes("salaire")) {
-            response = `### 📊 Focus Approfondi IRPP (LF 2025-2026)
+        const db = window.LegalReferenceDatabase || {};
+        if (!db.irpp) return "⚠️ Erreur: Base de données légale non chargée.";
 
-Le calcul de l'IRPP en 2026 repose sur un **barème progressif à 8 tranches**, conçu pour favoriser l'équité fiscale :
+        const matches = (word) => new RegExp(`\\b${word}\\b`, 'i').test(query);
 
-**1. Le Barème Permanent :**
-- 🟢 **0 - 5 000 DT** : 0% (Seuil d'exonération)
-- 🟡 **5 001 - 10 000 DT** : 15%
-- 🟠 **10 001 - 20 000 DT** : 25%
-- 🔴 **20 001 - 30 000 DT** : 30%
-- 🔴 **30 001 - 40 000 DT** : 33%
-- 🔴 **40 001 - 50 000 DT** : 36%
-- 🔴 **50 001 - 70 000 DT** : 38%
-- 🔥 **Au-delà de 70 000 DT** : 40%
+        // --- IRPP LOGIC (Advanced detailing) ---
+        if (matches("irpp") || query.includes("impôt sur le revenu") || matches("salaire")) {
+            const rules = db.irpp.brackets["2026"];
+            const family = db.irpp.deductions.family;
 
-**2. Les Abattements et Déductions :**
-- **Frais Professionnels** : 10% du salaire brut, mais plafonnés strictement à **2 000 DT** par an (LF 2026).
-- **Situation Familiale** : Déduction de **300 DT** pour le chef de famille, **300 DT** pour le conjoint sans revenu.
-- **Enfants à charge** : **100 DT** par enfant (max 4), avec des majorations pour les étudiants (**1000 DT**) ou les enfants handicapés (**2000 DT**).
+            response = `### 📊 Diagnostic Précis IRPP 2026 (JORT 148)
+            
+Le nouveau barème ${rules.version} (Art. 44) s'articule autour de 8 tranches :
 
-**3. Cotisations Sociales :** N'oubliez pas que le calcul du net imposable déduit d'abord la CNSS (9.18% secteur privé) ou la CNRPS (10.2% secteur public).
+| Tranche de Revenu (DT) | Taux |
+| :--- | :--- |
+| 0 - 5 000 | **0%** |
+| 5 000 - 10 000 | **15%** |
+| 10 000 - 20 000 | **25%** |
+| 20 000 - 30 000 | **30%** |
+| 30 000 - 40 000 | **33%** |
+| 40 000 - 50 000 | **36%** |
+| 50 000 - 70 000 | **38%** |
+| Au-delà de 70 000 | **40%** |
 
-*Source : Articles 44 à 52 du Code de l'IRPP.*`;
+**Déductions & Abattements (Art. 40) :**
+- **Frais Pro** : 10% du brut (Plafonné à **2000 DT**).
+- **Chef de famille** : **300 DT**.
+- **Enfants** : 150 (1er), 100 (others). Max 4 enfants.
+- **Étudiant** : **1000 DT** par enfant étudiant non boursier.
+- **Parents à charge** : **450 DT** (LF 2026)`;
+        }
+        // --- IS LOGIC (Advanced detailing) ---
+        else if (matches("is") || matches("société") || query.includes("impôt sur les sociétés")) {
+            const isRates = db.is.rates["2026"];
+            response = `### 🏢 Régime de l'IS (Loi de Finances 2026)
+            
+Les taux applicables selon l'Art. 49 sont :
+- **${isRates.standard * 100}%** : Taux standard (PME, Industries, Services).
+- **${isRates.financial * 100}%** : Banques, Assurances, Telecoms (Secteur financier).
+- **10%** : Entreprises totalement exportatrices (sous conditions).
 
-        } else if (query.includes("is") || query.includes("société") || query.includes("entreprise")) {
-            response = `### 🏢 Focus Approfondi IS (LF 2026)
+**Minimum d'Impôt (Art. 12 LF 2026) :**
+L'impôt ne peut être < **0.2% du CA brut**, même en cas de déficit.
+**CSS Entreprise** : 3% du bénéfice imposable.`;
+        }
+        // --- TVA LOGIC ---
+        else if (matches("tva")) {
+            const tva = db.tva.rates["2026"];
+            response = `### 💸 TVA & Fiscalité Indirecte 2026
+           
+Les articles 6 et 7 fixent les taux suivants :
+- **19%** : Taux de droit commun (Opérations standard).
+- **13%** : Taux intermédiaire (Tourisme, Restauration).
+- **7%** : Taux réduit (Médicaments, Aliments de base).
 
-L'Impôt sur les Sociétés subit une refonte majeure pour les exercices 2026 :
+⚠️ **Réforme Facturation** : L'Art. 18 de la LF 2026 rend la **Facture Électronique** obligatoire. Sans facture numérique conforme, la déduction de la TVA peut être remise en cause.`;
+        }
+        // --- DEADLINES (Full 상세 Month-by-Month) ---
+        else if (query.includes("échéance") || query.includes("calendrier") || query.includes("date")) {
+            response = `### 📅 Calendrier Fiscal Complet 2026
+            
+Voici l'agenda exhaustif des obligations :
 
-**1. Taux Progressifs selon l'activité :**
-- **10%** : Taux préférentiel pour l'Agriculture, la Pêche, l'Artisanat et les entreprises totalement exportatrices.
-- **20%** : Taux de droit commun pour la majorité des entreprises commerciales et industrielles.
-- **35%** : Taux majoré pour les grandes surfaces, les concessionnaires automobiles, et les opérateurs télécoms.
-- **40%** : Taux spécifique pour le secteur bancaire, financier et les compagnies d'assurances.
+**Mensuellement (Avant le 15 ou 28) :**
+- Déclaration Mensuelle (TVA, RS, TFP, FOPROLOS).
 
-**2. Minimum d'Impôt :** Même en cas de perte, les sociétés sont redevables d'un minimum d'impôt égal à **0.2% du chiffre d'affaires total brut**, plafonné ou non selon le régime.
+**Échéances Exceptionnelles :**
+- **25 Janvier** : Bilan IRPP (Salaires de Décembre).
+- **28 Février** : Déclaration Employeur (DE).
+- **25 Mars** : Déclaration Annuelle IS (Sociétés commerciales).
+- **25 Mai** : Déclaration Annuelle IRPP (Personnes Physiques).
+- **28 Juin** : **Acompte Provisionnel n°1** (20% de l'IS/IRPP 2025).
+- **28 Septembre** : **Acompte Provisionnel n°2** (20%).
+- **28 Décembre** : **Acompte Provisionnel n°3** (20%).
 
-**3. Taxe Conjoncturelle (CSS) :** Une contribution sociale de solidarité s'ajoute, variant généralement de **3% à 4%** du bénéfice fiscal.
+*Note : Si la date tombe un jour férié, l'échéance est reportée au premier jour ouvrable suivant.*`;
+        }
+        // --- STARTUP / REGIMES ---
+        else if (query.includes("startup") || query.includes("avantage") || query.includes("zdr")) {
+            response = `### 🚀 Incitations & Régimes Spéciaux
+            
+**Startup Act :**
+- Exonération totale d'IS pendant 8 ans.
+- Prise en charge des charges sociales (Patronales + Salariales) par l'État.
 
-*Source : Article 49 du Code de l'IRPP et de l'IS.*`;
+**Zones de Développement Régional (ZDR) :**
+- Déduction de 100% des revenus pendant 10 ans (Zone 1) ou 5 ans (Zone 2).
+- Prime d'investissement pouvant atteindre 30%.`;
+        }
+        // --- DEFAULT ---
+        else {
+            response = `### 🤖 Expert Fiscal AI (Mode Précis)
+             
+Je suis programmé avec les détails de la **Loi de Finances 2026**. 
+Je peux vous donner des détails précis sur :
+- **Le Barème IRPP** (Tableau des tranches)
+- **Le Calendrier 2026** (Dates des acomptes)
+- **L'IS & TVA** (Secteurs et Facturation)
+- **Les Avantages** (Startup Act, ZDR)
 
-        } else if (query.includes("tva") || query.includes("taxe sur la valeur ajoutée")) {
-            response = `### 💸 Focus Approfondi TVA (LF 2026)
-
-La TVA est un impôt indirect collecté pour le compte de l'État :
-
-**1. Structure des Taux :**
-- **7%** : Taux réduit (Produits de santé, informatique, hôtellerie, journalisme).
-- **13%** : Taux intermédiaire (Services de transport, électricité basse tension, certaines professions libérales).
-- **19%** : Taux standard (Vente de biens, prestations de services générales, produits de luxe).
-
-**2. Révolution Digitale :** En 2026, la **facturation électronique (E-Invoicing)** est généralisée. Toute déduction de TVA nécessite désormais une facture validée sur la plateforme nationale TEJ.
-
-**3. Droits à Déduction :** Seule la TVA mentionnée sur les factures conformes et payée par un moyen traçable est récupérable (règle du prorata si nécessaire).
-
-*Source : Code de la TVA Tunisienne.*`;
-
-        } else if (query.includes("rs") || query.includes("retenue") || query.includes("source")) {
-            response = `### ⚡ Focus Retenues à la Source (RS)
-
-La RS est un mécanisme de précompte de l'impôt à la source :
-
-- **Honoraires et Commissions** : **10%** pour les résidents, **15%** pour les non-résidents.
-- **Loyers** : **10%** sur le montant brut du loyer.
-- **Marchés Publics** : Généralement **1.5%** sur le montant des factures.
-- **Dividendes** : **10%** lors de la distribution aux personnes physiques.
-
-*Note : Toutes les attestations de RS doivent obligatoirement être générées via la plateforme **TEJ** en 2026.*`;
-
-        } else if (query.includes("fortune") || query.includes("if") || query.includes("isf") || query.includes("immobilier")) {
-            response = `### 💎 Impôt sur la Fortune Immobilière (IF)
-
-Introduit pour renforcer la justice fiscale, cet impôt concerne le patrimoine immobilier :
-
-- **Seuil d'imposition** : S'applique si la valeur vénale totale du patrimoine immobilier dépasse **2 000 000 DT**.
-- **Taux** : **0.5%** sur la valeur du patrimoine.
-- **Exonérations** : La résidence principale est généralement exclue (sous réserve des limites de surface) ainsi que les biens productifs utilisés pour l'exploitation économique.
-
-*Réf : Loi de Finances 2023 et actualisations LF 2026.*`;
-
-        } else if (query.includes("zdr") || query.includes("développement regional") || query.includes("avantage")) {
-            response = `### 📍 Avantages Zones de Développement Régional (ZDR)
-
-La Tunisie encourage l'investissement dans les régions intérieures via :
-
-- **Exonération totale d'IS** : Pendant les **5 premières années** (Groupe 1) ou **10 premières années** (Groupe 2).
-- **Réduction de 50%** de l'impôt après la période d'exonération totale.
-- **Prise en charge CNSS** : L'État prend en charge la part patronale des cotisations sociales pendant 5 ou 10 ans.
-- **Prime d'investissement** : Aide financière directe pouvant atteindre 15% à 30% du coût du projet.`;
-
-        } else if (query.includes("startup") || query.includes("act") || query.includes("innovation")) {
-            response = `### 🚀 Le Startup Act (Loi 2018-20)
-
-Un cadre unique pour les entreprises innovantes labellisées :
-
-1. **Avantages Fiscaux** : Exonération totale d'IS pour la startup. Exonération d'IRPP pour les fondateurs sur les revenus issus de la startup.
-2. **Social** : Prise en charge intégrale des charges sociales par l'État.
-3. **Change** : Autorisation de détenir des comptes en devises pour faciliter les opérations internationales.
-4. **Bourse de Startup** : Allocation mensuelle versée aux fondateurs pendant la première année.`;
-
-        } else if (query.includes("bilan") || query.includes("résultat") || query.includes("mon calcul")) {
-            const snapshot = this._getFiscalSnapshot();
-            response = `### 📝 Diagnostic de votre Simulation
-
-Sur la base des données saisies dans le simulateur :
-
-> **${snapshot}**
-
-**Analyse Pédagogique :**
-Ce résultat tient compte du barème **LF 2026** (8 tranches). Si vous basculez sur 2025, vous remarquerez une différence notable due à l'ancienne structure à 5 tranches. 
-
-Pour optimiser votre situation, vérifiez si vous avez bien saisi vos **avantages famille** (Chef de famille, enfants étudiants) qui impactent directement votre base imposable.`;
-
-        } else {
-            response = `### 🤖 Assistant Fiscal Expert (Local)
-
-Je suis configuré pour vous aider sur tous les modules de la plateforme. Posez-moi une question détaillée sur :
-
-- **IRPP** : Barèmes 2025/2026, déductions familiales, frais pros.
-- **IS** : Taux selon l'activité (10/20/35/40%), CSS, minimum d'impôt.
-- **TVA** : Taux (7, 13, 19%), E-Invoicing, récupérabilité.
-- **Retenues à la Source** : Honoraires, loyers, plateforme TEJ.
-- **Impôt Fortune** : Seuils et taux immobiliers.
-- **Incitations** : ZDR, Startup Act, Exportation.
-
-*Je fonctionne en mode local pour garantir votre confidentialité et une réponse instantanée sans internet.*`;
+Posez une question spécifique pour obtenir les détails techniques !`;
         }
 
         return response;
+    }
+
+    /**
+     * Builds the System Prompt Analysis Context (RAG)
+     * Injects the entire LegalReferenceDatabase as text for the AI
+     */
+    buildRAGContext() {
+        const db = window.LegalReferenceDatabase;
+        if (!db) return "";
+
+        return `
+CONTEXTE LÉGAL OFFICIEL (TUNISIE 2026) :
+1. IRPP : ${JSON.stringify(db.irpp.brackets["2026"])}
+2. DÉDUCTIONS : ${JSON.stringify(db.irpp.deductions)}
+3. IS : ${JSON.stringify(db.is.rates["2026"])}
+4. TVA : ${JSON.stringify(db.tva.rates["2026"])}
+5. ZDR : ${JSON.stringify(db.is.zdr)}
+`;
     }
 
     async sendToN8N(userMessage, onChunk = null, onComplete = null, onError = null) {

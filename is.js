@@ -1,36 +1,40 @@
 // IS - IMPÔT SUR LES SOCIÉTÉS - LF 2026
+// Updated with Comparative Logic (Before/After Optimization)
 
 // I18N Keys for Sectors and Groups
 const SECTOR_OPTIONS = [
-    // --- TAUX 10% (Activités Spécifiques) ---
-    { id: "agri", lang_key: "sect_agri", is: 0.10, css: 0.03, spec: 0, min: 0.001, group_key: "group_10" },
-    { id: "artisanat", lang_key: "sect_artisanat", is: 0.10, css: 0.03, spec: 0, min: 0.001, group_key: "group_10" },
-    { id: "culture", lang_key: "sect_culture", is: 0.10, css: 0.03, spec: 0, min: 0.001, group_key: "group_10" },
-    { id: "recyclage", lang_key: "sect_recycling", is: 0.10, css: 0.03, spec: 0, min: 0.001, group_key: "group_10" },
+    // --- TAUX 10% (Prioritaires / Export) ---
+    { id: "agri", lang_key: "sect_agri", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
+    { id: "artisanat", lang_key: "sect_artisanat", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
+    { id: "export", lang_key: "sect_export", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
 
-    // --- TAUX 20% (Droit Commun) ---
-    { id: "commun", lang_key: "sect_common", is: 0.20, css: 0.03, spec: 0, min: 0.002, group_key: "group_20" },
-    { id: "commerce", lang_key: "sect_commerce", is: 0.20, css: 0.03, spec: 0, min: 0.002, group_key: "group_20" },
-    { id: "industrie", lang_key: "sect_industrie", is: 0.20, css: 0.03, spec: 0, min: 0.002, group_key: "group_20" },
+    // --- TAUX PROGRESSIF (Droit Commun : 15% / 20% / 25%) ---
+    // CA < 5M: 15% | 5M <= CA < 20M: 20% | CA >= 20M: 25%
+    { id: "commun", lang_key: "sect_common", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "commerce", lang_key: "sect_commerce", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "industrie", lang_key: "sect_industrie", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "services", lang_key: "sect_services", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "btp", lang_key: "sect_btp", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "transport", lang_key: "sect_transport", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "tourisme", lang_key: "sect_tourism", type: "progressive", css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
 
-    // --- TAUX 35% (Haute Rentabilité) ---
-    { id: "telecom", lang_key: "sect_telecom", is: 0.35, css: 0.03, spec: 0.04, min: 0.002, group_key: "group_35" },
-    { id: "petrole", lang_key: "sect_oil", is: 0.35, css: 0.03, spec: 0, min: 0.002, group_key: "group_35" },
-    { id: "grandes_surfaces", lang_key: "sect_hyper", is: 0.35, css: 0.03, spec: 0, min: 0.002, group_key: "group_35" },
-    { id: "auto", lang_key: "sect_auto", is: 0.35, css: 0.03, spec: 0.04, min: 0.002, group_key: "group_35" },
-    { id: "franchise", lang_key: "sect_franchise", is: 0.35, css: 0.03, spec: 0, min: 0.002, group_key: "group_35" },
-    { id: "investissement", lang_key: "sect_invest", is: 0.35, css: 0.03, spec: 0, min: 0.002, group_key: "group_35" },
+    // --- TAUX 35% (Spécifiques) ---
+    { id: "telecom", lang_key: "sect_telecom", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
+    { id: "petrole", lang_key: "sect_oil", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
+    { id: "grandes_surfaces", lang_key: "sect_hyper", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
+    { id: "auto", lang_key: "sect_auto", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
+    { id: "franchise", lang_key: "sect_franchise", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
+    { id: "immo", lang_key: "sect_immo", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
 
-    // --- TAUX 43% (Secteur Financier - 35% + CSS 4% + Taxe Consolidée 4%) ---
-    { id: "banque", lang_key: "sect_bank", is: 0.35, css: 0.04, spec: 0.04, min: 0.002, group_key: "group_finance" },
-    { id: "leasing", lang_key: "sect_leasing", is: 0.35, css: 0.04, spec: 0.04, min: 0.002, group_key: "group_finance" },
-    { id: "assurance", lang_key: "sect_insurance", is: 0.35, css: 0.04, spec: 0.04, min: 0.002, group_key: "group_finance" },
+    // --- TAUX 40% (Financier - Banques & Assurances - LF 2026) ---
+    { id: "banque", lang_key: "sect_bank", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
+    { id: "assurance", lang_key: "sect_insurance", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
+    { id: "leasing", lang_key: "sect_leasing", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
 
-    // --- RÉGIME SPÉCIAL : Nouvelles Entreprises (2024-2025) ---
-    { id: "nouvelle_1", lang_key: "sect_new_1", is: 0.00, css: 0, spec: 0, min: 0, group_key: "group_new" },
-    { id: "nouvelle_2", lang_key: "sect_new_2", is: 0.05, css: 0.03, spec: 0, min: 0.002, group_key: "group_new" },
-    { id: "nouvelle_3", lang_key: "sect_new_3", is: 0.10, css: 0.03, spec: 0, min: 0.002, group_key: "group_new" },
-    { id: "nouvelle_4", lang_key: "sect_new_4", is: 0.15, css: 0.03, spec: 0, min: 0.002, group_key: "group_new" }
+    // --- RÉGIME SPÉCIAL : Nouvelles Entreprises ---
+    // Taux dégressifs fixes pour simplification ici (ou géré via logique ZDR/New)
+    { id: "nouvelle_1", lang_key: "sect_new_1", type: "fixed", rate: 0.00, css: 0, min_tax: 0, group_key: "group_new" },
+    { id: "nouvelle_4", lang_key: "sect_new_4", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, group_key: "group_new" }
 ];
 
 function initIS() {
@@ -42,113 +46,105 @@ function initIS() {
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
     };
 
-    // Group options by category
+    // Group options
     let groups = {};
     SECTOR_OPTIONS.forEach(s => {
         if (!groups[s.group_key]) groups[s.group_key] = [];
         groups[s.group_key].push(s);
     });
 
-    // Generate grouped options HTML
     let optionsHtml = '';
-    for (const [groupKey, sectors] of Object.entries(groups)) {
-        optionsHtml += `<optgroup label="${t(groupKey)}">`;
-        sectors.forEach(s => {
-            optionsHtml += `<option value="${s.id}">${t(s.lang_key)}</option>`;
-        });
-        optionsHtml += `</optgroup>`;
-    }
+    // Priority order for groups
+    const order = ['group_progressive', 'group_10', 'group_35', 'group_finance', 'group_new'];
+
+    order.forEach(groupKey => {
+        if (groups[groupKey]) {
+            optionsHtml += `<optgroup label="${t(groupKey) || groupKey}">`;
+            groups[groupKey].forEach(s => {
+                optionsHtml += `<option value="${s.id}">${t(s.lang_key)}</option>`;
+            });
+            optionsHtml += `</optgroup>`;
+        }
+    });
 
     container.innerHTML = `
-        <!-- Main Form -->
-        <!-- Section 1: Secteur -->
         <div class="form-section" style="border-left: 4px solid var(--primary);">
             <div class="section-title">
-                <span class="icon">🏢</span>
-                <span data-i18n="label_sector">Secteur d'Activité</span>
+                <span class="icon">🏢</span> <span data-i18n="label_sector">Secteur d'Activité</span>
             </div>
-            
             <div class="form-group">
                 <select id="secteurActivite" class="form-control" style="font-weight: 500;">
                     ${optionsHtml}
                 </select>
             </div>
-            
-            <div class="info-bubble" id="taux-info" style="font-size: 0.9em;">
-                <!-- Will be updated by JS -->
-            </div>
+            <div class="info-bubble" id="taux-info" style="font-size: 0.9em;"></div>
         </div>
 
-        <!-- Section 2: Résultats -->
         <div class="form-section">
             <div class="section-title">
-                <span class="icon">📊</span>
-                <span data-i18n="label_financial_results">Résultats Financiers</span>
+                <span class="icon">📊</span> <span data-i18n="label_financial_results">Résultats Financiers</span>
             </div>
-            
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label data-i18n="label_accounting_result">${t("label_accounting_result")}</label>
-                    <input type="number" id="resComptable" class="form-control" data-i18n="[placeholder]placeholder_benefit_loss" placeholder="${t("placeholder_benefit_loss")}">
+                    <label data-i18n="label_turnover_ttc">${t("label_turnover_ttc")}</label>
+                    <input type="number" id="caTtc" class="form-control" placeholder="Total TTC (Min. Impôt)" oninput="updateSectorInfo()"> 
+                    <!-- Trigger update because rate depends on CA now -->
                 </div>
                 <div class="form-group flex-col-50">
-                    <label data-i18n="label_turnover_ttc">${t("label_turnover_ttc")}</label>
-                    <input type="number" id="caTtc" class="form-control" data-i18n="[placeholder]placeholder_min_tax_base" placeholder="${t("placeholder_min_tax_base")}">
-                    <div class="help-text" data-i18n="help_min_tax_base">${t("help_min_tax_base")}</div>
+                    <label data-i18n="label_accounting_result">${t("label_accounting_result")}</label>
+                    <input type="number" id="resComptable" class="form-control" placeholder="Bénéfice Net">
                 </div>
             </div>
         </div>
 
-        <!-- Section 3: Ajustements Fiscaux -->
         <div class="form-section">
             <div class="section-title">
-                <span class="icon">⚖️</span>
-                <span data-i18n="label_fiscal_adjustments">Ajustements Fiscaux</span>
+                <span class="icon">⚖️</span> <span data-i18n="label_fiscal_adjustments">Ajustements & Avantages</span>
             </div>
             
             <div class="flex-row">
                 <div class="form-group flex-col-50">
                     <label data-i18n="label_reintegrations">Réintégrations (+)</label>
-                    <div class="info-bubble" style="font-size: 0.75em; color: var(--warning); margin-bottom: 5px;" data-i18n="help_reintegrations">
-                        ${t("help_reintegrations")}
-                    </div>
                     <input type="number" id="reintegrations" class="form-control" value="0">
-                    
-                    <label style="margin-top:10px; display:block" data-i18n="label_op_specific">${t("label_op_specific")}</label>
-                    <input type="number" id="opSpecifiqueIs" class="form-control" placeholder="0.00">
                 </div>
                 <div class="form-group flex-col-50">
-                    <label data-i18n="label_deductions">${t("label_deductions")}</label>
-                    <div class="info-bubble" style="font-size: 0.75em; color: var(--success); margin-bottom: 5px;" data-i18n="help_deductions">
-                        ${t("help_deductions")}
-                    </div>
+                    <label data-i18n="label_deductions">Déductions Classiques (-)</label>
                     <input type="number" id="deductions" class="form-control" value="0">
+                </div>
+            </div>
+
+            <!-- New: Reinvestment Section -->
+            <div class="form-group" style="margin-top: 15px; background: rgba(34, 197, 94, 0.05); padding: 10px; border-radius: 8px; border: 1px dashed rgba(34, 197, 94, 0.3);">
+                <div class="flex-row">
+                    <div class="flex-col-50">
+                        <label style="color: var(--success); font-weight: 600;">🌱 ${t("label_reinvested_amount")}</label>
+                        <div style="font-size: 0.8em; opacity: 0.7; margin-bottom: 5px;">${t("help_reinvest_limit")}</div>
+                        <input type="number" id="montantReinvesti" class="form-control" placeholder="Déduction Base" value="0">
+                    </div>
+                    <div class="flex-col-50">
+                        <label style="color: var(--accent); font-weight: 600;">💳 ${t("label_tax_credit") || "Crédit d'Impôt"}</label>
+                        <div style="font-size: 0.8em; opacity: 0.7; margin-bottom: 5px;">${t("help_tax_credit") || "Déduction directe de l'IS dû."}</div>
+                        <input type="number" id="creditImpot" class="form-control" placeholder="R&D, Formation..." value="0">
+                    </div>
                 </div>
             </div>
         </div>
 
         <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
-            <button id="btn-calc-is" class="btn-primary" style="flex: 2;" data-i18n="btn_calc_is">
-                <span class="icon">📊</span> ${t("btn_calc_is")}
+            <button id="btn-calc-is" class="btn-primary" style="flex: 2;">
+                <span class="icon">📊</span> ${t("btn_compare_history") || "Simuler & Comparer"}
             </button>
             <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
                 <input type="checkbox" id="showDetailsIS" style="margin-right: 8px;">
-                <label for="showDetailsIS" style="font-size: 0.9em; cursor: pointer; user-select: none;" data-i18n="label_details">Voir détail calcul</label>
+                <label for="showDetailsIS" style="font-size: 0.9em; cursor: pointer;">${t("label_details")}</label>
             </div>
         </div>
         <div id="result-is"></div>
     `;
 
-    // Event Listeners
     document.getElementById('btn-calc-is').addEventListener('click', calculateIS);
     document.getElementById('secteurActivite').addEventListener('change', updateSectorInfo);
 
-    // Dynamic ZDR Form Container
-    const zdrSection = document.createElement('div');
-    zdrSection.id = 'zdr-extra-fields';
-    container.insertBefore(zdrSection, document.getElementById('btn-calc-is'));
-
-    // Init Info
     updateSectorInfo();
 }
 
@@ -157,77 +153,174 @@ function updateSectorInfo() {
     const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
     if (!s) return;
 
-    // I18N Helper
+    const ca = parseFloat(document.getElementById('caTtc').value) || 0;
+
+    // Determine Rate
+    let currentRate = s.rate;
+    let rateText = "";
+
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
     };
 
-    const infoDiv = document.getElementById('taux-info');
-
-    let infoText = `<strong>${t("label_rates_2026")} :</strong> IS <span class="highlight">${(s.is * 100).toFixed(0)}%</span>`;
-
-    if (s.css > 0) infoText += ` | CSS <span class="highlight">${(s.css * 100).toFixed(0)}%</span>`;
-    if (s.spec > 0) infoText += ` | Taxe Consolidée <span class="highlight">${(s.spec * 100).toFixed(0)}%</span>`;
-    if (s.min > 0) infoText += ` | Min. Impôt <span class="highlight">${(s.min * 100).toFixed(1)}%</span> CA`;
-
-    // Special notes
-    if (s.id.startsWith('nouvelle_')) {
-        infoText += `<br><small style="color: var(--success);">${t("msg_new_company_regime")}</small>`;
-    }
-    if (s.id === 'zdr') {
-        infoText += `<br><small style="color: var(--success);">${t("msg_zdr_exo_possible")}</small>`;
-    }
-    if (s.spec > 0) {
-        infoText += `<br><small style="color: var(--warning);">${t("msg_spec_tax_warning")}</small>`;
-    }
-    infoText += `<br><small style="color: #60a5fa;">${t("msg_tcl_note")}</small>`;
-
-    infoDiv.innerHTML = infoText;
-
-    // --- MISE À JOUR FORMULAIRE ZDR ---
-    const zdrContainer = document.getElementById('zdr-extra-fields');
-    if (s.id === 'zdr') {
-        zdrContainer.innerHTML = `
-            <div class="form-section" style="border-left: 4px solid var(--success); background: rgba(16, 185, 129, 0.05);">
-                <div class="section-title">
-                    <span class="icon">📍</span>
-                    <span>${t("label_zdr_details")}</span>
-                </div>
-                
-                <div class="flex-row">
-                    <div class="form-group flex-col-50">
-                        <label>${t("label_zdr_group")}</label>
-                        <select id="zdrGroupe" class="form-control">
-                            <option value="1">${t("opt_zdr_group_1")}</option>
-                            <option value="2">${t("opt_zdr_group_2")}</option>
-                        </select>
-                    </div>
-                    <div class="form-group flex-col-50">
-                        <label>${t("label_zdr_year")}</label>
-                        <input type="number" id="zdrAnnee" class="form-control" value="1" min="1" max="50">
-                        <div class="help-text">${t("help_zdr_year")}</div>
-                    </div>
-                </div>
-
-                <div class="flex-row" style="margin-top: 15px;">
-                    <div class="form-group flex-col-50">
-                        <label>${t("label_zdr_invest")}</label>
-                        <input type="number" id="zdrInvestissement" class="form-control" placeholder="Coût du projet" value="0">
-                        <div class="help-text">${t("help_zdr_invest")}</div>
-                    </div>
-                    <div class="form-group flex-col-50">
-                        <label>${t("label_zdr_wages")}</label>
-                        <input type="number" id="zdrMasseSalariale" class="form-control" placeholder="Total salaires bruts" value="0">
-                        <div class="help-text">${t("help_zdr_wages")}</div>
-                    </div>
-                </div>
-            </div>
-        `;
+    if (s.type === 'progressive') {
+        if (ca < 5000000) { currentRate = 0.15; rateText = "15% (CA < 5 MDT)"; }
+        else if (ca < 20000000) { currentRate = 0.20; rateText = "20% (CA < 20 MDT)"; }
+        else { currentRate = 0.25; rateText = "25% (CA > 20 MDT)"; }
     } else {
-        zdrContainer.innerHTML = '';
+        rateText = `${(s.rate * 100).toFixed(0)}% (${t(s.lang_key)})`;
     }
+
+    const infoDiv = document.getElementById('taux-info');
+    infoDiv.innerHTML = `
+        <strong>Taux IS 2026 :</strong> <span class="highlight">${rateText}</span><br>
+        <small>CSS : ${(s.css * 100).toFixed(0)}% | Min. Impôt : ${(s.min_tax * 100).toFixed(1)}% CA</small>
+    `;
 }
+
+// Core Logic (Refactored for Comparison)
+function computeIS(inputs) {
+    const {
+        sectorId, resComptable, caTtc,
+        reintegrations, deductions, montantReinvesti, creditImpot,
+        isZDR, isStartup, isExport // Advantages Flags
+    } = inputs;
+
+    const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
+    if (!s) return null;
+
+    // --- Helper for Single Run Calculation ---
+    const runCalculation = (config) => {
+        const { sector, ca, res, reinvest, credit, reintegrations, deductions, zdrOverride, startupOverride, exportOverride } = config;
+
+        // 1. Rate logic
+        let rate = sector.rate;
+        if (sector.type === 'progressive') {
+            if (ca < 5000000) rate = 0.15;
+            else if (ca < 20000000) rate = 0.20;
+            else rate = 0.25;
+        }
+
+        // --- OVERRIDES (Priority: Full Exemption > Reduced Rate) ---
+
+        // ZDR or Startup: 0% (Full Exemption takes precedence)
+        if (zdrOverride || startupOverride) {
+            rate = 0;
+        }
+        // Export: 10% (unless already lower or exempt by ZDR/Startup)
+        else if (exportOverride) {
+            rate = 0.10;
+        }
+
+        // 2. Base Global
+        const baseGlobal = Math.max(0, res + reintegrations - deductions);
+
+        // 3. Deduction for Reinvestment (with 35% legal cap per Tunisian law)
+        const REINVESTMENT_CAP_RATE = 0.35;
+        const reinvestCap = baseGlobal * REINVESTMENT_CAP_RATE;
+        const deductionAmount = Math.min(reinvest, reinvestCap, baseGlobal);
+        const baseNet = baseGlobal - deductionAmount;
+        const wasReinvestCapped = reinvest > reinvestCap && reinvest > 0;
+
+        // 4. IS Net (after reinvestment deduction)
+        const isGlobal = baseGlobal * rate; // IS before any reinvestment deduction
+        let isNet = baseNet * rate; // IS after reinvestment deduction
+
+        // 5. Floor Logic for Reinvestment (20% of IS before deduction)
+        // If ZDR/Startup/Export, Floor is NOT APPLICABLE (Exempt/Special).
+        const isSpecialSector = ['agri', 'export', 'nouvelle_1'].includes(sector.id) || zdrOverride || startupOverride || exportOverride;
+
+        let isDuCalc = isNet;
+        if (!isSpecialSector && reinvest > 0) {
+            const floorReinvest = isGlobal * 0.20; // 20% of IS before reinvestment deduction
+            isDuCalc = Math.max(isNet, floorReinvest);
+        }
+
+        // 6. Tax Credit Deduction (Step 5 of User's Algorithm)
+        if (credit > 0) {
+            isDuCalc = Math.max(0, isDuCalc - credit);
+        }
+
+        // 7. Minimum Tax (CA)
+        let minTaxCA = ca * sector.min_tax;
+        minTaxCA = Math.max(minTaxCA, 500); // Minimum 500 DT
+
+        let isFinal = isDuCalc;
+        if (!isSpecialSector) {
+            isFinal = Math.max(isDuCalc, minTaxCA);
+        } else if (zdrOverride || startupOverride) {
+            // Full Exemption usually implies No Min Tax during exemption period
+            if (rate === 0) isFinal = 0;
+        } else if (exportOverride) {
+            // Export (if not fully exempt) typically has a 0.1% minimum tax on CA.
+            let exportMin = ca * 0.001;
+            isFinal = Math.max(isDuCalc, exportMin);
+        }
+
+        // 8. CSS
+        const cssRate = sector.css;
+        let css = baseNet * cssRate;
+        if ((zdrOverride || startupOverride) && rate === 0) css = 0; // No CSS if exempt
+
+        return {
+            total: isFinal + css,
+            is: isFinal,
+            css: css,
+            baseGlobal: baseGlobal,
+            baseNet: baseNet,
+            appliedRate: rate,
+            minTaxCA: minTaxCA,
+            isBeforeMin: isDuCalc,
+            reinvestmentDeducted: deductionAmount,
+            reinvestmentCapped: wasReinvestCapped,
+            reinvestmentDeclared: reinvest
+        };
+    };
+
+    // --- 1. Current Scenario (Optimized) ---
+    const optimized = runCalculation({
+        sector: s,
+        ca: caTtc,
+        res: resComptable,
+        reinvest: montantReinvesti,
+        credit: creditImpot || 0,
+        reintegrations: reintegrations,
+        deductions: deductions,
+        zdrOverride: isZDR,
+        startupOverride: isStartup,
+        exportOverride: isExport
+    });
+
+    // --- 2. Standard Scenario (No Advantages) ---
+    // Ignore all checkbox overrides for Standard
+    const isSpecialExempt = ['agri', 'export', 'nouvelle_1', 'nouvelle_4'].includes(s.id);
+    const standardSector = isSpecialExempt ? SECTOR_OPTIONS.find(o => o.id === 'commun') : s;
+
+    const standard = runCalculation({
+        sector: standardSector,
+        ca: caTtc,
+        res: resComptable,
+        reinvest: 0,
+        credit: 0,
+        reintegrations: reintegrations,
+        deductions: deductions,
+        zdrOverride: false,
+        startupOverride: false,
+        exportOverride: false
+    });
+
+    return {
+        optimized: optimized,
+        standard: standard,
+        savings: standard.total - optimized.total,
+        savingsPct: standard.total > 0 ? ((standard.total - optimized.total) / standard.total) * 100 : 0
+    };
+}
+
+// Global Export
+window.FiscalLogic = window.FiscalLogic || {};
+window.FiscalLogic.computeIS = computeIS;
 
 function calculateIS() {
     // I18N Helper
@@ -238,88 +331,65 @@ function calculateIS() {
 
     // Inputs
     const sectorId = document.getElementById('secteurActivite').value;
-    const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
-
     const resComptable = parseFloat(document.getElementById('resComptable').value) || 0;
     const caTtc = parseFloat(document.getElementById('caTtc').value) || 0;
-
     const reintegrations = parseFloat(document.getElementById('reintegrations').value) || 0;
-    const opSpecifiqueIs = parseFloat(document.getElementById('opSpecifiqueIs').value) || 0;
     const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+    const montantReinvesti = parseFloat(document.getElementById('montantReinvesti').value) || 0;
+    const creditImpot = parseFloat(document.getElementById('creditImpot').value) || 0;
 
-    // 1. Resultat Fiscal
-    const resFiscal = resComptable + reintegrations + opSpecifiqueIs - deductions;
-    const baseImposable = Math.max(0, resFiscal);
+    // Perform Calculation
+    const result = computeIS({
+        sectorId, resComptable, caTtc, reintegrations, deductions, montantReinvesti, creditImpot
+    });
 
-    // --- LOGIQUE ZDR ---
-    let isAppliedRate = s.is;
-    let isExoTotale = false;
-    let zdrPrime = 0;
-    let cnssEconomie = 0;
-    let zdrStatus = "";
+    if (!result) return;
 
-    if (sectorId === 'zdr') {
-        const groupe = parseInt(document.getElementById('zdrGroupe').value);
-        const annee = parseInt(document.getElementById('zdrAnnee').value);
-        const invest = parseFloat(document.getElementById('zdrInvestissement').value) || 0;
-        const masseSalariale = parseFloat(document.getElementById('zdrMasseSalariale').value) || 0;
-
-        const limitExo = (groupe === 1) ? 5 : 10;
-        if (annee <= limitExo) {
-            isAppliedRate = 0;
-            isExoTotale = true;
-            zdrStatus = t("res_zdr_exo_total").replace("{{annee}}", annee).replace("{{total}}", limitExo);
-        } else {
-            isAppliedRate = 0.10;
-            zdrStatus = t("res_zdr_reduced_late");
-        }
-
-        // Prime d'investissement
-        const primeRate = (groupe === 1) ? 0.15 : 0.30;
-        const primeMax = (groupe === 1) ? 1500000 : 3000000;
-        zdrPrime = Math.min(invest * primeRate, primeMax);
-
-        // Economie CNSS (16.57%)
-        if (annee <= limitExo) {
-            cnssEconomie = masseSalariale * 0.1657;
-        }
-    }
-
-    // 2. IS Calculé
-    const isCalcule = baseImposable * isAppliedRate;
-
-    // 3. Minimum d'Impôt (0.2% standard, 0.1% pour taux 10%)
-    const minImpot = caTtc * s.min;
-
-    // 4. IS Dû (Le plus élevé entre IS Calculé et Min Impôt)
-    const isDu = Math.max(isCalcule, minImpot);
-
-    // 5. Contributions Additionnelles
-    let cssAmount = 0;
-    let specTaxAmount = 0;
-
-    if (baseImposable > 0) {
-        // 5.a CSS (Art. 88 LF 2024 / LF 2026) 
-        // 4% Banques/Assurances, 3% Autres Sociétés
-        cssAmount = baseImposable * s.css;
-
-        // 5.b Taxe Spéciale Consolidée (4% - LF 2026)
-        if (s.spec > 0) {
-            specTaxAmount = baseImposable * s.spec;
-        }
-    }
-
-    // 6. TCL (Taxe Locative / Établissements) - 0.2% du CA Local
-    const tclAmount = caTtc * 0.002;
-
-    const totalAPayer = isDu + cssAmount + specTaxAmount + tclAmount;
-
-    // Which tax applies?
-    const isMinApplied = minImpot > isCalcule;
+    // Destructure results
+    const opt = result.optimized;
+    const std = result.standard;
+    const savings = result.savings;
 
     // Display
     const resultDiv = document.getElementById('result-is');
     const showDetails = document.getElementById('showDetailsIS').checked;
+
+    // Comparison Chart Logic
+    const barMax = Math.max(std.total, opt.total);
+    const stdWidth = (std.total / barMax) * 100;
+    const optWidth = (opt.total / barMax) * 100;
+
+    let comparisonsHtml = '';
+    if (savings > 100) { // Show comparison if significant saving
+        comparisonsHtml = `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px;">
+                <h4 style="margin:0 0 10px 0; font-size:0.95em; color:#fff;">🎁 ${t("label_comparative_analysis") || "Analyse d'Impact Fiscal"}</h4>
+                
+                <!-- Standard Bar -->
+                <div style="display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em;">
+                    <div style="width: 120px; color: #94a3b8;">${t("label_standard_mode") || "Régime Standard"}</div>
+                    <div style="flex: 1; height: 18px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; position: relative;">
+                        <div style="width: ${stdWidth}%; height: 100%; background: #64748b;"></div>
+                        <span style="position: absolute; right: 8px; top: 1px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${std.total.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
+                    </div>
+                </div>
+
+                <!-- Optimized Bar -->
+                <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 0.85em;">
+                    <div style="width: 120px; color: var(--success); font-weight: 600;">${t("label_optimized_mode") || "Avec Avantages"}</div>
+                    <div style="flex: 1; height: 18px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; position: relative;">
+                        <div style="width: ${optWidth}%; height: 100%; background: var(--success);"></div>
+                        <span style="position: absolute; right: 8px; top: 1px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: bold;">${opt.total.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center;">
+                    <span style="color: var(--success);">📉 ${t("msg_you_save") || "Vous économisez"} <strong>${savings.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong> (${result.savingsPct.toFixed(1)}%)</span>
+                </div>
+            </div>
+        `;
+    }
 
     // --- RECOMMANDATION 3: Transparence (Mode Détail) ---
     let detailedCalculationHtml = '';
@@ -330,41 +400,37 @@ function calculateIS() {
                 
                 <div style="display: flex; justify-content: space-between;">
                     <span>(+) ${t("label_accounting_result")}</span>
-                    <span>${resComptable.toFixed(3)}</span>
+                    <span>${resComptable.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
                     <span>(+) ${t("label_reintegrations")}</span>
-                    <span>+ ${reintegrations.toFixed(3)}</span>
+                    <span>+ ${reintegrations.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                 </div>
                  <div style="display: flex; justify-content: space-between; color: #10b981;">
                     <span>(-) ${t("label_deductions")}</span>
-                    <span>- ${deductions.toFixed(3)}</span>
+                    <span>- ${deductions.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: var(--success);">
+                    <span>(-) ${t("label_reinvested_amount")}</span>
+                    <span>- ${montantReinvesti.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; color: #fff; border-top: 1px solid #777; padding-top: 5px;">
-                    <span>(=) ${t("res_fiscal_result")}</span>
-                    <span>${resFiscal.toFixed(3)}</span>
+                    <span>(=) ${t("res_fiscal_result")} (Net)</span>
+                    <span>${(opt.baseGlobal - Math.min(montantReinvesti, opt.baseGlobal)).toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                 </div>
 
                 <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #444;">
                    <div style="display: flex; justify-content: space-between;">
-                        <span>(x) Taux IS (${(isAppliedRate * 100).toFixed(0)}%)</span>
-                        <span>= ${isCalcule.toFixed(3)}</span>
+                        <span>(x) Taux IS (${(opt.appliedRate * 100).toFixed(0)}%)</span>
+                        <span>= ${opt.isBeforeMin.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                     </div>
                      <div style="display: flex; justify-content: space-between;">
-                        <span>(vs) Minimum (${(s.min * 100).toFixed(1)}% CA)</span>
-                        <span>= ${minImpot.toFixed(3)}</span>
+                        <span>(vs) Minimum (${(opt.minTaxCA / caTtc * 100).toFixed(1)}% CA)</span>
+                        <span>= ${opt.minTaxCA.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-weight:bold; color: #fbbf24;">
                         <span>(>) IS Dû Retenu</span>
-                        <span>${isDu.toFixed(3)}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    let detailsHtml = `
         <div style="margin-bottom: 20px;">
             <!-- Section 1: Résultat Fiscal -->
             <div style="background: rgba(255,255,255,0.05); padding:12px; border-radius:8px; margin-bottom:12px;">
@@ -440,15 +506,15 @@ function calculateIS() {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div>
                             <span style="opacity:0.8">${t("label_fiscal_regime")}</span>
-                            <strong style="float:right; color: var(--success)">${zdrStatus}</strong>
+                            <strong style="float:right; color: var(--success)">${zdrStatusStr}</strong>
                         </div>
                         <div>
                             <span style="opacity:0.8">${t("label_invest_bonus")}</span>
-                            <strong style="float:right; color: #10b981">+ ${zdrPrime.toLocaleString('fr-TN')} DT</strong>
+                            <strong style="float:right; color: #10b981">+ ${zdr.prime.toLocaleString('fr-TN')} DT</strong>
                         </div>
                         <div style="grid-column: span 2;">
                             <span style="opacity:0.8">${t("label_cnss_saving")}</span>
-                            <strong style="float:right; color: #10b981">+ ${cnssEconomie.toLocaleString('fr-TN')} DT / an</strong>
+                            <strong style="float:right; color: #10b981">+ ${zdr.cnss.toLocaleString('fr-TN')} DT / an</strong>
                         </div>
                     </div>
                 </div>
@@ -459,7 +525,7 @@ function calculateIS() {
         </div>
     `;
 
-    resultDiv.innerHTML = `
+        resultDiv.innerHTML = `
         <div class="result-card">
             <div class="result-header">
                 <span>${t("label_is_total_pay")}</span>
@@ -478,26 +544,25 @@ function calculateIS() {
         </div>
     `;
 
-    document.getElementById('btn-explain-is').addEventListener('click', () => {
-        if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
-    });
+        document.getElementById('btn-explain-is').addEventListener('click', () => {
+            if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
+        });
 
-    // LOG & Global Sync
-    window.lastCalculation = {
-        type: 'IS',
-        totalTax: totalAPayer,
-        data: {
-            resComptable,
-            resFiscal,
-            isDu,
-            cssAmount,
-            specTaxAmount,
-            tclAmount,
-            totalAPayer
-        }
-    };
+        // LOG & Global Sync
+        window.lastCalculation = {
+            type: 'IS',
+            totalTax: totalAPayer,
+            data: {
+                resComptable,
+                resFiscal,
+                isDu,
+                cssAmount,
+                specTaxAmount,
+                tclAmount,
+                totalAPayer
+            }
+        };
 
-    if (window.shareWithAI) {
-        window.shareWithAI(window.lastCalculation);
-    }
+    } // Close if(result) scope if needed or just end function
 }
+

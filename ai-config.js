@@ -152,13 +152,13 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
 
     // Quick action prompts (educational and user-friendly)
     quickActions: {
-        explainIRPP: "Explique-moi comment fonctionne le calcul de l'IRPP en 2026",
-        explainIS: "Quels sont les taux d'IS en 2026 ?",
-        compareIRPPIS: "Quelle est la différence entre IRPP et IS ?",
-        explainTVA: "Comment fonctionne la TVA ?",
-        explainRS: "C'est quoi la Retenue à la Source ?",
-        zdrBenefits: "Quels sont les avantages ZDR ?",
-        startupAct: "Explique-moi le Startup Act",
+        action_explain_irpp: "Explique-moi comment fonctionne le calcul de l'IRPP en 2026",
+        action_explain_is: "Quels sont les taux d'IS en 2026 ?",
+        action_explain_tva: "Quels sont les taux de TVA en 2026 ?",
+        action_explain_rs: "Comment fonctionne la retenue à la source (RS) ?",
+        action_explain_startup: "Quels sont les avantages du Startup Act ?",
+        action_explain_zdr: "Quels sont les avantages fiscaux en zone de développement régional (ZDR) ?",
+        action_calendar: "Quelles sont les prochaines échéances fiscales importantes ?",
         explainMyResult: "Explique-moi mon résultat de calcul"
     },
 

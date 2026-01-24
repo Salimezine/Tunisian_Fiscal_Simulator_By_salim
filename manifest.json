@@ -1,0 +1,21 @@
+{
+    "name": "Simulateur Fiscal Tunisien 2026",
+    "short_name": "Fiscal TN",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#1e293b",
+    "theme_color": "#3b82f6",
+    "description": "Simulateur d'impôts tunisien (IRPP, IS, TVA) conforme à la Loi de Finances 2026.",
+    "icons": [
+        {
+            "src": "isaas_logo.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        },
+        {
+            "src": "isaas_logo.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}

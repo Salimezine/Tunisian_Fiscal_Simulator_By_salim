@@ -367,7 +367,37 @@
     height: 20px;
 }
 
-/* Shortcuts Refined */
+/* Shortcuts & Tabs Refined */
+.chat-tabs-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 8px;
+}
+
+.chat-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.chat-tab-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chat-tab-btn.active {
+    color: var(--premium-purple);
+    background: rgba(168, 85, 247, 0.1);
+}
+
 .chat-shortcuts {
     display: flex;
     gap: 10px;
@@ -375,6 +405,10 @@
     padding: 4px 0;
     margin-bottom: 16px;
     scrollbar-width: none;
+}
+
+.chat-shortcuts.hidden {
+    display: none;
 }
 
 .chat-shortcuts::-webkit-scrollbar {
