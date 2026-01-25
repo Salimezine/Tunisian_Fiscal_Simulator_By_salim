@@ -502,6 +502,7 @@ window.I18N_DATA = {
         "label_potential_saving": "Économie potentielle :",
         "label_buy_power_gain": "🔥 Gain de pouvoir d'achat :",
         "label_fiscal_pressure_increase": "Légère augmentation de la pression fiscale."
+
     },
     // ---------------------- TUNISIAN (TN) ----------------------
     "tn": {
@@ -528,6 +529,7 @@ window.I18N_DATA = {
         "tab_expert": "🛡️ الخبير",
         "tab_compare": "⚖️ مقارنة",
         "tab_auto_entrepreneur": "👤 Auto-Ent.",
+        "tab_tej": "📂 منصة تاج",
 
         // Common
         "btn_calculate": "A7seb",
@@ -597,6 +599,8 @@ window.I18N_DATA = {
         "label_css_short": "CSS (0,5%)",
         "res_gross_annual": "Chahriya Brut fi 3am",
         "label_explain_results": "Fahhemni el resultats 🤖",
+
+        // TEJ TN
 
         // IS
         "is_title": "Dhariba 3al Chariket (IS)",
@@ -1113,6 +1117,8 @@ window.I18N_DATA = {
         "label_potential_saving": "الاقتصاد الممكن:",
         "label_buy_power_gain": "✨ ربح في القدرة الشرائية:",
         "label_fiscal_pressure_increase": "⚠️ ارتفاع طفيف في الضغط الجبائي.",
+
+
         "profile_irpp": "نظام الأشخاص (IRPP)",
         "profile_is": "نظام الشركات (IS)",
         "desc_saving_2026": "+{{amount}} د.ت توفير في 2026 بفضل الجدول الجديد.",

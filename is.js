@@ -39,6 +39,7 @@ const SECTOR_OPTIONS = [
 
 function initIS() {
     const container = document.getElementById('is-container');
+    if (!container) return;
 
     // I18N Helper
     const t = (key) => {
@@ -54,12 +55,11 @@ function initIS() {
     });
 
     let optionsHtml = '';
-    // Priority order for groups
     const order = ['group_progressive', 'group_10', 'group_35', 'group_finance', 'group_new'];
 
     order.forEach(groupKey => {
         if (groups[groupKey]) {
-            optionsHtml += `<optgroup label="${t(groupKey) || groupKey}">`;
+            optionsHtml += `<optgroup label="${t(groupKey)}">`;
             groups[groupKey].forEach(s => {
                 optionsHtml += `<option value="${s.id}">${t(s.lang_key)}</option>`;
             });
@@ -80,15 +80,35 @@ function initIS() {
             <div class="info-bubble" id="taux-info" style="font-size: 0.9em;"></div>
         </div>
 
+        <!-- Advantages Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <span class="icon">🎁</span> <span>Avantages Fiscaux</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1);">
+                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                    <input type="checkbox" id="isZDR" class="custom-checkbox">
+                    <span style="font-size: 0.9em;">Zone de Dév. Régional (ZDR)</span>
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                    <input type="checkbox" id="isStartup" class="custom-checkbox">
+                    <span style="font-size: 0.9em;">Label Startup Act</span>
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                    <input type="checkbox" id="isExport" class="custom-checkbox">
+                    <span style="font-size: 0.9em;">Exportateur Total</span>
+                </label>
+            </div>
+        </div>
+
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">📊</span> <span data-i18n="label_financial_results">Résultats Financiers</span>
             </div>
             <div class="flex-row">
                 <div class="form-group flex-col-50">
-                    <label data-i18n="label_turnover_ttc">${t("label_turnover_ttc")}</label>
-                    <input type="number" id="caTtc" class="form-control" placeholder="Total TTC (Min. Impôt)" oninput="updateSectorInfo()"> 
-                    <!-- Trigger update because rate depends on CA now -->
+                    <label data-i18n="label_turnover_ht">${t("label_turnover_ht")}</label>
+                    <input type="number" id="caHt" class="form-control" placeholder="Total HT (Base Min. Impôt)"> 
                 </div>
                 <div class="form-group flex-col-50">
                     <label data-i18n="label_accounting_result">${t("label_accounting_result")}</label>
@@ -113,7 +133,6 @@ function initIS() {
                 </div>
             </div>
 
-            <!-- New: Reinvestment Section -->
             <div class="form-group" style="margin-top: 15px; background: rgba(34, 197, 94, 0.05); padding: 10px; border-radius: 8px; border: 1px dashed rgba(34, 197, 94, 0.3);">
                 <div class="flex-row">
                     <div class="flex-col-50">
@@ -122,83 +141,79 @@ function initIS() {
                         <input type="number" id="montantReinvesti" class="form-control" placeholder="Déduction Base" value="0">
                     </div>
                     <div class="flex-col-50">
-                        <label style="color: var(--accent); font-weight: 600;">💳 ${t("label_tax_credit") || "Crédit d'Impôt"}</label>
-                        <div style="font-size: 0.8em; opacity: 0.7; margin-bottom: 5px;">${t("help_tax_credit") || "Déduction directe de l'IS dû."}</div>
+                        <label style="color: var(--accent); font-weight: 600;">💳 ${t("label_tax_credit")}</label>
+                        <div style="font-size: 0.8em; opacity: 0.7; margin-bottom: 5px;">${t("help_tax_credit")}</div>
                         <input type="number" id="creditImpot" class="form-control" placeholder="R&D, Formation..." value="0">
                     </div>
                 </div>
             </div>
             
-            <!-- Advanced Mode: Note 20/2008 Classification -->
             <div style="margin-top: 15px; padding: 10px; background: rgba(99, 102, 241, 0.05); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
                 <label style="display: flex; align-items: center; cursor: pointer; color: #a5b4fc; font-size: 0.9em;">
-                    <input type="checkbox" id="enableAdvancedMode" style="margin-right: 8px;" onchange="toggleAdvancedClassification()">
+                    <input type="checkbox" id="enableAdvancedMode" style="margin-right: 8px;">
                     <span>🧠 Mode Expert - Décomposition Note 20/2008 (Catégories A/B)</span>
                 </label>
             </div>
             
             <div id="advanced-classification" style="display: none; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(99, 102, 241, 0.3);">
-                <!-- Category A: Eligible Revenues -->
                 <div style="margin-bottom: 20px;">
                     <div style="color: #4ade80; font-weight: 700; margin-bottom: 10px; font-size: 0.95em;">✅ Catégorie A - Revenus Éligibles (Exonération)</div>
                     <div class="flex-row" style="gap: 10px;">
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">Résultat Exploitation</label>
-                            <input type="number" id="resExploitation" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="resExploitation" class="form-control" value="0">
                         </div>
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">Plus-values Équipements</label>
-                            <input type="number" id="pvEquipements" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="pvEquipements" class="form-control" value="0">
                         </div>
                     </div>
                     <div class="flex-row" style="gap: 10px;">
                         <div class="form-group flex-col-50">
-                            <label style="font-size: 0.85em;">Gains de Change (Exploitation)</label>
-                            <input type="number" id="gainsChange" class="form-control" placeholder="0" value="0">
+                            <label style="font-size: 0.85em;">Gains de Change</label>
+                            <input type="number" id="gainsChange" class="form-control" value="0">
                         </div>
                         <div class="form-group flex-col-50">
-                            <label style="font-size: 0.85em;">Abandons Dettes Fournisseurs</label>
-                            <input type="number" id="abandonsDettes" class="form-control" placeholder="0" value="0">
+                            <label style="font-size: 0.85em;">Abandons Dettes</label>
+                            <input type="number" id="abandonsDettes" class="form-control" value="0">
                         </div>
                     </div>
                 </div>
                 
-                <!-- Category B: Excluded Revenues -->
                 <div style="margin-bottom: 20px;">
                     <div style="color: #f87171; font-weight: 700; margin-bottom: 10px; font-size: 0.95em;">❌ Catégorie B - Revenus Exclus (Taxés 100%)</div>
                     <div class="flex-row" style="gap: 10px;">
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">Plus-values Terrains</label>
-                            <input type="number" id="pvTerrains" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="pvTerrains" class="form-control" value="0">
                         </div>
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">Plus-values Immeubles</label>
-                            <input type="number" id="pvImmeubles" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="pvImmeubles" class="form-control" value="0">
                         </div>
                     </div>
                     <div class="flex-row" style="gap: 10px;">
                         <div class="form-group flex-col-50">
-                            <label style="font-size: 0.85em;">Plus-values Fonds Commerce</label>
-                            <input type="number" id="pvFondsCommerce" class="form-control" placeholder="0" value="0">
+                            <label style="font-size: 0.85em;">PV Fonds Commerce</label>
+                            <input type="number" id="pvFondsCommerce" class="form-control" value="0">
                         </div>
                         <div class="form-group flex-col-50">
-                            <label style="font-size: 0.85em;">Jetons Présence / RCM</label>
-                            <input type="number" id="jetonsPresence" class="form-control" placeholder="0" value="0">
+                            <label style="font-size: 0.85em;">Jetons Présence</label>
+                            <input type="number" id="jetonsPresence" class="form-control" value="0">
                         </div>
                     </div>
                 </div>
                 
-                <!-- Pro-Rata Export (if applicable) -->
                 <div style="background: rgba(99, 102, 241, 0.1); padding: 10px; border-radius: 6px;">
                     <div style="color: #818cf8; font-weight: 600; margin-bottom: 8px; font-size: 0.9em;">📊 Pro-Rata Exportateur (si applicable)</div>
                     <div class="flex-row" style="gap: 10px;">
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">CA Export (DT)</label>
-                            <input type="number" id="caExport" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="caExport" class="form-control" value="0">
                         </div>
                         <div class="form-group flex-col-50">
                             <label style="font-size: 0.85em;">CA Local (DT)</label>
-                            <input type="number" id="caLocal" class="form-control" placeholder="0" value="0">
+                            <input type="number" id="caLocal" class="form-control" value="0">
                         </div>
                     </div>
                     <div id="proRataDisplay" style="margin-top: 5px; font-size: 0.8em; color: #a5b4fc;"></div>
@@ -206,38 +221,9 @@ function initIS() {
             </div>
         </div>
 
-        <script>
-        // Toggle Advanced Classification Form
-        window.toggleAdvancedClassification = function() {
-            const checkbox = document.getElementById('enableAdvancedMode');
-            const form = document.getElementById('advanced-classification');
-            form.style.display = checkbox.checked ? 'block' : 'none';
-        };
-        
-        // Update Pro-Rata Display
-        function updateProRata() {
-            const caExport = parseFloat(document.getElementById('caExport').value) || 0;
-            const caLocal = parseFloat(document.getElementById('caLocal').value) || 0;
-            const total = caExport + caLocal;
-            
-            if (total > 0) {
-                const ratio = (caExport / total * 100).toFixed(1);
-                document.getElementById('proRataDisplay').innerText = `Ratio Export: ${ ratio }% `;
-            } else {
-                document.getElementById('proRataDisplay').innerText = '';
-            }
-        }
-        
-        // Attach listeners
-        if (document.getElementById('caExport')) {
-            document.getElementById('caExport').addEventListener('input', updateProRata);
-            document.getElementById('caLocal').addEventListener('input', updateProRata);
-        }
-        </script>
-
         <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
             <button id="btn-calc-is" class="btn-primary" style="flex: 2;">
-                <span class="icon">📊</span> ${t("btn_compare_history") || "Simuler & Comparer"}
+                <span class="icon">📊</span> ${t("btn_compare_history")}
             </button>
             <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
                 <input type="checkbox" id="showDetailsIS" style="margin-right: 8px;">
@@ -247,10 +233,45 @@ function initIS() {
         <div id="result-is"></div>
     `;
 
+    // Attach listeners
     document.getElementById('btn-calc-is').addEventListener('click', calculateIS);
     document.getElementById('secteurActivite').addEventListener('change', updateSectorInfo);
+    document.getElementById('caHt').addEventListener('input', updateSectorInfo);
+    document.getElementById('enableAdvancedMode').addEventListener('change', toggleAdvancedClassification);
+    document.getElementById('caExport').addEventListener('input', updateProRataDisplay);
+    document.getElementById('caLocal').addEventListener('input', updateProRataDisplay);
 
     updateSectorInfo();
+}
+
+/**
+ * UI HELPER: Toggle Advanced Classification Form
+ */
+function toggleAdvancedClassification() {
+    const checkbox = document.getElementById('enableAdvancedMode');
+    const form = document.getElementById('advanced-classification');
+    if (checkbox && form) {
+        form.style.display = checkbox.checked ? 'block' : 'none';
+    }
+}
+
+/**
+ * UI HELPER: Update Pro-Rata Display
+ */
+function updateProRataDisplay() {
+    const caExport = parseFloat(document.getElementById('caExport').value) || 0;
+    const caLocal = parseFloat(document.getElementById('caLocal').value) || 0;
+    const total = caExport + caLocal;
+    const display = document.getElementById('proRataDisplay');
+
+    if (display) {
+        if (total > 0) {
+            const ratio = (caExport / total * 100).toFixed(1);
+            display.innerText = `Ratio Export: ${ratio}% (Utilisé pour l'exonération Cat. A)`;
+        } else {
+            display.innerText = '';
+        }
+    }
 }
 
 function updateSectorInfo() {
@@ -258,7 +279,7 @@ function updateSectorInfo() {
     const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
     if (!s) return;
 
-    const ca = parseFloat(document.getElementById('caTtc').value) || 0;
+    const ca = parseFloat(document.getElementById('caHt').value) || 0;
 
     // Determine Rate
     let currentRate = s.rate;
@@ -280,7 +301,7 @@ function updateSectorInfo() {
     const infoDiv = document.getElementById('taux-info');
     infoDiv.innerHTML = `
         <strong>Taux IS 2026 :</strong> <span class="highlight">${rateText}</span><br>
-        <small>CSS : ${(s.css * 100).toFixed(0)}% | Min. Impôt : ${(s.min_tax * 100).toFixed(1)}% CA</small>
+        <small>CSS : ${(s.css * 100).toFixed(0)}% | Min. Impôt : ${(s.min_tax * 100).toFixed(1)}% CA HT</small>
     `;
 }
 
@@ -360,33 +381,54 @@ function computeIS(inputs) {
 
     // --- Helper for Single Run Calculation ---
     const runCalculation = (config) => {
-        const { sector, ca, res, reinvest, credit, reintegrations, deductions, zdrOverride, startupOverride, exportOverride } = config;
+        const { sector, ca, res, reinvest, credit, reintegrations, deductions, zdrOverride, startupOverride, exportOverride, advancedData } = config;
 
         // 1. Rate logic
-        let rate = sector.rate;
+        let standardRate = sector.rate;
         if (sector.type === 'progressive') {
-            if (ca < 5000000) rate = 0.15;
-            else if (ca < 20000000) rate = 0.20;
-            else rate = 0.25;
+            if (ca < 5000000) standardRate = 0.15;
+            else if (ca < 20000000) standardRate = 0.20;
+            else standardRate = 0.25;
         }
 
-        // --- OVERRIDES (Priority: Full Exemption > Reduced Rate) ---
+        // Advantage Rate
+        let advantageRate = standardRate;
+        if (zdrOverride || startupOverride) advantageRate = 0;
+        else if (exportOverride) advantageRate = 0.10;
 
-        // ZDR or Startup: 0% (Full Exemption takes precedence)
-        if (zdrOverride || startupOverride) {
-            rate = 0;
-        }
-        // Export: 10% (unless already lower or exempt by ZDR/Startup)
-        else if (exportOverride) {
-            rate = 0.10;
-        }
-
-        // 2. Base Global
+        // 2. Base Calculation
         const baseGlobal = Math.max(0, res + reintegrations - deductions);
 
-        // 3. Deduction for Reinvestment (sector-specific caps per Tunisian law)
-        // ZDR & Agriculture: 100% deductible (no cap, no minimum tax)
-        // Common law: 35% cap
+        // 3. Advanced Classification (Note 20/2008)
+        let beneficeEligible = 0;
+        let beneficeTaxable = baseGlobal;
+        let ratioExport = 1.0;
+
+        if (advancedData && advancedData.enabled) {
+            const { categorieA, categorieB } = classifyRevenues(advancedData.inputs);
+            const caTotal = (advancedData.inputs.caExport || 0) + (advancedData.inputs.caLocal || 0);
+
+            if (caTotal > 0) {
+                ratioExport = advancedData.inputs.caExport / caTotal;
+                beneficeEligible = categorieA * ratioExport;
+                beneficeTaxable = (categorieA * (1 - ratioExport)) + categorieB;
+            } else {
+                // If no CA split, assume 100% Local or 100% Export based on checkbox?
+                // For simplicity in expert mode: if CA split is empty, assume everything is Category A
+                beneficeEligible = categorieA;
+                beneficeTaxable = categorieB;
+            }
+        } else if (zdrOverride || startupOverride || exportOverride) {
+            // Simple mode with advantage: assume everything is eligible
+            beneficeEligible = baseGlobal;
+            beneficeTaxable = 0;
+        }
+
+        // 4. IS Calculation
+        // IS = (Eligible * AdvantageRate) + (Taxable * StandardRate)
+        const isBeforeDeduction = (beneficeEligible * advantageRate) + (beneficeTaxable * standardRate);
+
+        // 5. Reinvestment Deduction
         const isPrivilegedSector = zdrOverride || sector.id === 'agri';
         const REINVESTMENT_CAP_RATE = isPrivilegedSector ? 1.0 : 0.35;
         const reinvestCap = baseGlobal * REINVESTMENT_CAP_RATE;
@@ -394,51 +436,48 @@ function computeIS(inputs) {
         const baseNet = baseGlobal - deductionAmount;
         const wasReinvestCapped = reinvest > reinvestCap && reinvest > 0;
 
-        // 4. IS Net (after reinvestment deduction)
-        const isGlobal = baseGlobal * rate; // IS before any reinvestment deduction
-        let isNet = baseNet * rate; // IS after reinvestment deduction
-
-        // 5. Floor Logic for Reinvestment (20% of IS before deduction)
-        // If ZDR/Startup/Export, Floor is NOT APPLICABLE (Exempt/Special).
-        const isSpecialSector = ['agri', 'export', 'nouvelle_1'].includes(sector.id) || zdrOverride || startupOverride || exportOverride;
-
-        let isDuCalc = isNet;
-        if (!isSpecialSector && reinvest > 0) {
-            const floorReinvest = isGlobal * 0.20; // 20% of IS before reinvestment deduction
-            isDuCalc = Math.max(isNet, floorReinvest);
+        // The IS reduction proportional to the deduction?
+        // In simple terms: IS_Net = IS_Global * (BaseNet / BaseGlobal)
+        let isAfterReinvest = 0;
+        if (baseGlobal > 0) {
+            isAfterReinvest = isBeforeDeduction * (baseNet / baseGlobal);
         }
 
-        // 6. Tax Credit Deduction (Step 5 of User's Algorithm)
+        // 6. Floor Logic for Reinvestment (20% of IS before deduction)
+        const isSpecialSector = ['agri', 'export', 'nouvelle_1'].includes(sector.id) || zdrOverride || startupOverride || exportOverride;
+        let isDuCalc = isAfterReinvest;
+        if (!isSpecialSector && reinvest > 0) {
+            const floorReinvest = isBeforeDeduction * 0.20;
+            isDuCalc = Math.max(isAfterReinvest, floorReinvest);
+        }
+
+        // 7. Tax Credit
         if (credit > 0) {
             isDuCalc = Math.max(0, isDuCalc - credit);
         }
 
-        // 7. Minimum Tax (CA)
-        // Exception: ZDR and Agriculture are exempt from IMF during advantage period
+        // 8. Minimum Tax (CA)
         let minTaxCA = ca * sector.min_tax;
-        minTaxCA = Math.max(minTaxCA, 500); // Minimum 500 DT
+        minTaxCA = Math.max(minTaxCA, 500);
 
-        // Override for privileged sectors
-        if (isPrivilegedSector && (zdrOverride || sector.id === 'agri')) {
-            minTaxCA = 0; // No minimum tax for ZDR/Agriculture
+        if (isPrivilegedSector || startupOverride) {
+            minTaxCA = 0; // Exemption from IMF
         }
 
         let isFinal = isDuCalc;
         if (!isSpecialSector && minTaxCA > 0) {
             isFinal = Math.max(isDuCalc, minTaxCA);
         } else if (zdrOverride || startupOverride) {
-            // Full Exemption usually implies No Min Tax during exemption period
-            if (rate === 0) isFinal = 0;
+            if (advantageRate === 0) isFinal = 0;
         } else if (exportOverride) {
-            // Export (if not fully exempt) typically has a 0.1% minimum tax on CA.
-            let exportMin = ca * 0.001;
+            let exportMin = ca * 0.001; // 0.1% Minimum for exporters
             isFinal = Math.max(isDuCalc, exportMin);
         }
 
-        // 8. CSS
+        // 9. CSS
         const cssRate = sector.css;
         let css = baseNet * cssRate;
-        if ((zdrOverride || startupOverride) && rate === 0) css = 0; // No CSS if exempt
+        if ((zdrOverride || startupOverride) && advantageRate === 0) css = 0;
 
         return {
             total: isFinal + css,
@@ -446,19 +485,22 @@ function computeIS(inputs) {
             css: css,
             baseGlobal: baseGlobal,
             baseNet: baseNet,
-            appliedRate: rate,
+            appliedRate: advantageRate,
+            standardRate: standardRate,
             minTaxCA: minTaxCA,
             isBeforeMin: isDuCalc,
             reinvestmentDeducted: deductionAmount,
             reinvestmentCapped: wasReinvestCapped,
-            reinvestmentDeclared: reinvest
+            beneficeEligible,
+            beneficeTaxable,
+            ratioExport: ratioExport * 100
         };
     };
 
     // --- 1. Current Scenario (Optimized) ---
     const optimized = runCalculation({
         sector: s,
-        ca: caTtc,
+        ca: caHt,
         res: resComptable,
         reinvest: montantReinvesti,
         credit: creditImpot || 0,
@@ -466,7 +508,11 @@ function computeIS(inputs) {
         deductions: deductions,
         zdrOverride: isZDR,
         startupOverride: isStartup,
-        exportOverride: isExport
+        exportOverride: isExport,
+        advancedData: inputs.advancedMode ? {
+            enabled: true,
+            inputs: inputs.classification
+        } : null
     });
 
     // --- 2. Standard Scenario (No Advantages) ---
@@ -476,7 +522,7 @@ function computeIS(inputs) {
 
     const standard = runCalculation({
         sector: standardSector,
-        ca: caTtc,
+        ca: caHt,
         res: resComptable,
         reinvest: 0,
         credit: 0,
@@ -484,7 +530,8 @@ function computeIS(inputs) {
         deductions: deductions,
         zdrOverride: false,
         startupOverride: false,
-        exportOverride: false
+        exportOverride: false,
+        advancedData: null // No advanced split in standard mode
     });
 
     return {
@@ -509,17 +556,22 @@ function calculateIS() {
     // Check if Advanced Mode is enabled
     const advancedMode = document.getElementById('enableAdvancedMode')?.checked || false;
 
-    // Inputs
     const sectorId = document.getElementById('secteurActivite').value;
     const resComptable = parseFloat(document.getElementById('resComptable').value) || 0;
-    const caTtc = parseFloat(document.getElementById('caTtc').value) || 0;
+    const caHt = parseFloat(document.getElementById('caHt').value) || 0;
     const reintegrations = parseFloat(document.getElementById('reintegrations').value) || 0;
     const deductions = parseFloat(document.getElementById('deductions').value) || 0;
     const montantReinvesti = parseFloat(document.getElementById('montantReinvesti').value) || 0;
     const creditImpot = parseFloat(document.getElementById('creditImpot').value) || 0;
 
+    // Gathering Advantage Flags
+    const isZDR = document.getElementById('isZDR')?.checked || false;
+    const isStartup = document.getElementById('isStartup')?.checked || false;
+    const isExport = document.getElementById('isExport')?.checked || false;
+
     let calculationInputs = {
-        sectorId, resComptable, caTtc, reintegrations, deductions, montantReinvesti, creditImpot
+        sectorId, resComptable, caHt, reintegrations, deductions, montantReinvesti, creditImpot,
+        isZDR, isStartup, isExport
     };
 
     // Advanced Mode: Apply Note 20/2008 Classification
@@ -630,7 +682,7 @@ function calculateIS() {
                         <span>= ${opt.isBeforeMin.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                     </div>
                      <div style="display: flex; justify-content: space-between;">
-                        <span>(vs) Minimum (${(opt.minTaxCA / caTtc * 100).toFixed(1)}% CA)</span>
+                        <span>(vs) Minimum (${(opt.minTaxCA / caHt * 100).toFixed(1)}% CA HT)</span>
                         <span>= ${opt.minTaxCA.toLocaleString('fr-TN', { minimumFractionDigits: 3 })}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-weight:bold; color: #fbbf24;">
