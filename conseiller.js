@@ -125,19 +125,6 @@ function initConseiller() {
                     </div>
                 </div>
 
-                <!-- IS Specifc Inputs (Initially Hidden) -->
-                <div id="expert-is-inputs" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1);">
-                    <div style="font-size: 0.8em; color: #94a3b8; margin-bottom: 10px;">📊 Données Financières (Estimation)</div>
-                    <div class="flex-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-                        <div class="form-group" style="flex: 1;">
-                            <label data-i18n="label_turnover_ttc">Chiffre d'Affaires (TTC)</label>
-                            <input type="number" id="expertCa" class="form-control" placeholder="Ex: 100000">
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label data-i18n="label_accounting_result">Résultat Comptable</label>
-                            <input type="number" id="expertRes" class="form-control" placeholder="Ex: 20000">
-                        </div>
-                    </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;">
@@ -184,9 +171,6 @@ function initConseiller() {
                                 <span style="color: #22c55e;">●</span> <strong style="font-size: 0.9rem;" data-i18n="label_expert_report">RAPPORT D'EXPERTISE ADVISOR</strong>
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button id="btn-n8n" onclick="sendToWebhook()" style="background: rgba(255,102,0,0.1); border: 1px solid rgba(255,102,0,0.3); color: #ff6600; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 5px;">
-                                    🚀 <span id="n8n-status" data-i18n="btn_sync_n8n">Synchroniser n8n</span>
-                                </button>
                                 <button onclick="exportDiscussion()" style="background: none; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;" data-i18n="btn_download">📥 Télécharger</button>
                             </div>
                         </div>
@@ -206,6 +190,16 @@ function initConseiller() {
             .report-text { line-height: 1.6; color: #94a3b8; font-size: 0.95rem; }
             .opp-badge { display: inline-block; padding: 2px 8px; background: rgba(34, 197, 94, 0.1); color: #4ade80; border-radius: 4px; font-size: 0.75rem; margin-right: 5px; font-weight: 600; }
             
+            /* Typing Indicator */
+            .typing-indicator { display: flex; gap: 5px; }
+            .typing-dot { width: 8px; height: 8px; background: #818cf8; border-radius: 50%; opacity: 0.4; animation: typing 1s infinite ease-in-out; }
+            .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+            .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+            @keyframes typing { 
+                0%, 100% { transform: translateY(0); opacity: 0.4; } 
+                50% { transform: translateY(-5px); opacity: 1; } 
+            }
+
             @media (max-width: 800px) {
                 .advisor-grid { grid-template-columns: 1fr; }
             }
@@ -216,13 +210,7 @@ function initConseiller() {
 
     // Global helper for input toggling
     window.toggleExpertInputs = function () {
-        const type = document.getElementById('typeContribuable').value;
-        const isInputs = document.getElementById('expert-is-inputs');
-        if (type === 'societe') {
-            isInputs.style.display = 'block';
-        } else {
-            isInputs.style.display = 'none';
-        }
+        // Inputs removed, function kept for compatibility if called elsewhere but does nothing
     };
 
     // Global helper for advantage validation
@@ -246,7 +234,12 @@ function initConseiller() {
     toggleExpertInputs();
 }
 
+// function generateAIAdvice removed - now integrated into analyserProfil
+
 async function analyserProfil() {
+    // AI Service Instance
+    const ai = typeof getAIService !== 'undefined' ? getAIService() : null;
+
     // I18N Helper
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
@@ -261,63 +254,34 @@ async function analyserProfil() {
     const secteur = document.getElementById('secteurIA').value;
     const isZDR = document.getElementById('checkZDR').checked;
 
-    // Simulate Research Phase
+    // Simulate Research Phase (Faster)
     btn.disabled = true;
     btn.innerHTML = `🔍 ${t('msg_searching_jort')}...`;
 
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 400));
     btn.innerHTML = `⚖️ ${t('msg_verifying_lf2026')}...`;
 
-    // RUN CALCULATION (If Society)
-    let calcResult = null;
-    if (typeProfile === 'societe' && window.FiscalLogic && window.FiscalLogic.computeIS) {
-        // Map Sector ID for calculation
-        // 'tech' -> 'nouvelle_1' if startup? or standard 15%? Let's assume standard 'commun' (20%) or 'nouvelle_4' (15%) for now
-        // For simplicity, we map generic sectors to specific IDs expected by IS module or pick defaults
-        const sectorMap = {
-            'tech': 'commun', // Or specific
-            'services': 'commun',
-            'banque': 'banque',
-            'industrie': 'industrie',
-            'agriculture': 'agri'
-        };
-
-        const ca = parseFloat(document.getElementById('expertCa').value) || 0;
-        const res = parseFloat(document.getElementById('expertRes').value) || 0;
-
-        const isStartup = document.getElementById('checkStartup').checked;
-        const isExport = document.getElementById('checkExport').checked;
-
-        calcResult = window.FiscalLogic.computeIS({
-            sectorId: sectorMap[secteur] || 'commun',
-            resComptable: res,
-            caTtc: ca,
-            reintegrations: 0,
-            deductions: 0,
-            montantReinvesti: 0,
-            isZDR: isZDR, // Pass ZDR Status
-            isStartup: isStartup, // Pass Startup Status
-            isExport: isExport // Pass Export Status
-        });
-    }
-
-    await new Promise(r => setTimeout(r, 600));
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-
+    // 1. Data Capture
     const data = {
         type: typeProfile,
         secteur: secteur,
-        anneeCreation: parseInt(document.getElementById('anneeCreation').value) || 2026,
+        anneeCreation: 2026,
         zoneRegionale: isZDR,
         startup: document.getElementById('checkStartup').checked,
         export: document.getElementById('checkExport').checked,
         extension: document.getElementById('checkExtension').checked
     };
 
+    // financial calculations removed per user request
+
+    await new Promise(r => setTimeout(r, 400));
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+
+    // 2. Show Dashboard container
     document.getElementById('advisor-dashboard').style.display = 'block';
 
-    // 1. Update Context Sidebar
+    // 3. Update Context Sidebar
     const contextInfo = document.getElementById('context-summary-info');
     contextInfo.innerHTML = `
         <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
@@ -328,179 +292,200 @@ async function analyserProfil() {
         </div>
     `;
 
-    const summaryDisplay = document.getElementById('net-val');
-    const labelDisplay = document.querySelector('#simulation-net-display div');
-
-    if (calcResult && calcResult.optimized) {
-        labelDisplay.innerText = t("label_is_due") || "IS Dû Estimé";
-        summaryDisplay.innerText = calcResult.optimized.total.toLocaleString('fr-TN', { style: 'currency', currency: 'TND' });
-    } else {
-        summaryDisplay.innerText = "---";
-    }
-
-    // --- GENERATE EDUCATIONAL NARRATIVE ---
-    const generateNarrative = (res, data) => {
-        // Safe access to properties
-        const stdRate = res && res.standard ? (res.standard.appliedRate * 100).toFixed(0) : "15";
-        const savings = res ? res.savings : 0;
-
-        let text = "";
-
-        // 1. Context Standard
-        text += `<p class="report-text">L'entreprise relève du régime de l'Impôt sur les Sociétés (IS) au taux de <strong>${stdRate}%</strong> (Régime de Droit Commun).<br>`;
-
-        // 2. Advantage Explanation (distinguishing Exemption vs Deduction)
-        if (data.startup) {
-            text += `Toutefois, en raison de son éligibilité au label <strong>Startup Act</strong>, elle bénéficie d'une <strong>exonération totale de l'IS</strong> pour la période légale (4 à 8 ans).<br>`;
-        } else if (data.zoneRegionale) {
-            text += `Toutefois, son implantation en <strong>Zone de Développement Régional (ZDR)</strong> lui ouvre droit à une <strong>exonération totale de l'IS</strong> (pendant 5 ou 10 ans selon le groupe).<br>`;
-        } else if (data.export) {
-            text += `Toutefois, son statut <strong>Totalement Exportateur</strong> lui permet de bénéficier d'une <strong>exonération temporaire</strong> puis d'un taux réduit de <strong>10%</strong>.<br>`;
-        }
-
-        // 3. Conclusion & Savings
-        if (savings > 0) {
-            // Check if IS due is 0
-            if (res.optimized.is === 0) {
-                text += `En conséquence, le montant de l'IS dû est <strong>nul</strong>, générant une économie fiscale estimée à <strong style="color:#4ade80;">${savings.toLocaleString()} DT</strong>.</p>`;
-            } else {
-                text += `En conséquence, le montant de l'IS dû est ramené à <strong>${res.optimized.total.toLocaleString()} DT</strong>, générant une économie fiscale estimée à <strong style="color:#4ade80;">${savings.toLocaleString()} DT</strong>.</p>`;
-            }
-        } else {
-            text += `Aucun avantage fiscal spécifique (exonération ou déduction) n'a été détecté.</p>`;
-        }
-
-        // 4. Add clarification note if Extension is checked
-        if (data.extension) {
-            text += `<p class="report-text" style="font-size:0.85rem; color:#94a3b8; margin-top:10px;"><em>Note : L'extension d'activité constitue une <strong>déduction fiscale</strong> (non une exonération), entraînant une réduction de la base imposable via amortissements accélérés.</em></p>`;
-        }
-
-        return text;
-    };
-
-    let reportNarrative = "";
-    if (calcResult) {
-        reportNarrative = generateNarrative(calcResult, data);
-    } else {
-        reportNarrative = `<p class="report-text">${t('txt_profile_detected')} : <strong>${data.type}</strong> (${data.secteur}).</p>`;
-    }
-
-    // 2. Generate Automated Report HTML
+    // 4. Report Initialization & AI logic
     const reportArea = document.getElementById('advisor-report-content');
+    reportArea.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: #818cf8;">
+            <div class="typing-indicator" style="margin-bottom: 20px;">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <p><strong data-i18n="msg_ai_writing">${t('msg_ai_writing')}</strong></p>
+        </div>
+    `;
 
-    // Determine badges
+    let aiAnalysis = "";
+    let aiVerdict = "good";
+    const isDroitCommun = ![data.startup, data.zoneRegionale, data.export, data.extension].some(Boolean);
+
+    if (ai) {
+        const prompt = `Analyse fiscale experte pour ce profil en Tunisie (LF 2026) :
+        - Type : ${data.type === 'societe' ? 'Société (IS)' : 'Particulier (IRPP)'}
+        - Secteur : ${data.secteur}
+        - Régime : ${isDroitCommun ? 'Droit Commun (Général)' : 'Incitations fiscales'}
+        - Avantages cochés : ${[data.startup ? 'Startup Act' : '', data.zoneRegionale ? 'ZDR' : '', data.export ? 'Export' : '', data.extension ? 'Extension' : ''].filter(Boolean).join(', ') || 'Aucun (Droit Commun)'}.
+
+        IMPORTANT : Réponds au format JSON strict suivant :
+        {
+          "verdict": "very_favorable" | "favorable" | "good" | "optimize" | "unfavorable",
+          "analysis": "Texte de l'analyse stratégique pédagogique en 3-4 phrases."
+        }`;
+
+        try {
+            const response = await ai.sendMessageSimple(prompt);
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                aiVerdict = parsed.verdict || "good";
+                aiAnalysis = parsed.analysis || "";
+            } else {
+                aiAnalysis = response;
+            }
+        } catch (e) {
+            console.error("AI Analysis Error:", e);
+            aiAnalysis = "⚠️ Impossible de générer l'analyse automatique.";
+        }
+    }
+
+    // Assign AI verdict to data for badge display
+    data.verdict = aiVerdict;
+
+    // 5. Final Report Rendering
     let badgesHtml = "";
     if (data.startup) badgesHtml += `<div class="opp-badge">Startup Act</div>`;
     if (data.zoneRegionale) badgesHtml += `<div class="opp-badge">ZDR</div>`;
     if (data.export) badgesHtml += `<div class="opp-badge">Export</div>`;
+    if (isDroitCommun) badgesHtml += `<div class="opp-badge" style="background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2);" data-i18n="label_regime_dc">Droit Commun</div>`;
 
-    const reportHtml = `
+    const reportNarrative = generateNarrative(data, aiAnalysis);
+
+    reportArea.innerHTML = `
         <div class="report-section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h4>📌 Synthèse Fiscale Advisor</h4>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h4 style="margin:0;">🚀 Synthèse Stratégique Advisor</h4>
                 <div>${badgesHtml}</div>
             </div>
             ${reportNarrative}
-        </div>
-
-        ${calcResult ? `
-        <div class="report-section">
-            <h4>💡 Détails du Calcul</h4>
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
-                    <span>Résultat Fiscal Global :</span> <strong>${calcResult.optimized.baseGlobal.toLocaleString()} DT</strong>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
-                    <span>Taux Retenu :</span> <strong>${(calcResult.optimized.appliedRate * 100).toFixed(0)}%</strong>
-                </div>
-                <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px; color:#c7d2fe; font-size:1rem;">
-                    <span>IS Net Dû :</span> <strong>${calcResult.optimized.total.toLocaleString()} DT</strong>
-                </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: rgba(129, 140, 248, 0.05); border-radius: 12px; border: 1px dashed rgba(129, 140, 248, 0.3);">
+                <h5 style="color: #818cf8; margin-bottom: 15px; font-weight: 700;">🛡️ Obligations & Rappels 2026</h5>
+                <ul style="font-size: 0.9rem; color: #94a3b8; padding-left: 20px; line-height: 1.8;">
+                    <li><strong>Déclaration Mensuelle :</strong> Obligatoire avant le 15 ou 28 du mois suivant.</li>
+                    <li><strong>Contribution Sociale (CSS) :</strong> Due sur le bénéfice à hauteur de 1% (Général) ou 4% (Spécifique).</li>
+                    <li><strong>Minimum d'Impôt :</strong> 0.2% de votre Chiffre d'Affaires quel que soit l'avantage (Hors ZDR/Agri).</li>
+                </ul>
             </div>
-        </div>
-        ` : ''}
-
-        <div class="report-section">
-            <h4>⚖️ ${t('title_obligations')}</h4>
-            <ul style="color: #94a3b8; font-size: 0.95rem; line-height: 1.8; padding-left: 20px;">
-                <li><strong>${t('label_reg_monthly_decl')} :</strong> ${t('txt_monthly_decl_deadline')}</li>
-                <li><strong>${t('label_reg_css')} :</strong> ${data.type === 'societe' ? t('txt_css_company') : t('txt_css_indiv')}.</li>
-                ${data.type === 'societe' ? `<li><strong>${t('label_reg_min_tax')} :</strong> ${t('txt_min_tax')}</li>` : ''}
-            </ul>
-        </div>
-
-        <div style="margin-top: 40px; padding: 20px; background: rgba(245, 158, 11, 0.05); border-radius: 15px; border: 1px dashed rgba(245, 158, 11, 0.2); text-align: center;">
-            <p style="margin: 0; color: #f59e0b; font-size: 0.85rem;">⚠️ ${t('disclaimer_auto_generated')}</p>
         </div>
     `;
 
-    reportArea.innerHTML = reportHtml;
+    // Global Sync for Assistant
+    window.lastCalculation = { type: 'ADVISOR', data: data, result: null };
+
+    // Auto-scroll
     document.getElementById('advisor-dashboard').scrollIntoView({ behavior: 'smooth' });
 }
 
-async function sendToWebhook() {
-    const webhookUrl = AI_CONFIG.n8n.webhookUrl;
-    const statusEl = document.getElementById('n8n-status');
-    const btn = document.getElementById('btn-n8n');
-
-    // I18N Helper
+/**
+ * Educational Narrative Generator
+ */
+function generateNarrative(data, aiAnalysis = "") {
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
     };
 
-    // Prepare Data
-    const payload = {
-        timestamp: new Date().toISOString(),
-        calculation: window.lastCalculation || null,
-        report: document.getElementById('advisor-report-content').innerText,
-        profile: {
-            type: document.getElementById('typeContribuable').value,
-            secteur: document.getElementById('secteurIA').value,
-            zdr: document.getElementById('checkZDR').checked,
-            startup: document.getElementById('checkStartup').checked,
-            export: document.getElementById('checkExport').checked
-        }
+    // Helper to format AI response (basic markdown)
+    const formatAI = (text) => {
+        if (!text) return "";
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
     };
 
-    try {
-        statusEl.innerText = t("status_sending"); // "Envoi..."
-        btn.style.opacity = "0.7";
+    const verdictConfig = {
+        'very_favorable': { color: '#22c55e', icon: '🌟', label: t('opt_verdict_very_favorable') },
+        'favorable': { color: '#4ade80', icon: '✅', label: t('opt_verdict_favorable') },
+        'good': { color: '#818cf8', icon: '👍', label: t('opt_verdict_good') },
+        'optimize': { color: '#f59e0b', icon: '⚖️', label: t('opt_verdict_to_optimize') },
+        'unfavorable': { color: '#ef4444', icon: '⚠️', label: t('opt_verdict_unfavorable') }
+    };
 
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+    const v = verdictConfig[data.verdict] || verdictConfig['good'];
 
-        if (response.ok) {
-            statusEl.innerText = t("status_synced"); // "Synchronisé !"
-            btn.style.background = "rgba(34, 197, 94, 0.1)";
-            btn.style.borderColor = "rgba(34, 197, 94, 0.3)";
-            btn.style.color = "#4ade80";
-        } else {
-            throw new Error("Erreur serveur");
-        }
-    } catch (error) {
-        console.error("Webhook Error:", error);
-        statusEl.innerText = t("status_failed"); // "Échec"
-        btn.style.background = "rgba(239, 68, 68, 0.1)";
-        btn.style.borderColor = "rgba(239, 68, 68, 0.3)";
-        btn.style.color = "#ef4444";
+    // NEW SECTION: Verdict de l'Expert
+    let html = `
+        <div class="report-section" style="margin-bottom: 30px;">
+            <h4 data-i18n="label_expert_opinion">🛡️ Verdict de l'Expert</h4>
+            
+            <!-- VERDICT BADGE -->
+            <div style="background: ${v.color}20; border: 1px solid ${v.color}40; padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                <div style="font-size: 2.5rem;">${v.icon}</div>
+                <div>
+                    <div style="font-size: 0.75rem; color: ${v.color}; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">SITUATION GLOBALE</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #fff;">${v.label}</div>
+                </div>
+            </div>
 
-        setTimeout(() => {
-            statusEl.innerText = t("status_retry"); // "Ressayer"
-            btn.style.opacity = "1";
-        }, 3000);
+            <p class="report-text" data-i18n="msg_expert_opinion_intro" style="margin-bottom: 15px;">
+                Basé sur votre profil et les avantages sélectionnés, voici notre analyse stratégique :
+            </p>
+
+            <!-- AI GENERATED CONTENT -->
+            ${aiAnalysis ? `
+            <div style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.2); margin-bottom: 20px; color: #cbd5e1; line-height: 1.6;">
+                <div style="font-size: 0.75rem; color: #818cf8; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1rem;">🤖</span> Analyse par Intelligence Artificielle
+                </div>
+                ${formatAI(aiAnalysis)}
+            </div>` : ''}
+        </div>
+    `;
+
+    if (data.startup) {
+        html += `<div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #6366f1; margin-bottom: 15px;">
+            <strong style="color: #fff; display: block; margin-bottom: 5px;">🚀 Éligibilité Startup Act</strong>
+            <p class="report-text" style="margin:0;">Grâce au Label Startup, vous pouvez prétendre à une <strong>exonération totale d'impôt (IS)</strong> pendant 8 ans. 
+            C'est l'incitation fiscale la plus performante en Tunisie.</p>
+        </div>`;
     }
+
+    if (data.zoneRegionale) {
+        html += `<div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #22c55e; margin-bottom: 15px;">
+            <strong style="color: #fff; display: block; margin-bottom: 5px;">📍 Avantages Développement Régional</strong>
+            <p class="report-text" style="margin:0;">Votre implantation en zone prioritaire vous permet de ne payer <strong>aucun impôt sur les sociétés</strong> pendant 5 ou 10 ans. 
+            Note : Vous êtes également dispensé du minimum d'impôt (IMF).</p>
+        </div>`;
+    }
+
+    if (data.export) {
+        html += `<div style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #f59e0b; margin-bottom: 15px;">
+            <strong style="color: #fff; display: block; margin-bottom: 5px;">🌍 Incitations à l'Exportation</strong>
+            <p class="report-text" style="margin:0;">Votre profil exportateur bénéficie d'une exonération initiale suivie d'une imposition réduite de <strong>10%</strong>. 
+            Le pro-rata entre revenus locaux et export est essentiel dans votre cas.</p>
+        </div>`;
+    }
+
+    if (data.extension) {
+        html += `<div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #8b5cf6; margin-bottom: 15px;">
+            <strong style="color: #fff; display: block; margin-bottom: 5px;">🏗️ Déduction pour Extension</strong>
+            <p class="report-text" style="margin:0;">L'extension d'activité permet une déduction fiscale via l'amortissement exceptionnel. 
+            C'est un levier puissant pour réduire votre base imposable sans être une exonération totale.</p>
+        </div>`;
+    }
+
+    if (!data.startup && !data.zoneRegionale && !data.export && !data.extension) {
+        html += `<p class="report-text" style="text-align: center; color: #64748b; padding: 20px;">
+            🔍 Aucun avantage spécifique n'a été coché.<br>Sélectionnez des options au-dessus pour voir vos gains potentiels.</p>`;
+    }
+
+    html += `<p style="font-size: 0.8rem; color: #64748b; margin-top: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+        💡 <strong>Recommandation :</strong> Pour un audit financier complet avec calcul du minimum d'impôt et de la CSS, utilisez l'onglet <strong>🏢 IS</strong>.</p>`;
+
+    return html;
 }
+
+// Webhook removed per user request
 
 function exportDiscussion() {
     const report = document.getElementById('advisor-report-content').innerText;
-    const blob = new Blob(["RAPPORT D'EXPERTISE FISCALE - LF 2026\n\n" + report], { type: 'text/plain' });
+    const blob = new Blob(["RAPPORT EXPERT FISCAL TUNISIE 2026\n\n" + report], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = "Rapport_Fiscal_Automatise.txt";
+    a.download = "Rapport_Advisor_2026.txt";
     a.click();
 }
+
+// Global Exports
+window.AdvisorLogic = { analyserProfil, exportDiscussion };

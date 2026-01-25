@@ -11,7 +11,7 @@ function initAutoEntrepreneur() {
         <div class="form-section">
             <div class="section-title">
                 <span class="icon">💼</span>
-                <span data-i18n="label_situation">Activité & Chiffre d'Affaires</span>
+                <span data-i18n="label_ae_activity_section">Activité & Chiffre d'Affaires</span>
             </div>
             
             <div class="form-group">
@@ -29,11 +29,11 @@ function initAutoEntrepreneur() {
 
             <div class="checkbox-group">
                 <input type="checkbox" id="ae-first-year">
-                <label for="ae-first-year">Première année d'activité (Exonération totale)</label>
+                <label for="ae-first-year" data-i18n="label_ae_first_year">Première année d'activité (Exonération totale)</label>
             </div>
         </div>
 
-        <button id="btn-calc-ae" class="btn-primary" style="width: 100%; margin-top: 15px;">
+        <button id="btn-calc-ae" class="btn-primary" style="width: 100%; margin-top: 15px;" data-i18n="btn_calc_ae">
             Calculer Contribution Unique
         </button>
 
@@ -46,78 +46,87 @@ function initAutoEntrepreneur() {
 async function calculateAE() {
     const turnover = parseFloat(document.getElementById('ae-turnover').value) || 0;
     const isFirstYear = document.getElementById('ae-first-year').checked;
+    const activity = document.getElementById('ae-activity').value;
     const resultDiv = document.getElementById('result-ae');
 
-    // Fetch rates from the JSON file
-    let rates;
-    try {
-        const response = await fetch('data/autaux.json');
-        const data = await response.json();
-        rates = data.auto_entrepreneur;
-    } catch (e) {
-        console.error("Erreur chargement rates AE:", e);
-        // Fallback
-        rates = {
-            rates: { income_tax: 0.005, social_security: 0.075, smig_2026_estimated: 480 },
-            thresholds: { max_turnover: 75000 }
-        };
-    }
+    // I18N Helper
+    const t = (key) => window.t ? window.t(key) : key;
 
-    if (turnover > 75000) {
+    // LF 2026 RULES
+    const RULES = {
+        threshold: 75000,
+        flat_cnss: 288.000,
+        rates: {
+            commerce: 0.005, // 0.5%
+            services: 0.01   // 1%
+        }
+    };
+
+    if (turnover > RULES.threshold) {
         resultDiv.innerHTML = `
             <div class="result-card" style="border-color: var(--error);">
-                <h3 style="color: var(--error);">⚠️ Seuil Dépassé</h3>
-                <p>Le régime Auto-Entrepreneur est limité à un CA de <strong>75,000 DT</strong>. 
-                Vous devez opter pour le régime Réel ou Forfaitaire.</p>
+                <h3 style="color: var(--error);" data-i18n="title_threshold_exceeded">${t('title_threshold_exceeded')}</h3>
+                <p data-i18n="msg_ae_threshold_desc">${t('msg_ae_threshold_desc')}</p>
             </div>
         `;
         return;
     }
 
+    // 1. Calculate Tax (Contribution Unique)
+    const taxRate = RULES.rates[activity] || RULES.rates.commerce;
+    let incomeTax = turnover * taxRate;
+
+    // Apply First Year Exemption (Tax only)
     if (isFirstYear) {
-        resultDiv.innerHTML = `
-            <div class="result-card" style="border-color: var(--success);">
-                <h3 style="color: var(--success);">✨ Exonération Totale</h3>
-                <p>Pour la première année d'activité, vous êtes exonéré de la contribution unique 
-                et des charges sociales (Prises en charge par l'État).</p>
-                <div style="font-size: 1.5rem; font-weight: 800; text-align: center; margin: 15px 0;">0.000 DT</div>
-            </div>
-        `;
-        return;
+        incomeTax = 0;
     }
 
-    // Calculation:
-    // 1. Income Tax (Contribution Unique) = 0.5% of turnover
-    const incomeTax = turnover * rates.rates.income_tax;
+    // 2. Fixed CNSS (Still due in first year)
+    const socialSecurity = RULES.flat_cnss;
 
-    // 2. Social Security = 7.5% of (2/3 of SMIG * 12)
-    // Based on user prompt: 7.5% de 2/3 de SMIG
-    const smigAnnual = rates.rates.smig_2026_estimated * 12;
-    const socialBase = (2 / 3) * smigAnnual;
-    const socialSecurity = socialBase * rates.rates.social_security;
-
+    // 3. Total
     const total = incomeTax + socialSecurity;
+
+    const ratePct = (taxRate * 100).toString().replace('.', ',');
 
     resultDiv.innerHTML = `
         <div class="result-card">
+            ${isFirstYear ? `
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); margin-bottom: 15px; font-size: 0.85rem; color: #4ade80;">
+                    <strong data-i18n="title_ae_exo">${t('title_ae_exo')}</strong> : ${t('msg_ae_exo_desc')}
+                </div>
+            ` : ''}
+
             <div class="result-header">
-                <h3>Contribution Unique Totale</h3>
+                <h3 data-i18n="label_ae_total_contribution">${t('label_ae_total_contribution')}</h3>
                 <span class="final-amount" style="color: var(--primary);">${total.toFixed(3)} DT</span>
             </div>
             
             <div style="margin-top: 15px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="opacity: 0.7;">Impôt (0.5% du CA) :</span>
+                    <span style="opacity: 0.7;">${t('label_ae_tax_only').replace('{{rate}}', ratePct)} :</span>
                     <strong>${incomeTax.toFixed(3)} DT</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="opacity: 0.7;">Charges Sociales (CNSS) :</span>
+                    <span style="opacity: 0.7;">${t('label_ae_social_short')} :</span>
                     <strong>${socialSecurity.toFixed(3)} DT</strong>
                 </div>
             </div>
 
-            <p style="font-size: 0.85em; opacity: 0.6; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                * Les charges sociales sont calculées sur la base de 2/3 du SMIG (Estimation 2026: ${rates.rates.smig_2026_estimated} DT/mois).
+            <!-- Detailed Explanations -->
+            <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                <div style="color: #818cf8; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;" data-i18n="label_ae_learn_more">
+                    ${t('label_ae_learn_more')}
+                </div>
+                <ul style="font-size: 0.85rem; color: #94a3b8; padding-left: 18px; line-height: 1.6; margin: 0;">
+                    <li style="margin-bottom: 6px;">${t('msg_ae_explain_tax').replace('{{rate}}', ratePct)}</li>
+                    <li style="margin-bottom: 6px;">${t('msg_ae_explain_social')}</li>
+                    <li>${t('msg_ae_explain_threshold')}</li>
+                </ul>
+            </div>
+
+            <p style="font-size: 0.75em; opacity: 0.5; margin-top: 20px; font-style: italic;">
+                ${t('msg_ae_footnote').replace('{{smig}}', '480')}
             </p>
         </div>
     `;

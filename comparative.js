@@ -66,7 +66,7 @@ window.runComparison = function () {
     const container = document.getElementById('comp-results');
     container.style.display = 'block';
 
-    const best = (impotIRPP < impotIS) ? "Entreprise Individuelle (IRPP)" : "Société (IS)";
+    const best = (impotIRPP < impotIS) ? window.t('profile_irpp') : window.t('profile_is');
     const diff = Math.abs(impotIRPP - impotIS);
 
     const resHtmlTitle = window.t('res_compare_advantageous').replace('{{best}}', best);
@@ -89,40 +89,68 @@ window.runComparison = function () {
     `;
 };
 
+let comparativeChartInstance = null;
+
 window.runHistoryComparison = function () {
     const revenu = parseFloat(document.getElementById('hist-revenu').value) || 0;
     if (revenu === 0) return;
 
+    // Use a clean context to avoid NaN
+    const baseContext = {
+        grossIncome: revenu,
+        nbEnfants: 0,
+        chefFamille: false,
+        applyCNSS: true,
+        typeRevenu: 'salarie'
+    };
+
     // Calc 2026
-    window.setYear('2026'); // Use official bridge
-    const res2026 = calculateIRPPCore({ grossIncome: revenu, nbEnfants: 0 });
+    const res2026 = calculateIRPPCore(baseContext, '2026');
 
     // Calc 2025
-    window.setYear('2025');
-    const res2025 = calculateIRPPCore({ grossIncome: revenu, nbEnfants: 0 });
-    window.setYear('2026'); // Restore
+    const res2025 = calculateIRPPCore(baseContext, '2025');
 
-    const ctx = document.getElementById('historyChart');
-    ctx.style.display = 'block';
+    const canvas = document.getElementById('historyChart');
+    const ctx = canvas.getContext('2d');
+    canvas.style.display = 'block';
 
-    new Chart(ctx, {
+    if (comparativeChartInstance) {
+        comparativeChartInstance.destroy();
+    }
+
+    comparativeChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: [window.t('label_year_2025'), window.t('label_year_2026')],
             datasets: [{
                 label: window.t('res_impot_total'),
                 data: [res2025.totalRetenue, res2026.totalRetenue],
-                backgroundColor: ['#64748b', '#3b82f6'],
-                borderRadius: 4
+                backgroundColor: ['rgba(148, 163, 184, 0.4)', 'rgba(59, 130, 246, 0.8)'],
+                borderColor: ['rgba(148, 163, 184, 0.8)', '#3b82f6'],
+                borderWidth: 1,
+                borderRadius: 6
             }]
         },
         options: {
             indexAxis: 'y',
             responsive: true,
-            plugins: { legend: { display: false } },
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.raw.toFixed(3)} DT`
+                    }
+                }
+            },
             scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                y: { ticks: { color: '#fff' } }
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                y: {
+                    ticks: { color: '#fff', font: { weight: '600' } }
+                }
             }
         }
     });
@@ -130,9 +158,15 @@ window.runHistoryComparison = function () {
     const gain = res2025.totalRetenue - res2026.totalRetenue;
     const textEl = document.getElementById('hist-text');
     if (gain > 0) {
-        textEl.innerHTML = `<span style="color:#10b981; font-weight:600;">${window.t('label_buy_power_gain')} +${gain.toFixed(3)} DT en 2026</span>`;
+        textEl.innerHTML = `<div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 15px;">
+            <span style="color:#10b981; font-weight:700; font-size:1.1rem;">✨ ${window.t('label_buy_power_gain')}</span><br>
+            <span style="color:#94a3b8; font-size:0.9rem;">${window.t('desc_saving_2026').replace('{{amount}}', gain.toFixed(3))}</span>
+        </div>`;
     } else if (gain < 0) {
-        textEl.innerHTML = `<span style="color:#f59e0b; font-weight:600;">${window.t('label_fiscal_pressure_increase')}</span>`;
+        textEl.innerHTML = `<div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.2); margin-top: 15px;">
+            <span style="color:#f59e0b; font-weight:700;">⚠️ ${window.t('label_fiscal_pressure_increase')}</span><br>
+            <span style="color:#94a3b8; font-size:0.9rem;">${window.t('desc_increase_2026').replace('{{amount}}', Math.abs(gain).toFixed(3))}</span>
+        </div>`;
     } else {
         textEl.innerHTML = "-";
     }

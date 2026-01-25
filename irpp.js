@@ -309,7 +309,7 @@ function calculateStandardIRPP() {
     inputs.opSpecifiqueIrpp = parseFloat(document.getElementById('opSpecifiqueIrpp').value) || 0;
 
     // Calculate
-    const result = calculateIRPPCore(inputs);
+    const result = calculateIRPPCore(inputs, currentFiscalYear);
 
     // Global Context for Advisor
     window.lastCalculation = {
@@ -353,7 +353,7 @@ function calculateReverseIRPP() {
 
         // Test with this Gross
         contextInputs.grossIncome = mid;
-        const res = calculateIRPPCore(contextInputs);
+        const res = calculateIRPPCore(contextInputs, currentFiscalYear);
         const calculatedNet = (res.netMensuel * 12);
 
         if (Math.abs(calculatedNet - targetNetAnnual) < tolerance) {
@@ -375,7 +375,7 @@ function calculateReverseIRPP() {
     if (!found) {
         // Fallback to last mid
         contextInputs.grossIncome = mid;
-        bestResult = calculateIRPPCore(contextInputs);
+        bestResult = calculateIRPPCore(contextInputs, currentFiscalYear);
     }
 
     // Global Context for Advisor
@@ -392,15 +392,27 @@ function calculateReverseIRPP() {
 /**
  * Pure Calculation Logic
  */
-function calculateIRPPCore(inputs) {
-    const { grossIncome, typeRevenu, applyCNSS } = inputs;
+function calculateIRPPCore(inputs = {}, year = '2026') {
+    const {
+        grossIncome = 0,
+        typeRevenu = 'salarie',
+        applyCNSS = true,
+        nbEnfants = 0,
+        nbEtudiants = 0,
+        nbInfirmes = 0,
+        nbParents = 0,
+        opSpecifiqueIrpp = 0,
+        autreDeduction = 0,
+        chefFamille = false,
+        secteur = 'prive'
+    } = inputs;
     // ... Copying logic from previous valid state ...
 
     // 1. CNSS Calculation
     let cnss = 0;
     if (typeRevenu === 'salarie' && applyCNSS) {
         // CORRECTION FISCALE: Taux différencié Public vs Privé
-        const tauxCNSS = (inputs.secteur === 'public') ? 0.102 : 0.0918; // 10.2% Public (CNRPS), 9.18% Privé (CNSS)
+        const tauxCNSS = (secteur === 'public') ? 0.102 : 0.0918; // 10.2% Public (CNRPS), 9.18% Privé (CNSS)
         cnss = grossIncome * tauxCNSS;
     }
 
@@ -421,27 +433,27 @@ function calculateIRPPCore(inputs) {
 
     // 3. Deductions
     let familyDeductions = 0;
-    if (inputs.chefFamille) familyDeductions += 300;
+    if (chefFamille) familyDeductions += 300;
 
     // Child deductions (Corrected: 150 for 1st, 100 for others)
     let childDeductions = 0;
-    if (inputs.nbEnfants > 0) {
+    if (nbEnfants > 0) {
         childDeductions += 150; // 1st child
-        if (inputs.nbEnfants > 1) {
-            const extraEnfants = Math.min(inputs.nbEnfants - 1, 3); // Max 4 total
+        if (nbEnfants > 1) {
+            const extraEnfants = Math.min(nbEnfants - 1, 3); // Max 4 total
             childDeductions += extraEnfants * 100;
         }
     }
     familyDeductions += childDeductions;
 
-    familyDeductions += inputs.nbEtudiants * 1000;
-    familyDeductions += inputs.nbInfirmes * 2000;
-    familyDeductions += inputs.nbParents * 450; // LF 2026 update usually 450 or keep 400
+    familyDeductions += nbEtudiants * 1000;
+    familyDeductions += nbInfirmes * 2000;
+    familyDeductions += nbParents * 450; // LF 2026 update
 
-    const totalDeductions = familyDeductions + inputs.autreDeduction;
+    const totalDeductions = familyDeductions + autreDeduction;
 
     // 4. Taxable Base
-    let assietteSoumise = Math.max(0, (netApresAbattement + inputs.opSpecifiqueIrpp) - totalDeductions);
+    let assietteSoumise = Math.max(0, (netApresAbattement + opSpecifiqueIrpp) - totalDeductions);
 
     // 5. IRPP Calculation (Dynamic Brackets)
     const brackets2026 = [
@@ -463,7 +475,7 @@ function calculateIRPPCore(inputs) {
         { min: 50000, max: Infinity, rate: 0.35 }
     ];
 
-    const brackets = (currentFiscalYear === '2026') ? brackets2026 : brackets2025;
+    const brackets = (year === '2025') ? brackets2025 : brackets2026;
 
     let impotTotal = 0;
     let bracketDetails = [];
