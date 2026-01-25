@@ -10,7 +10,7 @@ class ExportService {
     /**
      * Génère un PDF "Fiche de Simulation" professionnelle
      * @param {Object} data - Les données du calcul (IRPP, IS, etc.)
-     * @param {String} type - Le type de simulation ('IRPP', 'IS'...)
+     * @param {String} type - Le type de simulation ('IRPP', 'IS', 'TVA', 'RS'...)
      */
     generatePDF(data, type) {
         if (!window.jspdf) {
@@ -39,6 +39,12 @@ class ExportService {
 
         if (type === 'IRPP') {
             this._renderIRPPDetails(doc, data, yPos);
+        } else if (type === 'IS') {
+            this._renderISDetails(doc, data, yPos);
+        } else if (type === 'TVA') {
+            this._renderTVADetails(doc, data, yPos);
+        } else if (type === 'RS') {
+            this._renderRSDetails(doc, data, yPos);
         }
 
         // --- PIED DE PAGE ---
@@ -77,7 +83,6 @@ class ExportService {
     _renderIRPPDetails(doc, data, startY) {
         let y = startY;
 
-        // Informations Générales
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
         doc.text("1. SITUATION DU CONTRIBUABLE", 14, y);
@@ -90,7 +95,7 @@ class ExportService {
 
         const details = [
             `• Date de la simulation : ${new Date().toLocaleString('fr-TN')}`,
-            `• Revenu Brut Annuel : ${data.grossIncome.toLocaleString('fr-TN', { style: 'currency', currency: 'TND' })}`,
+            `• Revenu Brut Annuel : ${data.grossIncome.toLocaleString('fr-TN')} DT`,
             `• Situation : ${inputs.typeRevenu || 'Non défini'}, ${inputs.nbEnfants || 0} enfant(s)`,
             `• Chef de famille : ${inputs.chefFamille ? 'Oui' : 'Non'}`
         ];
@@ -106,7 +111,6 @@ class ExportService {
         doc.text("2. DÉTAIL DU CALCUL (LF 2026)", 14, y);
         y += 10;
 
-        // Tableau des chiffres clés
         const tableData = [
             ["Salaire Brut Annuel", `${data.grossIncome.toFixed(3)} DT`],
             ["Cotisations Sociales (CNSS)", `-${data.cnss.toFixed(3)} DT`],
@@ -125,30 +129,149 @@ class ExportService {
             head: [['Rubrique', 'Montant']],
             body: tableData,
             theme: 'grid',
-            headStyles: { fillColor: [59, 130, 246] }, // Blue header
+            headStyles: { fillColor: [59, 130, 246] },
             styles: { fontSize: 10, cellPadding: 3 },
             alternateRowStyles: { fillColor: [240, 249, 255] }
         });
 
         y = doc.lastAutoTable.finalY + 15;
 
-        // Tableau des tranches si disponible
         if (data.bracketDetails && data.bracketDetails.length > 0) {
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("3. VENTILATION PAR TRANCHE", 14, y);
             y += 5;
 
-            const bracketRows = data.bracketDetails.map(b => [b.label, b.rate, `${b.base.toFixed(3)} DT`, `${b.tax.toFixed(3)} DT`]);
+            const bracketRows = data.bracketDetails.map(b => [b.label, b.rate, `${parseFloat(b.base).toFixed(3)} DT`, `${parseFloat(b.tax).toFixed(3)} DT`]);
 
             doc.autoTable({
                 startY: y,
                 head: [['Tranche', 'Taux', 'Base', 'Montant']],
                 body: bracketRows,
                 theme: 'striped',
-                headStyles: { fillColor: [16, 185, 129] } // Green header
+                headStyles: { fillColor: [16, 185, 129] }
             });
         }
+    }
+
+    /**
+     * Rendu spécifique pour l'IS
+     */
+    _renderISDetails(doc, data, startY) {
+        let y = startY;
+        const opt = data.optimized || data;
+        const inputs = data.inputs || {};
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. INFORMATIONS SOCIÉTÉ", 14, y);
+        y += 8;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        const details = [
+            `• Date : ${new Date().toLocaleString('fr-TN')}`,
+            `• Secteur d'activité : ${inputs.sectorId || 'Non défini'}`,
+            `• Chiffre d'Affaires TTC : ${parseFloat(inputs.caTtc || 0).toLocaleString()} DT`
+        ];
+
+        details.forEach(line => {
+            doc.text(line, 20, y);
+            y += 6;
+        });
+
+        y += 10;
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("2. DÉTAIL DU CALCUL FISCAL", 14, y);
+        y += 10;
+
+        const tableData = [
+            ["Résultat Comptable", `${parseFloat(inputs.resComptable || 0).toFixed(3)} DT`],
+            ["Réintégrations / Déductions (Net)", `${(parseFloat(inputs.reintegrations || 0) - parseFloat(inputs.deductions || 0)).toFixed(3)} DT`],
+            ["Bénéfice Fiscal Avant Avantages", `${parseFloat(opt.baseGlobal || 0).toFixed(3)} DT`],
+            ["Déduction Réinvestissement", `-${parseFloat(opt.reinvestmentDeducted || 0).toFixed(3)} DT`],
+            ["Bénéfice Fiscal Net", `${parseFloat(opt.baseNet || 0).toFixed(3)} DT`],
+            ["Taux IS Appliqué", `${(parseFloat(opt.appliedRate || 0) * 100).toFixed(0)}%`],
+            ["IS Théorique", `${parseFloat(opt.isBeforeMin || 0).toFixed(3)} DT`],
+            ["Minimum d'Impôt (CA)", `${parseFloat(opt.minTaxCA || 0).toFixed(3)} DT`],
+            ["IS Dû Retenu", `${parseFloat(opt.is || 0).toFixed(3)} DT`],
+            ["CSS Sociétale", `${parseFloat(opt.css || 0).toFixed(3)} DT`],
+            ["TOTAL À PAYER (IS + CSS)", `${parseFloat(opt.total || 0).toFixed(3)} DT`]
+        ];
+
+        doc.autoTable({
+            startY: y,
+            head: [['Rubrique', 'Montant / Info']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [59, 130, 246] }
+        });
+    }
+
+    /**
+     * Rendu spécifique pour la TVA
+     */
+    _renderTVADetails(doc, data, startY) {
+        let y = startY;
+        const d = data.data || data;
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. RÉSUMÉ DE LA DÉCLARATION", 14, y);
+        y += 10;
+
+        const tableData = [
+            ["Chiffre d'Affaires HT", `${parseFloat(d.baseHT || 0).toFixed(3)} DT`],
+            ["TVA Collectée (Facturée)", `${parseFloat(d.tvaCollectee || 0).toFixed(3)} DT`],
+            ["Montant TTC des Ventes", `${parseFloat(d.montantTTC || 0).toFixed(3)} DT`],
+            ["TVA Déductible (Récupérable)", `-${parseFloat(d.totalDeductible || 0).toFixed(3)} DT`],
+            ["SOLDE DE TVA", `${parseFloat(d.solde || 0).toFixed(3)} DT`]
+        ];
+
+        doc.autoTable({
+            startY: y,
+            head: [['Poste', 'Montant']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [59, 130, 246] }
+        });
+
+        y = doc.lastAutoTable.finalY + 15;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        const status = d.solde > 0 ? "👉 RÉSULTAT : TVA À REVERSER À L'ÉTAT" : "👉 RÉSULTAT : CRÉDIT DE TVA À REPORTER";
+        doc.text(status, 14, y);
+    }
+
+    /**
+     * Rendu spécifique pour la Retenue à la Source (RS)
+     */
+    _renderRSDetails(doc, data, startY) {
+        let y = startY;
+        const d = data.data || data;
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. RÉCAPITULATIF DE LA TRANSACTION", 14, y);
+        y += 10;
+
+        const tableData = [
+            ["Montant Brut (HT)", `${parseFloat(d.brutHT || 0).toFixed(3)} DT`],
+            ["TVA de la transaction", `${parseFloat(d.tvaAmount || 0).toFixed(3)} DT`],
+            ["Montant Total TTC", `${parseFloat(d.brutTTC || 0).toFixed(3)} DT`],
+            ["Retenue à la Source", `-${parseFloat(d.rsAmount || 0).toFixed(3)} DT`],
+            ["NET À PAYER AU FOURNISSEUR", `${parseFloat(d.netAPayer || 0).toFixed(3)} DT`]
+        ];
+
+        doc.autoTable({
+            startY: y,
+            head: [['Désignation', 'Montant']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [16, 185, 129] }
+        });
     }
 
     _addFooter(doc) {
@@ -171,13 +294,13 @@ class ExportService {
             return;
         }
 
-        // Préparation des données aplaties
         let rows = [];
+        const timestamp = new Date().toLocaleString();
 
         if (type === 'IRPP') {
             rows = [
-                ["SIMULATION FALCALE - IRPP 2026"],
-                ["Date", new Date().toLocaleString()],
+                [`SIMULATION FISCALE - IRPP 2026`],
+                ["Date", timestamp],
                 [],
                 ["PARAMÈTRES"],
                 ["Brut Annuel", data.grossIncome],
@@ -194,23 +317,69 @@ class ExportService {
                 ["Net Annuel", data.netMensuel * 12],
                 ["Net Mensuel", data.netMensuel]
             ];
-
-            // Ajout des tranches
             if (data.bracketDetails) {
-                rows.push([], ["DÉTAIL TRANCHES"]);
-                rows.push(["Tranche", "Taux", "Base", "Impôt"]);
-                data.bracketDetails.forEach(b => {
-                    rows.push([b.label, b.rate, b.base, b.tax]);
-                });
+                rows.push([], ["DÉTAIL TRANCHES"], ["Tranche", "Taux", "Base", "Impôt"]);
+                data.bracketDetails.forEach(b => rows.push([b.label, b.rate, b.base, b.tax]));
             }
+        } else if (type === 'IS') {
+            const opt = data.optimized || data;
+            const inputs = data.inputs || {};
+            rows = [
+                [`SIMULATION FISCALE - IS 2026`],
+                ["Date", timestamp],
+                [],
+                ["DONNÉES"],
+                ["Secteur", inputs.sectorId],
+                ["CA TTC", inputs.caTtc],
+                ["Résultat Comptable", inputs.resComptable],
+                [],
+                ["RÉSULTATS FISCAUX"],
+                ["Base Globale", opt.baseGlobal],
+                ["Réinvestissement", opt.reinvestmentDeducted],
+                ["Base Nette", opt.baseNet],
+                ["Taux IS", opt.appliedRate],
+                ["IS Dû", opt.is],
+                ["CSS", opt.css],
+                ["Charge Fiscale Totale", opt.total]
+            ];
+        } else if (type === 'TVA') {
+            const d = data.data || data;
+            rows = [
+                [`SIMULATION FISCALE - TVA`],
+                ["Date", timestamp],
+                [],
+                ["COLLECTÉE"],
+                ["Base HT", d.baseHT],
+                ["TVA Facturée", d.tvaCollectee],
+                ["Total TTC", d.montantTTC],
+                [],
+                ["DÉDUCTIBLE"],
+                ["TVA Récupérable Totale", d.totalDeductible],
+                [],
+                ["BILAN"],
+                ["Solde", d.solde],
+                ["Statut", d.solde > 0 ? "À payer" : "Crédit"]
+            ];
+        } else if (type === 'RS') {
+            const d = data.data || data;
+            rows = [
+                [`SIMULATION FISCALE - RS`],
+                ["Date", timestamp],
+                [],
+                ["TRANSACTION"],
+                ["Montant HT", d.brutHT],
+                ["Montant TVA", d.tvaAmount],
+                ["Montant TTC", d.brutTTC],
+                [],
+                ["RETENUE"],
+                ["Montant RS", d.rsAmount],
+                ["NET À PAYER", d.netAPayer]
+            ];
         }
 
-        // Création du Workbook
         const ws = XLSX.utils.aoa_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Simulation");
-
-        // Sauvegarde
         const validName = `Fiscal_Export_${type}_${new Date().toISOString().slice(0, 10)}.xlsx`;
         XLSX.writeFile(wb, validName);
     }

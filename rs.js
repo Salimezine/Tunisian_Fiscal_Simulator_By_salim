@@ -156,8 +156,18 @@ function calculateRS() {
                 <button id="btn-explain-rs" class="btn-primary" style="flex: 2; background: var(--primary-gradient);">
                     <span class="icon">🤖</span> <span data-i18n="label_explain_results">${t("label_explain_results")}</span>
                 </button>
-                <button onclick="window.print()" class="btn-primary" style="flex: 1; background: var(--accent);">
+                <button id="btn-print-rs" class="btn-primary" style="flex: 1; background: var(--accent);">
                     <span class="icon">📄</span> <span data-i18n="btn_print">${t("btn_print")}</span>
+                </button>
+            </div>
+
+            <!-- Export Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="btn-export-pdf-rs" class="btn-secondary" style="flex: 1; border: 1px solid var(--primary); color: var(--primary);">
+                    <span class="icon">📄</span> PDF
+                </button>
+                <button id="btn-export-excel-rs" class="btn-secondary" style="flex: 1; border: 1px solid #10b981; color: #10b981;">
+                    <span class="icon">📊</span> Excel
                 </button>
             </div>
             
@@ -178,6 +188,16 @@ function calculateRS() {
 
     document.getElementById('btn-explain-rs').addEventListener('click', () => {
         if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));
+    });
+
+    document.getElementById('btn-print-rs').addEventListener('click', () => window.print());
+
+    document.getElementById('btn-export-pdf-rs').addEventListener('click', () => {
+        if (window.FiscalExport) window.FiscalExport.generatePDF(window.lastCalculation.data, 'RS');
+    });
+
+    document.getElementById('btn-export-excel-rs').addEventListener('click', () => {
+        if (window.FiscalExport) window.FiscalExport.generateExcel(window.lastCalculation.data, 'RS');
     });
 
 
