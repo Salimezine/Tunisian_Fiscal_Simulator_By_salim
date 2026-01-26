@@ -100,17 +100,21 @@ function initIRPP() {
             </div>
             
             <div class="form-group flex-col-50">
-                <label data-i18n="label_situation">Situation Familiale</label>
+                <label data-i18n="label_revenue_type">Type de Revenu</label>
                 <select id="typeRevenu" class="form-control" onchange="calculerIRPP()">
+                    <option value="salarie" data-i18n="opt_salary">Salarié</option>
+                    <option value="retraite" data-i18n="opt_pension">Pensionné</option>
+                </select>
+            </div>
+            <div class="form-group flex-col-50">
+                <label data-i18n="label_situation">Situation Familiale</label>
+                <select id="etatCivil" class="form-control" onchange="calculerIRPP()">
                     <option value="celibataire" data-i18n="opt_single">Célibataire</option>
                     <option value="marie" data-i18n="opt_married">Marié(e)</option>
                     <option value="divorce" data-i18n="opt_divorced">Divorcé(e)</option>
                 </select>
             </div>
-            <div class="form-group flex-col-50">
-               <label data-i18n="label_children">Nombre d'enfants</label>
-               <input type="number" id="nbEnfants" class="form-control" value="0" min="0" onchange="calculerIRPP()">
-            </div>
+
 
             <div class="form-group">
                 <label id="labelMontant" data-i18n="label_salary_monthly">Salaire Brut Mensuel (DT)</label>
@@ -435,14 +439,11 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
     let familyDeductions = 0;
     if (chefFamille) familyDeductions += 300;
 
-    // Child deductions (Corrected: 150 for 1st, 100 for others)
+    // Child deductions (Correction Request: 100 DT per child, max 4)
     let childDeductions = 0;
     if (nbEnfants > 0) {
-        childDeductions += 150; // 1st child
-        if (nbEnfants > 1) {
-            const extraEnfants = Math.min(nbEnfants - 1, 3); // Max 4 total
-            childDeductions += extraEnfants * 100;
-        }
+        const countableChildren = Math.min(nbEnfants, 4); // Max 4 children eligible
+        childDeductions = countableChildren * 100;
     }
     familyDeductions += childDeductions;
 
@@ -607,6 +608,11 @@ function displayIRPPResults(result, isReverseMode) {
                     <span>(+) ${t("res_gross_annual")}</span>
                     <span>${result.grossIncome.toFixed(3)}</span>
                 </div>
+                ${result.inputs.opSpecifiqueIrpp !== 0 ? `
+                <div style="display: flex; justify-content: space-between; color: var(--warning);">
+                    <span>(+) Op. Spécifique</span>
+                    <span>+ ${result.inputs.opSpecifiqueIrpp.toFixed(3)}</span>
+                </div>` : ''}
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
                     <span>(-) CNSS (9.18% / 10.2%)</span>
                     <span>- ${result.cnss.toFixed(3)}</span>
@@ -623,6 +629,19 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
                     <span>(-) ${t("label_head_family")}</span>
                     <span>- ${(result.inputs.chefFamille ? 300 : 0).toFixed(3)}</span>
+                </div>
+                <!-- Added missing details -->
+                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
+                    <span>(-) ${t("label_kids_deduction")} (${result.inputs.nbEnfants})</span>
+                    <span>- ${(result.totalDeductions - (result.inputs.chefFamille ? 300 : 0) - result.inputs.autreDeduction - (result.inputs.nbParents * 450)).toFixed(3)}</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
+                    <span>(-) Parents à charge (${result.inputs.nbParents})</span>
+                    <span>- ${(result.inputs.nbParents * 450).toFixed(3)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #f59e0b;">
+                    <span>(-) ${t("label_other_deductions")}</span>
+                    <span>- ${result.inputs.autreDeduction.toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; color: #fff; border-top: 1px solid #777; padding-top: 5px;">
