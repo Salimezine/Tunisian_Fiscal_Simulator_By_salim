@@ -68,14 +68,16 @@ window.LegalReferenceDatabase = {
                 article: "Article 40 du Code IRPP",
                 url: "https://www.legislation.tn/detailtexte/CodeIRPPIS",
                 amount: 1000,
-                description: "Déduction pour enfant étudiant (1 000 DT par étudiant)",
+                description: "Déduction pour enfant étudiant non boursier (1 000 DT par étudiant)",
                 applicationType: "base_abatement" // Applied before tax calculation
             },
             family: {
                 article: "Article 40 du Code IRPP",
                 url: "https://www.legislation.tn/detailtexte/CodeIRPPIS",
                 spouse: 300,
-                children: [150, 100, 100, 100], // First child, second, third, fourth+
+                children: [100, 100, 100, 100], // flat 100 DT per child (Max 4)
+                handicappedChild: 2000,
+                parents: 450,
                 description: "Déductions familiales"
             },
             professionalExpenses: {

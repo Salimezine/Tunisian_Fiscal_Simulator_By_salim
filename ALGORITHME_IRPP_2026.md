@@ -6,19 +6,19 @@ Ce document détaille l'algorithme de calcul de l'Impôt sur le Revenu des Perso
 
 | Paramètre | Valeur | Note (Ref. Légale) |
 | :--- | :--- | :--- |
-| **CNSS** | 9.18% | Art. 38 (Sur brut annuel) |
+| **CNSS** | 9.68% | Art. 38 (Sur brut annuel) - Part Salariale |
 | **Frais Professionnels** | 10% | Art. 38 (Plafond : 2 000 DT) |
 | **Abattement Retraite** | 25% | Art. 25-27 (SANS plafond) |
-| **Déduction Chef Famille** | 300 DT | Art. 40-1 (Statut marital) |
-| **Déduction Enfant** | 100 DT | Art. 40-2 (Max 4 enfants) |
-| **Déduction Étudiant** | 1 000 DT | Art. 48 LF 2026 (Par enfant) |
-| **Déduction Parent à charge** | 400 DT | Art. 40-4 (Par parent) |
+| **Crédit Impôt Chef Famille** | 300 DT | Art. 40-1 (Déduit de l'impôt) |
+| **Crédit Impôt Enfant** | 300 DT | Art. 40-2 (Max 4 enfants - Déduit de l'impôt) |
+| **Crédit Impôt Étudiant** | 1 000 DT | Art. 48 LF 2026 (Par enfant - Déduit de l'impôt) |
+| **Crédit Impôt Parent** | 450 DT | Art. 40-4 (Par parent - Déduit de l'impôt) |
 | **Déduction Enfant Infirme** | 2 000 DT | Art. 40-3 (Par enfant) |
 | **CSS** | 0.5% | Art. 88 LF 2024 / LF 2026 |
 
-*\*Note : La limitation à 4 enfants pour la déduction de 100 DT est une règle historique (Code IRPP).*
+*\*Note : Les déductions pour Chef de Famille, Enfants, Étudiants et Parents sont toutes classifiées comme crédits d'impôt en 2026.*
 
-## 2. Barème Progressif IRPP (Corrigé - 5 Tranches)
+## 2. Barème Progressif IRPP (8 Tranches)
 
 | Tranche annuelle (DT) | Taux |
 | --------------------- | ---- |
@@ -48,31 +48,41 @@ DEBUT ALGORITHME CALCUL_FISCAL_CORRIGE
 
     // --- 3. Déductions Sociales & Abattements ---
     SI type_revenu == "salaire" ALORS
-        cnss = revenu_brut_annuel * 0.0918
+        // 1. CNSS (9.68% sur le Brut)
+        cnss = revenu_brut_annuel * 0.0968
+        
+        // 2. Frais Professionnels (10% sur le Brut Annuel - Plafonné 2000)
+        // Note: La LF 2026 maintient le calcul sur le Brut
+        abattement = MIN(revenu_brut_annuel * 0.10, 2000)
+        
         revenu_apres_cnss = revenu_brut_annuel - cnss
-        abattement = MIN(revenu_apres_cnss * 0.10, 2000) // Frais pros
     SINON SI type_revenu == "retraite" ALORS
-        cnss = 0 // Pas de CNSS sur les retraites
+        cnss = 0
         revenu_apres_cnss = revenu_brut_annuel
-        abattement = revenu_apres_cnss * 0.25 // Abattement retraite 25%
+        abattement = revenu_apres_cnss * 0.25 // Abattement retraite 25% (SANS plafond)
     FIN SI
 
     net_imposable_intermediaire = revenu_apres_cnss - abattement
 
-    // --- 4. Déductions Familiales ---
-    deductions_famille = 0
-    SI chef_de_famille ALORS deductions_famille += 300
-    deductions_famille += MIN(nombre_enfants, 4) * 100
-    deductions_famille += nombre_enfants_infirmes * 2000
-    deductions_famille += nombre_parents_a_charge * 400
-    deductions_famille += nombre_etudiants * 1000 // Déduction Étudiant LF 2026
+    // --- 4. Déductions Revenu (Avant Impôt) ---
+    deductions_revenu = 0
+    deductions_revenu += nombre_enfants_infirmes * 2000
 
     // --- 5. Assiette Imposable ---
-    assiette = net_imposable_intermediaire - deductions_famille
+    assiette = net_imposable_intermediaire - deductions_revenu
     SI assiette < 0 ALORS assiette = 0
 
-    // --- 6. Calcul IRPP (Barème 8 tranches) ---
-    irpp = CALCUL_SUIVANT_BAREME_8_TRANCHES(assiette)
+    // --- 6. Calcul IRPP Brut (Barème LF 2026 - 8 tranches) ---
+    irpp_brut = CALCUL_SUIVANT_BAREME_8_TRANCHES(assiette)
+    
+    // --- 7. Crédits d'Impôt (Après Impôt) ---
+    credits_impot = 0
+    SI chef_de_famille ALORS credits_impot += 300
+    credits_impot += MIN(nombre_enfants, 4) * 300
+    credits_impot += nombre_parents_a_charge * 450
+    credits_impot += nombre_etudiants * 1000
+    
+    irpp_net = MAX(0, irpp_brut - credits_impot)
 
 
     // --- 7. Calcul CSS (0.5%) ---

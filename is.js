@@ -148,7 +148,7 @@ function initIS() {
                 </div>
             </div>
             
-            <div style="margin-top: 15px; padding: 10px; background: rgba(99, 102, 241, 0.05); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
+            <div style="display: none; margin-top: 15px; padding: 10px; background: rgba(99, 102, 241, 0.05); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
                 <label style="display: flex; align-items: center; cursor: pointer; color: #a5b4fc; font-size: 0.9em;">
                     <input type="checkbox" id="enableAdvancedMode" style="margin-right: 8px;">
                     <span>🧠 Mode Expert - Décomposition Note 20/2008 (Catégories A/B)</span>
@@ -371,7 +371,7 @@ function applyProRata(categorieA, categorieB, caExport, caLocal, isRate) {
 // Core Logic (Refactored for Comparison)
 function computeIS(inputs) {
     const {
-        sectorId, resComptable, caTtc,
+        sectorId, resComptable, caTtc: caHt,  // Rename for consistency with rest of function
         reintegrations, deductions, montantReinvesti, creditImpot,
         isZDR, isStartup, isExport // Advantages Flags
     } = inputs;
