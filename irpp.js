@@ -125,6 +125,10 @@ function initIRPP() {
                         <option value="mensuel" data-i18n="opt_monthly" selected>Mensuel</option>
                     </select>
                 </div>
+                    </select>
+                </div>
+                <!-- Help Text for Salary -->
+                <div id="salary-help-text" style="font-size: 0.8em; opacity: 0.7; margin-top: 5px; color: #94a3b8; font-style: italic;"></div>
             </div>
             
             <div class="form-group">
@@ -142,7 +146,7 @@ function initIRPP() {
             
             <div class="checkbox-group">
                 <input type="checkbox" id="cnss" checked>
-                <label for="cnss" data-i18n="label_cnss_deduction">Appliquer déduction CNSS/CNRPS (9.18%)</label>
+                <label for="cnss" data-i18n="label_cnss_deduction">Appliquer déduction CNSS/CNRPS (9.68%)</label>
             </div>
             <div class="help-text" data-i18n="desc_cnss_help">Les frais professionnels (10%, max 2000 DT) sont appliqués automatiquement</div>
         </div>
@@ -156,7 +160,7 @@ function initIRPP() {
             
             <div class="checkbox-group">
                 <input type="checkbox" id="chefFamille">
-                <label for="chefFamille" data-i18n="label_head_family">Chef de famille (Déduction 300 DT)</label>
+                <label for="chefFamille" data-i18n="label_head_family">Chef de famille (Crédit d'impôt 300 DT)</label>
             </div>
 
             <div class="flex-row">
@@ -238,21 +242,30 @@ function initIRPP() {
         const isInverse = document.getElementById('modeInverse').checked;
         const frequence = document.getElementById('frequenceRevenu').value;
         const labelMontant = document.getElementById('labelMontant');
+        const helpText = document.getElementById('salary-help-text');
 
         let key = "label_salary_monthly";
+        let helpKey = "help_salary_gross";
+
         if (isInverse) {
             key = (frequence === 'annuel') ? "label_salary_inverse_annual" : "label_salary_inverse_monthly";
+            helpKey = "help_salary_net";
             labelMontant.style.color = "var(--accent)";
         } else {
             key = (frequence === 'annuel') ? "label_salary_annual" : "label_salary_monthly";
+            helpKey = "help_salary_gross";
             labelMontant.style.color = "var(--text-main)";
         }
 
         labelMontant.setAttribute('data-i18n', key);
+        if (helpText) {
+            helpText.setAttribute('data-i18n', helpKey);
+        }
 
         // Immediate update of text
         if (typeof t === 'function') {
             labelMontant.textContent = t(key);
+            if (helpText) helpText.textContent = t(helpKey);
         }
     };
 
@@ -415,8 +428,9 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
     // 1. CNSS Calculation
     let cnss = 0;
     if (typeRevenu === 'salarie' && applyCNSS) {
-        // CORRECTION FISCALE: Taux différencié Public vs Privé
-        const tauxCNSS = (secteur === 'public') ? 0.102 : 0.0918; // 10.2% Public (CNRPS), 9.18% Privé (CNSS)
+        // CORRECTION FISCALE LF 2026: Taux 9.68% Privé (CNSS), 10.2% Public (CNRPS)
+        // Part salariale (déductible IRPP) : 9,68 %
+        const tauxCNSS = (secteur === 'public') ? 0.102 : 0.0968;
         cnss = grossIncome * tauxCNSS;
     }
 
@@ -426,37 +440,27 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
     let labelAbattement = "";
 
     if (typeRevenu === 'retraite') {
-        abattement = revenuApresCnss * 0.25; // 25% Abatement
+        abattement = revenuApresCnss * 0.25; // 25% Abatement (SANS plafond)
         labelAbattement = "label_abattement_retraite";
     } else {
-        abattement = Math.min(revenuApresCnss * 0.10, 2000); // 10% capped at 2000
+        // Frais professionnels (10% du Salaire Net de CNSS plafonné à 2000 DT)
+        // Source LF 2026: (Brut - CNSS) x 10%
+        abattement = Math.min(revenuApresCnss * 0.10, 2000);
         labelAbattement = "label_abattement_pro";
     }
 
     let netApresAbattement = revenuApresCnss - abattement;
 
-    // 3. Deductions
-    let familyDeductions = 0;
-    if (chefFamille) familyDeductions += 300;
-
-    // Child deductions (Correction Request: 100 DT per child, max 4)
-    let childDeductions = 0;
-    if (nbEnfants > 0) {
-        const countableChildren = Math.min(nbEnfants, 4); // Max 4 children eligible
-        childDeductions = countableChildren * 100;
-    }
-    familyDeductions += childDeductions;
-
-    familyDeductions += nbEtudiants * 1000;
-    familyDeductions += nbInfirmes * 2000;
-    familyDeductions += nbParents * 450; // LF 2026 update
-
-    const totalDeductions = familyDeductions + autreDeduction;
+    // 3. Deductions (From income)
+    let extraDeductions = autreDeduction;
+    // CORRECTION ERREUR 2: "Parents" et "Etudiants" sont des CREDITS D'IMPOT (Déduits après IRPP)
+    // On ne les déduit plus de l'assiette imposable ici.
+    extraDeductions += nbInfirmes * 2000;
 
     // 4. Taxable Base
-    let assietteSoumise = Math.max(0, (netApresAbattement + opSpecifiqueIrpp) - totalDeductions);
+    let assietteSoumise = Math.max(0, (netApresAbattement + opSpecifiqueIrpp) - extraDeductions);
 
-    // 5. IRPP Calculation (Dynamic Brackets)
+    // 5. IRPP Calculation (Barème LF 2026 - 8 Tranches)
     const brackets2026 = [
         { min: 0, max: 5000, rate: 0.00 },
         { min: 5000, max: 10000, rate: 0.15 },
@@ -503,15 +507,31 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
         }
     });
 
-    // 6. CSS
+    // 6. Family Credits (Applied AFTER tax) - LF 2026
+    let creditChefFamille = chefFamille ? 300 : 0;
+    // LF 2026: 100 DT par enfant (4 premiers)
+    let creditEnfants = Math.min(nbEnfants, 4) * 100;
+
+    // CORRECTION ERREUR 2 & 3: Déplacement Parents et Etudiants ici (Crédits d'impôt)
+    let creditParents = nbParents * 450;
+    let creditEtudiants = nbEtudiants * 1000;
+
+    let totalCredits = creditChefFamille + creditEnfants + creditParents + creditEtudiants;
+
+    let irppNet = Math.max(0, impotTotal - totalCredits); // totalCredits instead of just Chef+Enfants
+
+    // 7. CSS
     let cssSolidaire = 0;
-    if (assietteSoumise > 0) { // CSS logic check
-        // Often based on tax due or base, simplifying to base 0.5% as per user note
+    if (assietteSoumise > 0) {
         cssSolidaire = assietteSoumise * 0.005; // 0.5%
     }
 
-    const totalRetenue = impotTotal + cssSolidaire;
+    const totalRetenue = irppNet + cssSolidaire;
     const netMensuel = (grossIncome - cnss - totalRetenue) / 12;
+
+    // 8. Charges Patronales (Info)
+    const tfp = grossIncome * 0.01;
+    const foprolos = grossIncome * 0.01;
 
     return {
         grossIncome,
@@ -519,13 +539,21 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
         abattement,
         labelAbattement,
         netApresAbattement,
-        totalDeductions,
+        totalDeductions: extraDeductions, // Income deductions
+        familyCredits: totalCredits, // Tax credits
+        creditChefFamille,
+        creditEnfants,
+        creditParents,
+        creditEtudiants,
         assietteSoumise,
-        irpp: impotTotal,
+        irppBrut: impotTotal,
+        irppNet: irppNet,
         css: cssSolidaire,
         totalRetenue,
         netMensuel,
         bracketDetails,
+        tfp,
+        foprolos,
         inputs
     };
 }
@@ -614,30 +642,17 @@ function displayIRPPResults(result, isReverseMode) {
                     <span>+ ${result.inputs.opSpecifiqueIrpp.toFixed(3)}</span>
                 </div>` : ''}
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) CNSS (9.18% / 10.2%)</span>
+                    <span>(-) CNSS salariale (9.68%)</span>
                     <span>- ${result.cnss.toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #555; padding-bottom: 2px; margin-bottom: 2px;">
-                    <span>(=) ${t("label_gross_taxable")}</span>
-                    <span>${(result.grossIncome - result.cnss).toFixed(3)}</span>
+                    <span>(=) Brut Imposable</span>
+                    <span>${(result.grossIncome - result.cnss + (result.inputs.opSpecifiqueIrpp || 0)).toFixed(3)}</span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
                     <span>(-) ${t(result.labelAbattement)}</span>
                     <span>- ${result.abattement.toFixed(3)}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) ${t("label_head_family")}</span>
-                    <span>- ${(result.inputs.chefFamille ? 300 : 0).toFixed(3)}</span>
-                </div>
-                <!-- Added missing details -->
-                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) ${t("label_kids_deduction")} (${result.inputs.nbEnfants})</span>
-                    <span>- ${(result.totalDeductions - (result.inputs.chefFamille ? 300 : 0) - result.inputs.autreDeduction - (result.inputs.nbParents * 450)).toFixed(3)}</span>
-                </div>
-                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
-                    <span>(-) Parents à charge (${result.inputs.nbParents})</span>
-                    <span>- ${(result.inputs.nbParents * 450).toFixed(3)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; color: #f59e0b;">
                     <span>(-) ${t("label_other_deductions")}</span>
@@ -647,6 +662,43 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; color: #fff; border-top: 1px solid #777; padding-top: 5px;">
                     <span>(=) ${t("res_taxable_annual")}</span>
                     <span>${result.assietteSoumise.toFixed(3)}</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; color: #34d399; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px;">
+                    <span>Calcul IRPP (Sur barème)</span>
+                    <span>${result.irppBrut.toFixed(3)}</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between; color: #34d399;">
+                    <span>(-) Crédit Chef de Famille</span>
+                    <span>- ${result.creditChefFamille.toFixed(3)}</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between; color: #34d399;">
+                    <span>(-) Crédit Enfants (${result.inputs.nbEnfants})</span>
+                    <span>- ${result.creditEnfants.toFixed(3)}</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between; color: #34d399;">
+                    <span>(-) Crédit Parents (${result.inputs.nbParents})</span>
+                    <span>- ${result.creditParents.toFixed(3)}</span>
+                </div>
+                 <div style="display: flex; justify-content: space-between; color: #34d399;">
+                    <span>(-) Crédit Etudiants (${result.inputs.nbEtudiants})</span>
+                    <span>- ${result.creditEtudiants.toFixed(3)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; color: #fff;">
+                    <span>(=) IRPP Net à payer</span>
+                    <span>${result.irppNet.toFixed(3)}</span>
+                </div>
+                
+                 <div style="margin-top: 10px; padding-top: 5px; border-top: 1px dashed #555; font-size: 0.9em; opacity: 0.8;">
+                    <strong style="color: #94a3b8; display:block; margin-bottom:3px;">Charges Patronales (Info):</strong>
+                    <div style="display: flex; justify-content: space-between; color: #94a3b8;">
+                        <span>TFP (1%)</span>
+                        <span>${result.tfp.toFixed(3)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #94a3b8;">
+                        <span>FOPROLOS (1%)</span>
+                        <span>${result.foprolos.toFixed(3)}</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -683,7 +735,7 @@ function displayIRPPResults(result, isReverseMode) {
                 <div style="padding: 10px; margin-top:15px; border-top:1px dashed rgba(255,255,255,0.1)">
                     <p style="margin: 5px 0;">
                         <strong>1. ${t("label_irpp_bracket")} :</strong> 
-                        <span style="float:right; color:var(--text-main);">${result.irpp.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
+                        <span style="float:right; color:var(--text-main);">${result.irppNet.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     <p style="margin: 5px 0; color: var(--accent);">
                         <strong>2. ${t("label_css_short")} :</strong>
