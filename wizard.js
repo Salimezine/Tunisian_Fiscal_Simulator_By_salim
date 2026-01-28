@@ -72,14 +72,14 @@ class IRPPWizard {
                 return `
                     <div class="form-group">
                         <label>${t('label_children_charge')}</label>
-                        <input type="number" class="form-control" value="${this.data.enfants}" onchange="irppWizard.setData('enfants', this.value)" min="0" max="10">
+                        <input type="number" class="form-control" value="${this.data.enfants}" oninput="irppWizard.setData('enfants', this.value, true)" min="0" max="10">
                     </div>
                 `;
             case 3:
                 return `
                     <div class="form-group">
                         <label>${t('label_salary_annual')}</label>
-                        <input type="number" class="form-control" value="${this.data.salaireBrut}" onchange="irppWizard.setData('salaireBrut', this.value)" placeholder="ex: 24000">
+                        <input type="number" class="form-control" value="${this.data.salaireBrut}" oninput="irppWizard.setData('salaireBrut', this.value, true)" placeholder="ex: 24000">
                     </div>
                     <div class="form-group" style="margin-top: 20px;">
                         <label>${t('label_sector')}</label>
@@ -104,9 +104,9 @@ class IRPPWizard {
         }
     }
 
-    setData(key, value) {
+    setData(key, value, silent = false) {
         this.data[key] = value;
-        this.render();
+        if (!silent) this.render();
     }
 
     next() {

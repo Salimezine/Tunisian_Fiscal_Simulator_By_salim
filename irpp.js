@@ -591,8 +591,8 @@ function displayIRPPResults(result, isReverseMode) {
         qvTaux.innerText = pression + " %";
     }
     if (qvStatus) {
-        qvStatus.innerText = (result.inputs.salary > 0) ? "LF " + currentFiscalYear : t("irpp_status_pending");
-        qvStatus.style.color = (result.inputs.salary > 0) ? "#10b981" : "#94a3b8";
+        qvStatus.innerText = (result.grossIncome > 0) ? "LF " + currentFiscalYear : t("irpp_status_pending");
+        qvStatus.style.color = (result.grossIncome > 0) ? "#10b981" : "#94a3b8";
     }
 
 

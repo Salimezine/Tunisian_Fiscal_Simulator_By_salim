@@ -75,20 +75,17 @@ function runTests() {
         allPassed = false;
     }
 
-    const expectedCredit = 300 + (2 * 300); // 900
+    const expectedCredit = 300 + (2 * 100); // 500
     const actualCredit = resBase.irppNet - resCredits.irppNet;
 
     // Note: irppNet might hit 0, so ensure we have enough tax
-    if (resBase.irppNet > 900) {
-        if (Math.abs(actualCredit - expectedCredit) < 0.001) {
-            console.log(`✅ Tax Credit Applied Correctly: -${actualCredit.toFixed(3)} DT (Expected -900.000)`);
-        } else {
-            console.error(`❌ Tax Credit Error: Diff is ${actualCredit.toFixed(3)}, Expected ${expectedCredit.toFixed(3)}`);
-            allPassed = false;
-        }
+    if (Math.abs(actualCredit - expectedCredit) < 0.001) {
+        console.log(`✅ Tax Credit Applied Correctly: -${actualCredit.toFixed(3)} DT (Expected -500.000)`);
     } else {
-        console.warn("⚠️ Warning: Not enough base tax to fully test credit deduction magnitude.");
+        console.error(`❌ Tax Credit Error: Diff is ${actualCredit.toFixed(3)}, Expected ${expectedCredit.toFixed(3)}`);
+        allPassed = false;
     }
+
 
     // --- TEST 3: Max 4 Children ---
     console.log("\n[TEST 3] Max 4 Children Rule (5 Children Input)");
@@ -100,11 +97,11 @@ function runTests() {
         nbEnfants: 5 // Should cap at 4
     };
     const res3 = calculateIRPPCore(input3, '2026');
-    // Credit should be 4 * 300 = 1200
-    if (res3.creditEnfants === 1200) {
+    // Credit should be 4 * 100 = 400
+    if (res3.creditEnfants === 400) {
         console.log(`✅ Max 4 Children Cap Correct: Credit is ${res3.creditEnfants} DT`);
     } else {
-        console.error(`❌ Max 4 Children Cap Failed: Got ${res3.creditEnfants} DT, Expected 1200 DT`);
+        console.error(`❌ Max 4 Children Cap Failed: Got ${res3.creditEnfants} DT, Expected 400 DT`);
         allPassed = false;
     }
 

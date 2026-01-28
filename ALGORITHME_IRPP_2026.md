@@ -10,7 +10,7 @@ Ce document détaille l'algorithme de calcul de l'Impôt sur le Revenu des Perso
 | **Frais Professionnels** | 10% | Art. 38 (Plafond : 2 000 DT) |
 | **Abattement Retraite** | 25% | Art. 25-27 (SANS plafond) |
 | **Crédit Impôt Chef Famille** | 300 DT | Art. 40-1 (Déduit de l'impôt) |
-| **Crédit Impôt Enfant** | 300 DT | Art. 40-2 (Max 4 enfants - Déduit de l'impôt) |
+| **Crédit Impôt Enfant** | 100 DT | Art. 40-2 (Max 4 enfants - Déduit de l'impôt) |
 | **Crédit Impôt Étudiant** | 1 000 DT | Art. 48 LF 2026 (Par enfant - Déduit de l'impôt) |
 | **Crédit Impôt Parent** | 450 DT | Art. 40-4 (Par parent - Déduit de l'impôt) |
 | **Déduction Enfant Infirme** | 2 000 DT | Art. 40-3 (Par enfant) |
@@ -78,7 +78,7 @@ DEBUT ALGORITHME CALCUL_FISCAL_CORRIGE
     // --- 7. Crédits d'Impôt (Après Impôt) ---
     credits_impot = 0
     SI chef_de_famille ALORS credits_impot += 300
-    credits_impot += MIN(nombre_enfants, 4) * 300
+    credits_impot += MIN(nombre_enfants, 4) * 100
     credits_impot += nombre_parents_a_charge * 450
     credits_impot += nombre_etudiants * 1000
     
