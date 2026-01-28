@@ -209,9 +209,10 @@ Le nouveau barème ${rules.version} (Art. 44) s'articule autour de 8 tranches :
 **Déductions & Abattements (Art. 40) :**
 - **Frais Pro** : 10% du brut (Plafonné à **2000 DT**).
 - **Chef de famille** : **300 DT**.
-- **Enfants** : 150 (1er), 100 (others). Max 4 enfants.
+- **Enfants** : 100 DT par enfant. Max 4 enfants.
 - **Étudiant** : **1000 DT** par enfant étudiant non boursier.
-- **Parents à charge** : **450 DT** (LF 2026)`;
+- **Parents à charge** : **450 DT** (LF 2026)
+`;
         }
         // --- IS LOGIC (Advanced detailing) ---
         else if (matches("is") || matches("société") || query.includes("impôt sur les sociétés")) {
