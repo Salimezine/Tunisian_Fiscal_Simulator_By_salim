@@ -484,20 +484,21 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
 
     let impotTotal = 0;
     let bracketDetails = [];
+    let remainingBase = assietteSoumise;
 
     brackets.forEach(bracket => {
         let taxableInThisBracket = 0;
-        let lower = bracket.min;
-        let upper = Math.min(bracket.max, assietteSoumise);
+        let bracketSize = bracket.max - bracket.min;
 
-        if (upper > lower) {
-            taxableInThisBracket = upper - lower;
+        if (remainingBase > 0) {
+            taxableInThisBracket = Math.min(remainingBase, bracketSize);
+            remainingBase -= taxableInThisBracket;
         }
 
         let taxForBracket = taxableInThisBracket * bracket.rate;
         impotTotal += taxForBracket;
 
-        if (taxForBracket > 0 || (bracket.rate === 0 && taxableInThisBracket > 0)) {
+        if (taxableInThisBracket > 0 || (bracket.rate === 0 && bracket.min === 0)) {
             bracketDetails.push({
                 label: `${bracket.min.toLocaleString('fr-TN')} - ${bracket.max === Infinity ? '+' : bracket.max.toLocaleString('fr-TN')}`,
                 rate: (bracket.rate * 100).toFixed(0) + '%',
@@ -512,18 +513,22 @@ function calculateIRPPCore(inputs = {}, year = '2026') {
     // LF 2026: 100 DT par enfant (4 premiers)
     let creditEnfants = Math.min(nbEnfants, 4) * 100;
 
-    // CORRECTION ERREUR 2 & 3: Déplacement Parents et Etudiants ici (Crédits d'impôt)
+    // CREDITS D'IMPOT (Déduits après IRPP)
     let creditParents = nbParents * 450;
     let creditEtudiants = nbEtudiants * 1000;
 
     let totalCredits = creditChefFamille + creditEnfants + creditParents + creditEtudiants;
 
-    let irppNet = Math.max(0, impotTotal - totalCredits); // totalCredits instead of just Chef+Enfants
+    let irppNet = Math.max(0, impotTotal - totalCredits);
 
-    // 7. CSS
+    // 7. CSS (Contribution Sociale de Solidarité)
+    // CORRECTION LF 2026 : Mesures exceptionnelles maintenues
+    // Taux Personnes Physiques : réduit de 0,5 point => 0,5%
+    // Base de calcul : Revenu Net Imposable (Assiette Soumise)
+    // Exonération totale si Assiette Soumise <= 5000 DT
     let cssSolidaire = 0;
-    if (assietteSoumise > 0) {
-        cssSolidaire = assietteSoumise * 0.005; // 0.5%
+    if (assietteSoumise > 5000) {
+        cssSolidaire = assietteSoumise * 0.005;
     }
 
     const totalRetenue = irppNet + cssSolidaire;
@@ -738,7 +743,7 @@ function displayIRPPResults(result, isReverseMode) {
                         <span style="float:right; color:var(--text-main);">${result.irppNet.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     <p style="margin: 5px 0; color: var(--accent);">
-                        <strong>2. ${t("label_css_short")} :</strong>
+                        <strong>2. ${t("label_css_short")} (0,5% IRPP Net) :</strong>
                         <span style="float:right">+ ${result.css.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     

@@ -14,7 +14,11 @@ Ce document détaille l'algorithme de calcul de l'Impôt sur le Revenu des Perso
 | **Crédit Impôt Étudiant** | 1 000 DT | Art. 48 LF 2026 (Par enfant - Déduit de l'impôt) |
 | **Crédit Impôt Parent** | 450 DT | Art. 40-4 (Par parent - Déduit de l'impôt) |
 | **Déduction Enfant Infirme** | 2 000 DT | Art. 40-3 (Par enfant) |
-| **CSS** | 0.5% | Art. 88 LF 2024 / LF 2026 |
+
+- **CSS Personnes Physiques** : **0,5 %** appliqué sur l'IRPP Net (Mesure exceptionnelle 2026).
+- **Exonération CSS** : Exonération totale si le revenu annuel net imposable (**Assiette Soumise**) <= **5 000 DT**.
+- **CSS Personnes Morales** : **3 %** (IS à 10/15/20/25%) ou **4 %** (IS à 35/40%).
+- **Assiette CSS (Sociétés)** : Bénéfice net imposable.
 
 *\*Note : Les déductions pour Chef de Famille, Enfants, Étudiants et Parents sont toutes classifiées comme crédits d'impôt en 2026.*
 
@@ -35,45 +39,21 @@ Ce document détaille l'algorithme de calcul de l'Impôt sur le Revenu des Perso
 
 ```plaintext
 DEBUT ALGORITHME CALCUL_FISCAL_CORRIGE
-    // --- 1. Entrées ---
-    LIRE revenu_brut_mensuel
-    LIRE type_revenu ("salaire" ou "retraite")
-    LIRE chef_de_famille (booléen)
-    LIRE nombre_enfants
-    LIRE nombre_enfants_infirmes
-    LIRE nombre_parents_a_charge
-
-    // --- 2. Base Annuelle ---
-    revenu_brut_annuel = revenu_brut_mensuel * 12
-
-    // --- 3. Déductions Sociales & Abattements ---
-    SI type_revenu == "salaire" ALORS
-        // 1. CNSS (9.68% sur le Brut)
-        cnss = revenu_brut_annuel * 0.0968
-        
-        // 2. Frais Professionnels (10% sur le Brut Annuel - Plafonné 2000)
-        // Note: La LF 2026 maintient le calcul sur le Brut
-        abattement = MIN(revenu_brut_annuel * 0.10, 2000)
-        
-        revenu_apres_cnss = revenu_brut_annuel - cnss
-    SINON SI type_revenu == "retraite" ALORS
-        cnss = 0
-        revenu_apres_cnss = revenu_brut_annuel
-        abattement = revenu_apres_cnss * 0.25 // Abattement retraite 25% (SANS plafond)
-    FIN SI
-
-    net_imposable_intermediaire = revenu_apres_cnss - abattement
-
-    // --- 4. Déductions Revenu (Avant Impôt) ---
-    deductions_revenu = 0
-    deductions_revenu += nombre_enfants_infirmes * 2000
+    // ... (Entrées, Base Annuelle, Déductions Sociales identiques) ...
 
     // --- 5. Assiette Imposable ---
     assiette = net_imposable_intermediaire - deductions_revenu
     SI assiette < 0 ALORS assiette = 0
 
     // --- 6. Calcul IRPP Brut (Barème LF 2026 - 8 tranches) ---
-    irpp_brut = CALCUL_SUIVANT_BAREME_8_TRANCHES(assiette)
+    reste_a_imposer = assiette
+    irpp_brut = 0
+    POUR CHAQUE tranche DANS bareme_2026 FAIRE
+        portion = MIN(reste_a_imposer, taille_tranche)
+        irpp_brut += portion * taux_tranche
+        reste_a_imposer -= portion
+        SI reste_a_imposer <= 0 ALORS QUITTER BOUCLE
+    FIN POUR
     
     // --- 7. Crédits d'Impôt (Après Impôt) ---
     credits_impot = 0
@@ -84,17 +64,16 @@ DEBUT ALGORITHME CALCUL_FISCAL_CORRIGE
     
     irpp_net = MAX(0, irpp_brut - credits_impot)
 
-
-    // --- 7. Calcul CSS (0.5%) ---
-    // Règle d'or : Pas d'IRPP => Pas de CSS
-    SI irpp > 0 ALORS
-        css = assiette * 0.005
+    // --- 7. Calcul CSS (1% sur IRPP NET) ---
+    SI irpp_net > 0 ALORS
+        css = irpp_net * 0.01
     SINON
         css = 0
     FIN SI
 
     // --- 8. Résultat Mensuel ---
-    net_annuel = revenu_brut_annuel - cnss - irpp - css
+    total_retenue = irpp_net + css
+    net_annuel = revenu_brut_annuel - cnss - total_retenue
     net_mensuel = net_annuel / 12
 
     RETOURNER net_mensuel

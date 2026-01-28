@@ -3,38 +3,26 @@
 
 // I18N Keys for Sectors and Groups
 const SECTOR_OPTIONS = [
-    // --- TAUX 10% (Prioritaires / Export) ---
-    { id: "agri", lang_key: "sect_agri", type: "fixed", rate: 0.10, css: 0.01, min_tax: 0.001, group_key: "group_10" },
-    { id: "artisanat", lang_key: "sect_artisanat", type: "fixed", rate: 0.10, css: 0.01, min_tax: 0.001, group_key: "group_10" },
-    { id: "export", lang_key: "sect_export", type: "fixed", rate: 0.10, css: 0.01, min_tax: 0.001, group_key: "group_10" },
+    // --- TAUX 10% (Agriculture, Santé, Éducation, Artisanat, Export/ZDR Post-Exo) ---
+    { id: "agri", lang_key: "sect_agri", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
+    { id: "artisanat", lang_key: "sect_artisanat", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
+    { id: "sante", lang_key: "sect_health", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
+    { id: "education", lang_key: "sect_edu", type: "fixed", rate: 0.10, css: 0.03, min_tax: 0.001, group_key: "group_10" },
 
-    // --- TAUX PROGRESSIF (Droit Commun : 15% / 20% / 25%) ---
-    // CA < 5M: 15% | 5M <= CA < 20M: 20% | CA >= 20M: 25%
-    { id: "commun", lang_key: "sect_common", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "commerce", lang_key: "sect_commerce", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "industrie", lang_key: "sect_industrie", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "services", lang_key: "sect_services", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "btp", lang_key: "sect_btp", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "transport", lang_key: "sect_transport", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
-    { id: "tourisme", lang_key: "sect_tourism", type: "progressive", css: 0.01, min_tax: 0.002, group_key: "group_progressive" },
+    // --- TAUX DROIT COMMUN (15%) : Industrie, Commerce, Services, Export ---
+    { id: "commun", lang_key: "sect_common", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "industrie", lang_key: "sect_industrie", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, isEnvironmental: true, group_key: "group_progressive" },
+    { id: "extraction", lang_key: "sect_extraction", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, isEnvironmental: true, group_key: "group_progressive" },
+    { id: "commerce", lang_key: "sect_commerce", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "services", lang_key: "sect_services", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.002, group_key: "group_progressive" },
+    { id: "export", lang_key: "sect_export", type: "fixed", rate: 0.15, css: 0.03, min_tax: 0.001, group_key: "group_progressive" },
 
-    // --- TAUX 35% (Spécifiques) ---
-    { id: "telecom", lang_key: "sect_telecom", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-    { id: "petrole", lang_key: "sect_oil", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-    { id: "grandes_surfaces", lang_key: "sect_hyper", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-    { id: "auto", lang_key: "sect_auto", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-    { id: "franchise", lang_key: "sect_franchise", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-    { id: "immo", lang_key: "sect_immo", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" },
-
-    // --- TAUX 40% (Financier - Banques & Assurances - LF 2026) ---
-    { id: "banque", lang_key: "sect_bank", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
-    { id: "assurance", lang_key: "sect_insurance", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
-    { id: "leasing", lang_key: "sect_leasing", type: "fixed", rate: 0.40, css: 0.04, min_tax: 0.002, group_key: "group_finance" },
-
-    // --- RÉGIME SPÉCIAL : Nouvelles Entreprises ---
-    // Taux dégressifs fixes pour simplification ici (ou géré via logique ZDR/New)
-    { id: "nouvelle_1", lang_key: "sect_new_1", type: "fixed", rate: 0.00, css: 0, min_tax: 0, group_key: "group_new" },
-    { id: "nouvelle_4", lang_key: "sect_new_4", type: "fixed", rate: 0.15, css: 0.01, min_tax: 0.002, group_key: "group_new" }
+    // --- TAUX MAJORÉ (35%) : Banques, Assurances, Télécoms, Pétrole, Auto ---
+    { id: "banque", lang_key: "sect_bank", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
+    { id: "assurance", lang_key: "sect_insurance", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
+    { id: "telecom", lang_key: "sect_telecom", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
+    { id: "petrole", lang_key: "sect_oil", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
+    { id: "auto", lang_key: "sect_auto", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" }
 ];
 
 function initIS() {
@@ -83,21 +71,31 @@ function initIS() {
         <!-- Advantages Section -->
         <div class="form-section">
             <div class="section-title">
-                <span class="icon">🎁</span> <span>Avantages Fiscaux</span>
+                <span class="icon">🎁</span> <span>Avantages Fiscaux & Régimes</span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1);">
-                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
-                    <input type="checkbox" id="isZDR" class="custom-checkbox">
-                    <span style="font-size: 0.9em;">Zone de Dév. Régional (ZDR)</span>
-                </label>
-                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
-                    <input type="checkbox" id="isStartup" class="custom-checkbox">
-                    <span style="font-size: 0.9em;">Label Startup Act</span>
-                </label>
-                <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
-                    <input type="checkbox" id="isExport" class="custom-checkbox">
-                    <span style="font-size: 0.9em;">Exportateur Total</span>
-                </label>
+            <div style="background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                        <input type="checkbox" id="isZDR" class="custom-checkbox">
+                        <span style="font-size: 0.9em;">Zone de Dév. Régional (ZDR)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                        <input type="checkbox" id="isStartup" class="custom-checkbox">
+                        <span style="font-size: 0.9em;">Label Startup Act</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                        <input type="checkbox" id="isExport" class="custom-checkbox">
+                        <span style="font-size: 0.9em;">Exportateur Total (ETE)</span>
+                    </label>
+                </div>
+                
+                <div class="form-group" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                    <label style="font-size: 0.85em; opacity: 0.8;">Années d'exercice (Ancienneté) :</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" id="anciennete" class="form-control" value="1" min="1" max="50" style="width: 80px;">
+                        <span style="font-size: 0.8em; opacity: 0.6;">(Utilisé pour les exonérations de 10 ans)</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -371,9 +369,17 @@ function applyProRata(categorieA, categorieB, caExport, caLocal, isRate) {
 // Core Logic (Refactored for Comparison)
 function computeIS(inputs) {
     const {
-        sectorId, resComptable, caTtc: caHt,  // Rename for consistency with rest of function
-        reintegrations, deductions, montantReinvesti, creditImpot,
-        isZDR, isStartup, isExport // Advantages Flags
+        sectorId,
+        resComptable = 0,
+        caHt = 0,
+        reintegrations = 0,
+        deductions = 0,
+        montantReinvesti = 0,
+        creditImpot = 0,
+        isZDR = false,
+        isStartup = false,
+        isExport = false,
+        anciennete = 1
     } = inputs;
 
     const s = SECTOR_OPTIONS.find(opt => opt.id === sectorId);
@@ -383,6 +389,10 @@ function computeIS(inputs) {
     const runCalculation = (config) => {
         const { sector, ca, res, reinvest, credit, reintegrations, deductions, zdrOverride, startupOverride, exportOverride, advancedData } = config;
 
+        // 0. Preliminary Variables
+        const isETE = exportOverride && (advancedData ? (advancedData.inputs.caExport / (advancedData.inputs.caExport + advancedData.inputs.caLocal) >= 0.8) : true);
+        const years = config.anciennete || 1;
+
         // 1. Rate logic
         let standardRate = sector.rate;
         if (sector.type === 'progressive') {
@@ -391,18 +401,28 @@ function computeIS(inputs) {
             else standardRate = 0.25;
         }
 
-        // Advantage Rate
+        // Advantage Rate & Period Logic
         let advantageRate = standardRate;
-        if (zdrOverride || startupOverride) advantageRate = 0;
-        else if (exportOverride) advantageRate = 0.10;
+        let isExemptPeriod = false;
+
+        if (zdrOverride) {
+            if (years <= 10) isExemptPeriod = true;
+            else advantageRate = 0.10;
+        } else if (startupOverride) {
+            if (years <= 8) isExemptPeriod = true;
+            else advantageRate = standardRate;
+        } else if (isETE) {
+            if (years <= 10) isExemptPeriod = true;
+            else advantageRate = standardRate; // 50% deduction applied later
+        }
 
         // 2. Base Calculation
         const baseGlobal = Math.max(0, res + reintegrations - deductions);
 
-        // 3. Advanced Classification (Note 20/2008)
+        // 3. Advanced Classification (Note 20/2008) & Export Deduction
         let beneficeEligible = 0;
         let beneficeTaxable = baseGlobal;
-        let ratioExport = 1.0;
+        let ratioExport = 0;
 
         if (advancedData && advancedData.enabled) {
             const { categorieA, categorieB } = classifyRevenues(advancedData.inputs);
@@ -410,23 +430,42 @@ function computeIS(inputs) {
 
             if (caTotal > 0) {
                 ratioExport = advancedData.inputs.caExport / caTotal;
-                beneficeEligible = categorieA * ratioExport;
-                beneficeTaxable = (categorieA * (1 - ratioExport)) + categorieB;
+                // If it's a partial export or post-10y ETE
+                if (isETE && years > 10) {
+                    // 50% deduction of export profit
+                    const beneficeExport = categorieA * ratioExport;
+                    beneficeEligible = beneficeExport * 0.5; // Only 50% taxed
+                    beneficeTaxable = (categorieA * (1 - ratioExport)) + categorieB;
+                } else if (isExemptPeriod) {
+                    beneficeEligible = categorieA * ratioExport;
+                    beneficeTaxable = (categorieA * (1 - ratioExport)) + categorieB;
+                } else {
+                    // Standard pro-rata for non-exempt partials
+                    beneficeEligible = categorieA * ratioExport;
+                    beneficeTaxable = (categorieA * (1 - ratioExport)) + categorieB;
+                }
             } else {
-                // If no CA split, assume 100% Local or 100% Export based on checkbox?
-                // For simplicity in expert mode: if CA split is empty, assume everything is Category A
                 beneficeEligible = categorieA;
                 beneficeTaxable = categorieB;
             }
-        } else if (zdrOverride || startupOverride || exportOverride) {
-            // Simple mode with advantage: assume everything is eligible
-            beneficeEligible = baseGlobal;
-            beneficeTaxable = 0;
+        } else {
+            // Simple mode
+            if (isExemptPeriod) {
+                beneficeEligible = baseGlobal;
+                beneficeTaxable = 0;
+            } else if (isETE && years > 10) {
+                beneficeEligible = baseGlobal * 0.5; // 50% deduction
+                beneficeTaxable = 0;
+            } else {
+                beneficeEligible = baseGlobal;
+                beneficeTaxable = 0;
+            }
         }
 
         // 4. IS Calculation
-        // IS = (Eligible * AdvantageRate) + (Taxable * StandardRate)
-        const isBeforeDeduction = (beneficeEligible * advantageRate) + (beneficeTaxable * standardRate);
+        // If exempt, IS is 0 for eligible part
+        const rateForEligible = isExemptPeriod ? 0 : advantageRate;
+        let isBeforeDeduction = (beneficeEligible * rateForEligible) + (beneficeTaxable * standardRate);
 
         // 5. Reinvestment Deduction
         const isPrivilegedSector = zdrOverride || sector.id === 'agri';
@@ -436,17 +475,16 @@ function computeIS(inputs) {
         const baseNet = baseGlobal - deductionAmount;
         const wasReinvestCapped = reinvest > reinvestCap && reinvest > 0;
 
-        // The IS reduction proportional to the deduction?
-        // In simple terms: IS_Net = IS_Global * (BaseNet / BaseGlobal)
+        // IS reduction proportional to deduction
         let isAfterReinvest = 0;
         if (baseGlobal > 0) {
             isAfterReinvest = isBeforeDeduction * (baseNet / baseGlobal);
         }
 
-        // 6. Floor Logic for Reinvestment (20% of IS before deduction)
-        const isSpecialSector = ['agri', 'export', 'nouvelle_1'].includes(sector.id) || zdrOverride || startupOverride || exportOverride;
+        // 6. Floor Logic (20% of IS) - Not applicable to exempt/zdr/startup
+        const isSpecialExempt = ['agri', 'export'].includes(sector.id) || zdrOverride || startupOverride || isETE;
         let isDuCalc = isAfterReinvest;
-        if (!isSpecialSector && reinvest > 0) {
+        if (!isSpecialExempt && reinvest > 0) {
             const floorReinvest = isBeforeDeduction * 0.20;
             isDuCalc = Math.max(isAfterReinvest, floorReinvest);
         }
@@ -456,38 +494,66 @@ function computeIS(inputs) {
             isDuCalc = Math.max(0, isDuCalc - credit);
         }
 
-        // 8. Minimum Tax (CA)
-        let minTaxCA = ca * sector.min_tax;
-        minTaxCA = Math.max(minTaxCA, 500);
+        // 8. Minimum Tax (CA TTC)
+        // LF 2026: 0.2% CA TTC (Standard) vs 0.1% CA TTC (Reduced)
+        const caTtc = ca * 1.19;
+        let minTax = 0;
+        let minAbsolu = 500;
+        let plafondMin = Infinity;
 
-        if (isPrivilegedSector || startupOverride) {
-            minTaxCA = 0; // Exemption from IMF
+        if (standardRate <= 0.10 || zdrOverride) {
+            minTax = caTtc * 0.001; // 0.1%
+            minAbsolu = 100;
+            plafondMin = 300;
+        } else {
+            minTax = caTtc * 0.002; // 0.2%
+            minAbsolu = 500;
         }
 
+        let isFinalMin = Math.max(minAbsolu, Math.min(minTax, plafondMin));
+
         let isFinal = isDuCalc;
-        if (!isSpecialSector && minTaxCA > 0) {
-            isFinal = Math.max(isDuCalc, minTaxCA);
-        } else if (zdrOverride || startupOverride) {
-            if (advantageRate === 0) isFinal = 0;
-        } else if (exportOverride) {
-            let exportMin = ca * 0.001; // 0.1% Minimum for exporters
-            isFinal = Math.max(isDuCalc, exportMin);
+        if (!isSpecialExempt && !isExemptPeriod) {
+            isFinal = Math.max(isDuCalc, isFinalMin);
+        } else if (isExemptPeriod) {
+            isFinal = 0; // Totale exemption
         }
 
         // 9. CSS
-        const cssRate = sector.css;
+        let cssRate = standardRate >= 0.35 ? 0.04 : 0.03;
         let css = baseNet * cssRate;
-        if ((zdrOverride || startupOverride) && advantageRate === 0) css = 0;
+
+        // ZDR Specific CSS post-10y: 0.1% CA TTC
+        if (zdrOverride) {
+            if (years <= 10) css = 0;
+            else css = caTtc * 0.001;
+        } else if (isExemptPeriod) {
+            css = 0;
+        }
+
+        // 10. Contributions Spécifiques LF 2026
+        let contribStrategic = 0;
+        if (sector.isStrategic && !isExemptPeriod) {
+            contribStrategic = baseNet * 0.04;
+        }
+
+        let contribEnv = 0;
+        if (sector.isEnvironmental && !isExemptPeriod) {
+            contribEnv = baseNet * 0.01;
+        }
 
         return {
-            total: isFinal + css,
+            total: isFinal + css + contribStrategic + contribEnv,
             is: isFinal,
             css: css,
+            contribStrategic: contribStrategic,
+            contribEnv: contribEnv,
             baseGlobal: baseGlobal,
             baseNet: baseNet,
             appliedRate: advantageRate,
-            standardRate: standardRate,
-            minTaxCA: minTaxCA,
+            isExemptPeriod: isExemptPeriod,
+            cssRate: zdrOverride && years > 10 ? '0.1% CA' : (cssRate * 100) + '%',
+            minTaxCA: isFinalMin,
             isBeforeMin: isDuCalc,
             reinvestmentDeducted: deductionAmount,
             reinvestmentCapped: wasReinvestCapped,
@@ -509,6 +575,7 @@ function computeIS(inputs) {
         zdrOverride: isZDR,
         startupOverride: isStartup,
         exportOverride: isExport,
+        anciennete: anciennete,
         advancedData: inputs.advancedMode ? {
             enabled: true,
             inputs: inputs.classification
@@ -531,6 +598,7 @@ function computeIS(inputs) {
         zdrOverride: false,
         startupOverride: false,
         exportOverride: false,
+        anciennete: 1, // Standard scenario assumes no seniority benefits
         advancedData: null // No advanced split in standard mode
     });
 
@@ -568,10 +636,11 @@ function calculateIS() {
     const isZDR = document.getElementById('isZDR')?.checked || false;
     const isStartup = document.getElementById('isStartup')?.checked || false;
     const isExport = document.getElementById('isExport')?.checked || false;
+    const anciennete = parseInt(document.getElementById('anciennete')?.value) || 1;
 
     let calculationInputs = {
         sectorId, resComptable, caHt, reintegrations, deductions, montantReinvesti, creditImpot,
-        isZDR, isStartup, isExport
+        isZDR, isStartup, isExport, anciennete
     };
 
     // Advanced Mode: Apply Note 20/2008 Classification
@@ -762,6 +831,16 @@ function calculateIS() {
                             <span style="opacity:0.7">${t("res_css_due")} (${(opt.cssRate * 100).toFixed(0)}%) :</span>
                             <strong style="float:right">+ ${opt.css.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
                         </div>
+                        ${opt.contribStrategic > 0 ? `
+                        <div style="grid-column: span 2; padding-top: 5px;">
+                            <span style="opacity:0.7">${t("label_contrib_strategic")} :</span>
+                            <strong style="float:right; color: var(--warning)">+ ${opt.contribStrategic.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
+                        </div>` : ''}
+                        ${opt.contribEnv > 0 ? `
+                        <div style="grid-column: span 2; padding-top: 5px;">
+                            <span style="opacity:0.7">${t("label_contrib_env")} :</span>
+                            <strong style="float:right; color: #10b981">+ ${opt.contribEnv.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</strong>
+                        </div>` : ''}
                     </div>
                 </div>
 
