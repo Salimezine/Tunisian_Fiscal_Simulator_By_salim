@@ -11,6 +11,17 @@ class AIService {
         this.isStreaming = false;
         this.abortController = null;
         this.currentContext = null;
+        this.interviewState = {
+            active: false,
+            step: 0,
+            answers: {}
+        };
+        this.diagnosisQuestions = [
+            { id: 'assurance_vie', text: "📊 Payez-vous des primes d'**Assurance Vie** ?" },
+            { id: 'credit_logement', text: "🏠 Avez-vous un **Crédit Logement** en cours ?" },
+            { id: 'epargne_actions', text: "📉 Avez-vous un **Compte Épargne en Actions (CEA)** ?" },
+            { id: 'dividendes', text: "💰 Percevez-vous des **Dividendes** d'actions ?" }
+        ];
     }
 
     /**
@@ -181,6 +192,20 @@ class AIService {
         const query = userMessage.toLowerCase();
         let response = "";
 
+        // --- SPECIAL CONSULTATION MODES ---
+        if (query.includes("consultation_irpp") || query.includes("analyse ma situation")) {
+            return this.analyzeIRPP(this.currentContext);
+        }
+
+        if (query.includes("diagnostic_interactif") || query.includes("poser des questions")) {
+            return this.startDiagnosis();
+        }
+
+        // --- INTERVIEW MODE HANDLING ---
+        if (this.interviewState.active) {
+            return this.processInterviewAnswer(query);
+        }
+
         const db = window.LegalReferenceDatabase || {};
         if (!db.irpp) return "⚠️ Erreur: Base de données légale non chargée.";
 
@@ -206,12 +231,12 @@ Le nouveau barème ${rules.version} (Art. 44) s'articule autour de 8 tranches :
 | 50 000 - 70 000 | **38%** |
 | Au-delà de 70 000 | **40%** |
 
-**Déductions & Abattements (Art. 40) :**
-- **Frais Pro** : 10% du brut (Plafonné à **2000 DT**).
-- **Chef de famille** : **300 DT**.
-- **Enfants** : 100 DT par enfant. Max 4 enfants.
-- **Étudiant** : **1000 DT** par enfant étudiant non boursier.
-- **Parents à charge** : **450 DT** (LF 2026)
+**Déductions Mise à Jour LF 2026 :**
+- **Frais Pro** : 10% du brut (Plafonné à **2 000 DT**).
+- **Chef de famille** : **300 DT** (Crédit d'impôt).
+- **Enfants** : **100 DT** par enfant (Crédit d'impôt, max 4).
+- **Enfant Étudiant** : **1 000 DT** (Crédit d'impôt).
+- **Parents à charge** : **450 DT** par parent (LF 2026 - Nouveau montant).
 `;
         }
         // --- IS LOGIC (Advanced detailing) ---
@@ -219,14 +244,21 @@ Le nouveau barème ${rules.version} (Art. 44) s'articule autour de 8 tranches :
             const isRates = db.is.rates["2026"];
             response = `### 🏢 Régime de l'IS (Loi de Finances 2026)
             
-Les taux applicables selon l'Art. 49 sont :
-- **${isRates.standard * 100}%** : Taux standard (PME, Industries, Services).
-- **${isRates.financial * 100}%** : Banques, Assurances, Telecoms (Secteur financier).
-- **10%** : Entreprises totalement exportatrices (sous conditions).
+**1. Taux d'Imposition (Art. 49) :**
+- **15%** : Taux Standard (Industrie, Commerce, Services).
+- **10%** : Développement Régional (après 10 ans) & Export (Période transitoire).
+- **35%** : Banques, Assurances, Grande Distribution (>2500m²).
+- **20%** : Introduction en Bourse (IPO) pendant 5 ans.
 
-**Minimum d'Impôt (Art. 12 LF 2026) :**
-L'impôt ne peut être < **0.2% du CA brut**, même en cas de déficit.
-**CSS Entreprise** : 3% du bénéfice imposable.`;
+**2. Régimes Privilégiés (ZDR & Export) :**
+- **ZDR** : Exonération Totale (0%) pendant 10 ans. 
+  - *Après 10 ans* : IS 10% + CSS 0.1% du Bénéfice.
+- **Export (ETE)** : Exonération Totale (0%) pendant 10 ans.
+  - *Après 10 ans* : IS 7.5% (Taux Effectif) + CSS 0%.
+
+**3. Charges Fiscales Minimales :**
+- **Minimum d'Impôt** : 0.2% du CA TTC (Général) ou 0.1% (ZDR < 10 ans).
+- **CSS** : 3% (Standard) ou 4% (activités à 35%).`;
         }
         // --- TVA LOGIC ---
         else if (matches("tva")) {
@@ -397,6 +429,139 @@ CONTEXTE LÉGAL OFFICIEL (TUNISIE 2026) :
      */
     setContext(context) {
         this.currentContext = context;
+    }
+
+    /**
+     * INTELLIGENT IRPP ANALYSIS
+     * Rule-based engine to suggest optimizations
+     */
+    analyzeIRPP(context) {
+        if (!context || context.type !== 'IRPP') {
+            return "⚠️ **Aucune donnée analysable.**\nVeuillez d'abord effectuer une simulation IRPP pour que je puisse l'analyser.";
+        }
+
+        const data = context.data;
+        const inputs = data.inputs;
+        let advice = [];
+        let savingsPotential = 0;
+
+        // Header
+        let response = `### 🕵️ Audit Fiscal Intelligent (IA)\n`;
+        response += `**Profil**: ${inputs.typeRevenu === 'salarie' ? 'Salarié' : 'Pensionné'} | **Revenu**: ${data.grossIncome.toLocaleString('fr-TN')} DT/an\n\n`;
+
+        // 1. Check Frais Professionnels
+        if (inputs.typeRevenu === 'salarie' && data.abattement === 2000) {
+            advice.push(`✅ **Frais Professionnels** : Vous bénéficiez du plafond maximal de **2 000 DT**.
+            *Conseil* : Si vos frais réels (transport, repas, formations) dépassent ce montant, optez pour le régime des frais réels.`);
+        }
+
+        // 2. Check Chef de Famille Logic
+        if (inputs.nbEnfants > 0 && !inputs.chefFamille && inputs.etatCivil === 'marie') {
+            advice.push(`❓ **Chef de Famille** : Vous avez des enfants mais n'avez pas coché "Chef de famille".
+            *Rappel* : Si votre conjoint(e) ne travaille pas ou a un revenu très faible, vous pourriez bénéficier de ce crédit de **300 DT**.`);
+        }
+
+        // 3. Parents à Charge
+        if (inputs.nbParents === 0) {
+            advice.push(`💡 **Parents à Charge** : Aidez-vous financièrement vos parents ?
+            *Opportunité* : Vous pouvez déduire **450 DT** par parent à charge (sous conditions de revenu).`);
+        }
+
+        // 4. Compte Epargne en Actions (CEA)
+        if (data.irppNet > 1000) {
+            const maxDed = 50000; // Simplified for advise
+            advice.push(`📉 **Optimisation Fiscale (CEA)** : Votre impôt est significatif (${data.irppNet.toLocaleString('fr-TN')} DT).
+            *Action* : Ouvrir un **Compte Épargne en Actions (CEA)** permet de déduire les versements jusqu'à **50 000 DT** de votre revenu imposable.
+            *Gain Potentiel* : Pour 1000 DT versés, vous économiseriez environ **${(1000 * 0.3).toFixed(0)} DT** d'impôt.`);
+        }
+
+        // 5. Assurance Vie
+        if (data.irppNet > 500) {
+            advice.push(`🛡️ **Assurance Vie** : Les primes d'assurance vie sont déductibles (max 10 000 DT). C'est un excellent moyen de préparer l'avenir tout en réduisant l'impôt.`);
+        }
+
+        if (advice.length === 0) {
+            response += "✅ **Votre situation semble optimisée !** Je n'ai pas détecté d'anomalies évidentes ou d'oublis classiques.";
+            response += "\n\n🤔 *Voulez-vous aller plus loin ? Tapez 'diagnostic' pour que je vous pose quelques questions.*";
+        } else {
+            response += advice.map(a => `- ${a}`).join('\n\n');
+            response += "\n\nℹ️ *Tapez 'diagnostic' pour un audit approfondi.*";
+        }
+
+        return response;
+    }
+
+    /**
+     * Start Interactive Diagnosis
+     */
+    startDiagnosis() {
+        this.interviewState = {
+            active: true,
+            step: 0,
+            answers: {}
+        };
+        return `🕵️ **Démarrage du Diagnostic Interactif**\n\nJe vais vous poser **${this.diagnosisQuestions.length} questions** pour mieux comprendre votre situation.\n\nrépondez simplement par 'oui' ou 'non'.\n\n1️⃣ ${this.diagnosisQuestions[0].text}`;
+    }
+
+    /**
+     * Process User Answer in Interview Mode
+     */
+    processInterviewAnswer(userMessage) {
+        const msg = userMessage.toLowerCase().trim();
+        const currentQ = this.diagnosisQuestions[this.interviewState.step];
+
+        // Interpret YES/NO
+        let val = null;
+        if (msg.includes('oui') || msg.includes('yes') || msg.includes('ouais')) val = true;
+        else if (msg.includes('non') || msg.includes('no')) val = false;
+        else return "⚠️ Je n'ai pas compris. Répondez par **Oui** ou **Non**.";
+
+        // Store Answer
+        this.interviewState.answers[currentQ.id] = val;
+        this.interviewState.step++;
+
+        // Next Question or Finish
+        if (this.interviewState.step < this.diagnosisQuestions.length) {
+            const nextQ = this.diagnosisQuestions[this.interviewState.step];
+            return `${this.interviewState.step + 1}️⃣ ${nextQ.text}`;
+        } else {
+            return this.finalizeDiagnosis();
+        }
+    }
+
+    /**
+     * Finalize Diagnosis and Generate Report
+     */
+    finalizeDiagnosis() {
+        this.interviewState.active = false;
+        const answers = this.interviewState.answers;
+        let report = `### ✅ Diagnostic Terminé !\nVoici mes recommandations basées sur vos réponses :\n\n`;
+        let tips = [];
+
+        if (answers.assurance_vie) {
+            tips.push(`✅ **Assurance Vie** : Excellent. Vérifiez que vous déduisez bien le montant max (**10 000 DT**) de votre revenu.`);
+        } else {
+            tips.push(`💡 **Assurance Vie** : Vous ne payez pas de primes. En souscrire une permettrait de déduire jusqu'à **10 000 DT** de votre assiette imposable tout en épargnant.`);
+        }
+
+        if (answers.credit_logement) {
+            tips.push(`🏠 **Crédit Logement** : N'oubliez pas que les **intérêts** (marge bénéficiaire) sont déductibles (selon le contrat et l'année de construction).`);
+        }
+
+        if (answers.epargne_actions) {
+            tips.push(`📉 **CEA** : Très bien. Le plafond de déduction est de **50 000 DT** par an.`);
+        } else {
+            tips.push(`📉 **CEA** : Pensez-y. C'est l'un des moyens les plus puissants pour réduire l'impôt (Déduction jusqu'à **50 000 DT**).`);
+        }
+
+        if (answers.dividendes) {
+            tips.push(`💰 **Dividendes** : Attention, ils subissent une retenue à la source libératoire de **10%**.`);
+        }
+
+        if (tips.length === 0) report += "Tout semble en ordre !";
+        else report += tips.map(t => `- ${t}`).join('\n\n');
+
+        return report;
     }
 }
 

@@ -310,16 +310,25 @@ async function analyserProfil() {
     const isDroitCommun = ![data.startup, data.zoneRegionale, data.export, data.extension].some(Boolean);
 
     if (ai) {
-        const prompt = `Analyse fiscale experte pour ce profil en Tunisie (LF 2026) :
-        - Type : ${data.type === 'societe' ? 'Société (IS)' : 'Particulier (IRPP)'}
+        const prompt = `Analyse expert fiscale Tunisie (LF 2026 STRICT) :
+        - Profil : ${data.type === 'societe' ? 'Société (IS)' : 'Particulier (IRPP)'}
         - Secteur : ${data.secteur}
-        - Régime : ${isDroitCommun ? 'Droit Commun (Général)' : 'Incitations fiscales'}
-        - Avantages cochés : ${[data.startup ? 'Startup Act' : '', data.zoneRegionale ? 'ZDR' : '', data.export ? 'Export' : '', data.extension ? 'Extension' : ''].filter(Boolean).join(', ') || 'Aucun (Droit Commun)'}.
+        - Options : ${[
+                data.startup ? 'Startup Act (Exonération 8 ans)' : '',
+                data.zoneRegionale ? 'ZDR (Exonération 10 ans + 10% après)' : '',
+                data.export ? 'Export (Exonération 10 ans + 0.2% Min Impôt)' : '',
+                data.extension ? 'Extension (Amor. accéléré)' : ''
+            ].filter(Boolean).join(', ') || 'Droit Commun (IS 15%, Min 0.2%)'}.
 
-        IMPORTANT : Réponds au format JSON strict suivant :
+        RÈGLES CRITIQUES LF 2026 :
+        1. ZDR : Exonération totale IS+CSS (10 ans), puis IS 10% + CSS 0.1% Profit.
+        2. Export : Exonération totale (10 ans), puis Taux effectif 7.5%.
+        3. Min Impôt : 0.2% CA TTC (Standard & Export).
+
+        Réponds en JSON uniquement :
         {
           "verdict": "very_favorable" | "favorable" | "good" | "optimize" | "unfavorable",
-          "analysis": "Texte de l'analyse stratégique pédagogique en 3-4 phrases."
+          "analysis": "Conseil stratégique court (Max 3 phrases) mentionnant les avantages précis calculés."
         }`;
 
         try {

@@ -775,3 +775,28 @@
         font-size: 1.6rem;
     }
 }
+
+/* Voice Recognition Animation */
+.listening {
+    color: #ef4444;
+    animation: pulseMic 1.5s infinite;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+}
+
+@keyframes pulseMic {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+
+    70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}

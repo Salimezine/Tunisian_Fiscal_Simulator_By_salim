@@ -1,4 +1,5 @@
 // IS - IMPÔT SUR LES SOCIÉTÉS - LF 2026
+
 // Updated with Comparative Logic (Before/After Optimization)
 
 // I18N Keys for Sectors and Groups
@@ -22,7 +23,8 @@ const SECTOR_OPTIONS = [
     { id: "assurance", lang_key: "sect_insurance", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
     { id: "telecom", lang_key: "sect_telecom", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
     { id: "petrole", lang_key: "sect_oil", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
-    { id: "auto", lang_key: "sect_auto", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" }
+    { id: "auto", lang_key: "sect_auto", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, isStrategic: true, group_key: "group_35" },
+    { id: "grande_distrib", lang_key: "sect_retail_large", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" }
 ];
 
 function initIS() {
@@ -86,6 +88,10 @@ function initIS() {
                     <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
                         <input type="checkbox" id="isExport" class="custom-checkbox">
                         <span style="font-size: 0.9em;">Exportateur Total (ETE)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                        <input type="checkbox" id="isIPO" class="custom-checkbox">
+                        <span style="font-size: 0.9em;">Intro. Bourse (IPO 5 ans)</span>
                     </label>
                 </div>
                 
@@ -379,6 +385,7 @@ function computeIS(inputs) {
         isZDR = false,
         isStartup = false,
         isExport = false,
+        isIPO = false,
         anciennete = 1
     } = inputs;
 
@@ -414,6 +421,13 @@ function computeIS(inputs) {
         } else if (isETE) {
             if (years <= 10) isExemptPeriod = true;
             else advantageRate = standardRate; // 50% deduction applied later
+        }
+
+        // IPO Check (20% Advantage if Standard Rate > 20%)
+        if (config.ipoOverride && years <= 5 && !isExemptPeriod) {
+            if (standardRate > 0.20) {
+                advantageRate = 0.20;
+            }
         }
 
         // 2. Base Calculation
@@ -502,9 +516,17 @@ function computeIS(inputs) {
         let plafondMin = Infinity;
 
         if (standardRate <= 0.10 || zdrOverride) {
-            minTax = caTtc * 0.001; // 0.1%
-            minAbsolu = 100;
-            plafondMin = 300;
+            if (isETE && !zdrOverride) {
+                // ETE (Course 5.1.3): IS Minimum 0.2% du CA TTC explicitly stated
+                minTax = caTtc * 0.002;
+                minAbsolu = 500;
+                plafondMin = Infinity;
+            } else {
+                // ZDR or other low rates
+                minTax = caTtc * 0.001; // 0.1%
+                minAbsolu = 100;
+                plafondMin = 300;
+            }
         } else {
             minTax = caTtc * 0.002; // 0.2%
             minAbsolu = 500;
@@ -524,11 +546,11 @@ function computeIS(inputs) {
         let css = baseNet * cssRate;
 
         // ZDR Specific CSS post-10y: 0.1% CA TTC
-        if (zdrOverride) {
-            if (years <= 10) css = 0;
-            else css = caTtc * 0.001;
-        } else if (isExemptPeriod) {
+        if (isExemptPeriod || isETE) {
             css = 0;
+        } else if (zdrOverride && years > 10) {
+            // ZDR Specific CSS post-10y: 0.1% of PROFITS (Course 5.2.4)
+            css = baseNet * 0.001;
         }
 
         // 10. Contributions Spécifiques LF 2026
@@ -552,7 +574,7 @@ function computeIS(inputs) {
             baseNet: baseNet,
             appliedRate: advantageRate,
             isExemptPeriod: isExemptPeriod,
-            cssRate: zdrOverride && years > 10 ? '0.1% CA' : (cssRate * 100) + '%',
+            cssRate: zdrOverride && years > 10 ? '0.1%' : (cssRate * 100) + '%',
             minTaxCA: isFinalMin,
             isBeforeMin: isDuCalc,
             reinvestmentDeducted: deductionAmount,
@@ -575,6 +597,7 @@ function computeIS(inputs) {
         zdrOverride: isZDR,
         startupOverride: isStartup,
         exportOverride: isExport,
+        ipoOverride: inputs.isIPO,
         anciennete: anciennete,
         advancedData: inputs.advancedMode ? {
             enabled: true,
@@ -636,11 +659,12 @@ function calculateIS() {
     const isZDR = document.getElementById('isZDR')?.checked || false;
     const isStartup = document.getElementById('isStartup')?.checked || false;
     const isExport = document.getElementById('isExport')?.checked || false;
+    const isIPO = document.getElementById('isIPO')?.checked || false;
     const anciennete = parseInt(document.getElementById('anciennete')?.value) || 1;
 
     let calculationInputs = {
         sectorId, resComptable, caHt, reintegrations, deductions, montantReinvesti, creditImpot,
-        isZDR, isStartup, isExport, anciennete
+        isZDR, isStartup, isExport, isIPO, anciennete
     };
 
     // Advanced Mode: Apply Note 20/2008 Classification

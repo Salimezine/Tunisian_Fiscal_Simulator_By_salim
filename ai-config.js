@@ -159,6 +159,7 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         action_explain_startup: "Quels sont les avantages du Startup Act ?",
         action_explain_zdr: "Quels sont les avantages fiscaux en zone de développement régional (ZDR) ?",
         action_calendar: "Quelles sont les prochaines échéances fiscales importantes ?",
+        action_diagnostic: "Démarrer un diagnostic interactif",
         explainMyResult: "Explique-moi mon résultat de calcul"
     },
 

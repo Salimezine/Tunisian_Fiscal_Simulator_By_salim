@@ -60,6 +60,90 @@ window.askAssistant = function (message) {
 };
 
 /**
+ * Trigger Consultation Logic
+ */
+window.triggerConsultation = function () {
+    window.askAssistant("consultation_irpp");
+};
+
+// --- VOICE RECOGNITION SETUP ---
+let recognition = null;
+let isVoiceEnabled = false;
+
+function initVoice() {
+    if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'fr-FR';
+
+        recognition.onstart = function () {
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn) micBtn.classList.add('listening');
+        };
+
+        recognition.onend = function () {
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn) micBtn.classList.remove('listening');
+        };
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            const input = document.getElementById('chat-input');
+            if (input) {
+                input.value = transcript;
+                isVoiceEnabled = true; // Auto-enable TTS if user used voice
+                handleUserInput();
+            }
+        };
+
+        recognition.onerror = function (event) {
+            console.error("Voice Error:", event.error);
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn) micBtn.classList.remove('listening');
+
+            if (event.error === 'not-allowed') {
+                alert("⚠️ Accès micro refusé. Veuillez autoriser le microphone.");
+            } else if (event.error === 'network') {
+                alert("⚠️ Erreur réseau : Une connexion internet est requise pour la reconnaissance vocale.");
+            } else if (event.error === 'no-speech') {
+                // Ignore
+            } else {
+                alert("⚠️ Erreur vocale : " + event.error);
+            }
+        };
+    } else {
+        console.warn("Web Speech API non supportée sur ce navigateur.");
+    }
+}
+
+function startListening() {
+    if (!recognition) {
+        initVoice();
+    }
+
+    if (recognition) {
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error("Erreur startListening:", e);
+        }
+    } else {
+        alert("❌ La reconnaissance vocale n'est pas supportée. Essayez Google Chrome.");
+    }
+}
+
+function speakResponse(text) {
+    if (!isVoiceEnabled) return;
+
+    window.speechSynthesis.cancel(); // Stop previous
+    const cleanText = text.replace(/[*#_`]/g, ''); // Remove MD chars
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'fr-FR';
+    window.speechSynthesis.speak(utterance);
+}
+
+/**
  * Setup chat input listeners
  */
 function setupChatListeners() {
@@ -77,6 +161,14 @@ function setupChatListeners() {
         button.addEventListener('click', handleUserInput);
     }
 
+    // Voice Button Listener
+    const micBtn = document.getElementById('mic-btn');
+    if (micBtn) {
+        micBtn.addEventListener('click', startListening);
+        // Init voice specifically here
+        initVoice();
+    }
+
     suggestions.forEach(s => {
         s.addEventListener('click', () => {
             const actionKey = s.getAttribute('data-msg-key');
@@ -87,27 +179,8 @@ function setupChatListeners() {
         });
     });
 
-    const utilBtns = document.querySelectorAll('.input-util-btn');
-    utilBtns.forEach((btn, index) => { // Added index for specific button handling
-        btn.addEventListener('click', () => {
-            // Visual feedback
-            btn.style.filter = 'brightness(1.5)';
-            setTimeout(() => btn.style.filter = '', 200);
-
-            // Specific functionality for buttons
-            if (index === 0) { // Emoji Button
-                const input = document.getElementById('chat-input');
-                input.value += " 😊";
-                input.focus();
-            } else if (index === 1) { // Attachment Button
-                const t = (key) => {
-                    const lang = localStorage.getItem('language') || 'fr';
-                    return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
-                };
-                alert("📎 " + t("msg_attach_pro"));
-            }
-        });
-    });
+    // Legacy util buttons (Emoji/Attachment) are removed. 
+    // Mic button has its own specific listener above.
 
     const clearBtn = document.getElementById('clear-chat-btn');
     if (clearBtn) {
@@ -156,6 +229,7 @@ async function handleUserInput() {
             (fullResponse) => {
                 typingUI.remove();
                 addMessage(fullResponse, 'system');
+                speakResponse(fullResponse); // Speak if enabled
             },
             // On error
             (error) => {

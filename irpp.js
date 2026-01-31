@@ -716,6 +716,13 @@ function displayIRPPResults(result, isReverseMode) {
                 <span class="final-amount" style="color: ${headerColor};">${headerAmount} DT</span>
             </div>
             ${comparisonHtml}
+
+            <!-- AI Consultation Trigger -->
+            <div style="margin: 15px 0;">
+                <button onclick="window.triggerConsultation()" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #6366f1); width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">
+                    <span>💡</span> <span data-i18n="btn_ai_audit">Analyser ce résultat avec l'IA</span>
+                </button>
+            </div>
             
             <div style="margin-bottom: 20px;">
                 <!-- Section 1: Revenus et Cotisations -->
