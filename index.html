@@ -113,14 +113,11 @@
                         <p data-i18n="irpp_subtitle">Barème progressif JORT 148</p>
                     </div>
                     <!-- Year Toggle -->
-                    <div class="year-toggle-container"
-                        style="background: rgba(255,255,255,0.05); padding: 5px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; gap: 5px;">
+                    <div class="year-toggle-container">
                         <input type="radio" name="fiscalYear" id="year2025" value="2025" style="display:none">
-                        <label for="year2025" class="year-label" onclick="setYear('2025')"
-                            style="padding: 6px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; color: var(--text-muted); transition: 0.3s;">2025</label>
+                        <label for="year2025" class="year-label" onclick="setYear('2025')">2025</label>
                         <input type="radio" name="fiscalYear" id="year2026" value="2026" checked style="display:none">
-                        <label for="year2026" class="year-label active" onclick="setYear('2026')"
-                            style="padding: 6px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); transition: 0.3s;">2026</label>
+                        <label for="year2026" class="year-label active" onclick="setYear('2026')">2026</label>
                     </div>
                 </div>
                 <div class="module-body" id="irpp-container"></div>

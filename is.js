@@ -27,6 +27,7 @@ const SECTOR_OPTIONS = [
     { id: "grande_distrib", lang_key: "sect_retail_large", type: "fixed", rate: 0.35, css: 0.04, min_tax: 0.002, group_key: "group_35" }
 ];
 
+
 function initIS() {
     const container = document.getElementById('is-container');
     if (!container) return;

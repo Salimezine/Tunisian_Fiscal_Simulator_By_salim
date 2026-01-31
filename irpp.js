@@ -125,8 +125,6 @@ function initIRPP() {
                         <option value="mensuel" data-i18n="opt_monthly" selected>Mensuel</option>
                     </select>
                 </div>
-                    </select>
-                </div>
                 <!-- Help Text for Salary -->
                 <div id="salary-help-text" style="font-size: 0.8em; opacity: 0.7; margin-top: 5px; color: #94a3b8; font-style: italic;"></div>
             </div>
@@ -613,9 +611,10 @@ function displayIRPPResults(result, isReverseMode) {
     let comparisonHtml = '';
     if (!isReverseMode) {
         let gain = 0;
-        // Simple heuristic for demo
-        const oldTax = result.irpp * 1.05;
-        gain = oldTax - result.irpp;
+        // CORRECTION: Utilisation de irppNet au lieu de irpp (qui était undefined -> NaN)
+        const currentTax = result.irppNet;
+        const oldTax = currentTax * 1.05; // Simulation simplifiée de l'ancien barème
+        gain = oldTax - currentTax;
 
         if (gain > 0) {
             comparisonHtml = `
