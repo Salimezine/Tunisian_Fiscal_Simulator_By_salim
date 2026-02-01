@@ -169,7 +169,7 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         maxTokens: 800,
         temperature: 0.7,
         apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-        apiKey: "AIzaSyCe0Ynzej1Q_eUXf0SOQ1bGifMWIv4vH10"
+        apiKey: "" // DO NOT HARDCODE. Use localStorage.setItem('fiscal_ai_gemini_key', 'YOUR_KEY') or .env
     },
 
     // n8n Chatbot Configuration
