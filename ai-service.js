@@ -58,8 +58,9 @@ class AIService {
      * Validate API key format
      */
     isValidApiKeyFormat(key) {
-        // Gemini keys start with "AIza"
-        return key && key.startsWith('AIza') && key.length > 30;
+        if (!key || typeof key !== 'string') return false;
+        // Gemini keys: AIza... (~39 chars)
+        return key.startsWith('AIza') && key.length >= 35;
     }
 
     /**
@@ -123,13 +124,26 @@ class AIService {
                 try {
                     return await this.callN8NWebhook(userMessage, onChunk, onComplete);
                 } catch (n8nError) {
-                    console.warn("⚠️ N8n unreachable, falling back to Local Expert:", n8nError);
-                    if (onChunk) onChunk("⚠️ *Mode Hors-ligne activé (Réseau indisponible)*\n\n", "⚠️ *Mode Hors-ligne activé (Réseau indisponible)*\n\n");
+                    console.warn("⚠️ N8n unreachable, falling back to Gemini/Local:", n8nError);
                 }
             }
 
-            // Priority 2: Fallback to Local Intelligence (Deterministic)
-            // Instant Local Response (Fast & Private)
+            // Priority 2: Direct Gemini Call (Robust Key Selection)
+            let apiKey = this.loadApiKey();
+            if (!this.isValidApiKeyFormat(apiKey)) {
+                apiKey = AI_CONFIG.gemini.apiKey;
+            }
+
+            if (apiKey && this.isValidApiKeyFormat(apiKey)) {
+                try {
+                    return await this.callGeminiAPI(userMessage, apiKey, onChunk, onComplete);
+                } catch (geminiError) {
+                    console.warn("⚠️ Gemini API error, falling back to Local Expert:", geminiError);
+                    if (onChunk) onChunk("⚠️ *Mode Hors-ligne (Gemini Indisponible)*\n\n", "⚠️ *Mode Hors-ligne (Gemini Indisponible)*\n\n");
+                }
+            }
+
+            // Priority 3: Fallback to Local Intelligence (Deterministic)
             const response = this.getLocalResponse(userMessage);
 
             // Simulate brief "typing" for UX
@@ -146,6 +160,54 @@ class AIService {
             if (onError) onError(error);
             return "Une erreur critique est survenue.";
         }
+    }
+
+    /**
+     * Call Google Gemini API
+     */
+    async callGeminiAPI(userMessage, apiKey, onChunk, onComplete) {
+        const url = `${AI_CONFIG.gemini.apiUrl}?key=${apiKey}`;
+
+        // Prepare Rich Snapshot
+        const snapshot = this._getFiscalSnapshot();
+        const systemPrompt = AI_CONFIG.systemPrompt;
+
+        const payload = {
+            contents: [
+                {
+                    role: "user",
+                    parts: [{ text: `SYSTEM_PROMPT: ${systemPrompt}\n\nFISCAL_SNAPSHOT: ${JSON.stringify(snapshot)}\n\nUSER_MESSAGE: ${userMessage}` }]
+                }
+            ],
+            generationConfig: {
+                maxOutputTokens: AI_CONFIG.gemini.maxTokens,
+                temperature: AI_CONFIG.gemini.temperature
+            }
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: this.abortController.signal
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || `HTTP Error ${response.status}`);
+        }
+
+        const data = await response.json();
+        let aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je n'ai pas pu générer de réponse.";
+
+        // Add a discreet indicator for verification
+        aiResponse = `### 🤖 Assistant Fiscal (Gemini AI)\n\n${aiResponse}`;
+
+        if (onChunk) onChunk(aiResponse, aiResponse);
+        if (onComplete) onComplete(aiResponse);
+
+        this.addToHistory('assistant', aiResponse);
+        return aiResponse;
     }
 
     /**
@@ -304,6 +366,17 @@ Voici l'agenda exhaustif des obligations :
 - Déduction de 100% des revenus pendant 10 ans (Zone 1) ou 5 ans (Zone 2).
 - Prime d'investissement pouvant atteindre 30%.`;
         }
+        // --- RS LOGIC ---
+        else if (matches("rs") || query.includes("retenue à la source")) {
+            response = `### ⚡ Retenue à la Source (RS) 2026
+            
+La RS est une avance sur l'impôt (IRPP ou IS). Voici les taux principaux :
+- **1,5%** : Marchés publics et achats de services/marchandises (Art. 52).
+- **10%** : Honoraires (avocats, experts, etc.) & Loyers.
+- **20%** : Retenue sur les honoraires de non-résidents.
+
+⚠️ **Plateforme TEJ** : L'Art. 18 de la LF 2026 généralise l'utilisation de la plateforme **TEJ** pour le dépôt des certificats de retenue.`;
+        }
         // --- DEFAULT ---
         else {
             response = `### 🤖 Expert Fiscal AI (Mode Précis)
@@ -344,25 +417,43 @@ CONTEXTE LÉGAL OFFICIEL (TUNISIE 2026) :
     }
 
     /**
-     * Helper to create a simple text summary of the current calculation
+     * Helper to create a rich data snapshot of the current calculation
      */
     _getFiscalSnapshot() {
-        if (!this.currentContext) return "Aucun calcul en cours.";
+        if (!this.currentContext) return { status: "no_data" };
 
         const ctx = this.currentContext;
         const type = ctx.type || ctx.module || "Fiscal";
 
         try {
             if (type === 'IRPP') {
-                return `IRPP 2026 | Brut: ${ctx.data.grossIncome.toFixed(3)} DT | Net: ${ctx.data.netMensuel.toFixed(3)} DT/mois | Impôt: ${ctx.totalTax.toFixed(3)} DT`;
+                return {
+                    type: 'IRPP',
+                    year: currentFiscalYear || '2026',
+                    gross: ctx.data.grossIncome,
+                    netMensuel: ctx.data.netMensuel,
+                    totalTax: ctx.totalTax,
+                    taxableBase: ctx.data.assietteSoumise,
+                    brackets: ctx.data.bracketDetails,
+                    credits: {
+                        chefFamille: ctx.data.creditChefFamille,
+                        enfants: ctx.data.creditEnfants,
+                        etudiants: ctx.data.creditEtudiants,
+                        parents: ctx.data.creditParents
+                    }
+                };
             } else if (type === 'IS') {
-                return `IS 2026 | Résultat: ${ctx.data.resultatFiscal.toFixed(3)} DT | Impôt dû: ${ctx.totalTax.toFixed(3)} DT`;
-            } else if (type === 'TVA') {
-                return `TVA 2026 | Chiffre Affaires: ${ctx.data.totalCA.toFixed(3)} DT | Solde: ${ctx.data.soldeTVA.toFixed(3)} DT (${ctx.data.soldeTVA >= 0 ? 'À payer' : 'Crédit'})`;
+                return {
+                    type: 'IS',
+                    resultatFiscal: ctx.data.resultatFiscal,
+                    totalTax: ctx.totalTax,
+                    isDû: ctx.data.isNet,
+                    css: ctx.data.css
+                };
             }
-            return `${type} | Total: ${ctx.totalTax || 0} DT`;
+            return { type, total: ctx.totalTax || 0 };
         } catch (e) {
-            return `Calcul ${type} en cours...`;
+            return { type, error: "Snapshot error" };
         }
     }
 
@@ -443,50 +534,55 @@ CONTEXTE LÉGAL OFFICIEL (TUNISIE 2026) :
         const data = context.data;
         const inputs = data.inputs;
         let advice = [];
-        let savingsPotential = 0;
 
         // Header
-        let response = `### 🕵️ Audit Fiscal Intelligent (IA)\n`;
-        response += `**Profil**: ${inputs.typeRevenu === 'salarie' ? 'Salarié' : 'Pensionné'} | **Revenu**: ${data.grossIncome.toLocaleString('fr-TN')} DT/an\n\n`;
+        let response = `### 🕵️ Audit Fiscal Précis (Analyste AI)\n`;
+        response += `**Base Imposable**: ${data.assietteSoumise.toLocaleString('fr-TN')} DT | **Impôt (IRPP+CSS)**: ${data.totalRetenue.toLocaleString('fr-TN')} DT\n\n`;
 
-        // 1. Check Frais Professionnels
-        if (inputs.typeRevenu === 'salarie' && data.abattement === 2000) {
-            advice.push(`✅ **Frais Professionnels** : Vous bénéficiez du plafond maximal de **2 000 DT**.
-            *Conseil* : Si vos frais réels (transport, repas, formations) dépassent ce montant, optez pour le régime des frais réels.`);
+        // 1. Bracket Awareness Analysis
+        const lastBracket = data.bracketDetails[data.bracketDetails.length - 1];
+        if (lastBracket) {
+            response += `📊 **Analyse de Tranche** : Vous êtes actuellement imposé dans la tranche à **${lastBracket.rate}**. `;
+
+            // Find next bracket limit
+            const allBrackets = AI_CONFIG.fiscalContext.irpp.brackets2026;
+            const nextBracket = allBrackets.find(b => b.min > data.assietteSoumise);
+
+            if (nextBracket) {
+                const distance = nextBracket.min - data.assietteSoumise;
+                response += `Il vous reste **${distance.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT** de marge avant de passer à la tranche supérieure de **${(nextBracket.rate * 100).toFixed(0)}%**.\n\n`;
+            } else {
+                response += `Vous êtes déjà dans la tranche marginale maximale de la Loi de Finances 2026.\n\n`;
+            }
         }
 
-        // 2. Check Chef de Famille Logic
-        if (inputs.nbEnfants > 0 && !inputs.chefFamille && inputs.etatCivil === 'marie') {
-            advice.push(`❓ **Chef de Famille** : Vous avez des enfants mais n'avez pas coché "Chef de famille".
-            *Rappel* : Si votre conjoint(e) ne travaille pas ou a un revenu très faible, vous pourriez bénéficier de ce crédit de **300 DT**.`);
+        // 2. Specific Optimization Rules
+        if (data.irppNet > 0) {
+            if (inputs.nbEtudiants === 0) {
+                advice.push(`🎓 **Optimisation Étudiant** : Avez-vous des enfants poursuivant des études supérieures ? 
+                La LF 2026 permet un crédit d'impôt de **1 000 DT** par étudiant non boursier.`);
+            }
+
+            // CEA calculation proof
+            const ceaGain = Math.min(data.irppNet, 1500); // estimated
+            advice.push(`📉 **Levier CEA** : En versant 5 000 DT sur un **Compte Épargne en Actions**, vous pourriez économiser environ **${ceaGain.toLocaleString('fr-TN')} DT** d'impôt.`);
         }
 
-        // 3. Parents à Charge
+        if (inputs.nbEnfants > 4) {
+            advice.push(`⚠️ **Limite Enfants** : Vous avez déclaré ${inputs.nbEnfants} enfants. Notez que les déductions forfaitaires sont plafonnées aux **4 premiers enfants** (Art. 40).`);
+        }
+
         if (inputs.nbParents === 0) {
-            advice.push(`💡 **Parents à Charge** : Aidez-vous financièrement vos parents ?
-            *Opportunité* : Vous pouvez déduire **450 DT** par parent à charge (sous conditions de revenu).`);
-        }
-
-        // 4. Compte Epargne en Actions (CEA)
-        if (data.irppNet > 1000) {
-            const maxDed = 50000; // Simplified for advise
-            advice.push(`📉 **Optimisation Fiscale (CEA)** : Votre impôt est significatif (${data.irppNet.toLocaleString('fr-TN')} DT).
-            *Action* : Ouvrir un **Compte Épargne en Actions (CEA)** permet de déduire les versements jusqu'à **50 000 DT** de votre revenu imposable.
-            *Gain Potentiel* : Pour 1000 DT versés, vous économiseriez environ **${(1000 * 0.3).toFixed(0)} DT** d'impôt.`);
-        }
-
-        // 5. Assurance Vie
-        if (data.irppNet > 500) {
-            advice.push(`🛡️ **Assurance Vie** : Les primes d'assurance vie sont déductibles (max 10 000 DT). C'est un excellent moyen de préparer l'avenir tout en réduisant l'impôt.`);
+            advice.push(`👵 **Parents à Charge** : N'oubliez pas le crédit de **450 DT** par parent à charge si applicable.`);
         }
 
         if (advice.length === 0) {
-            response += "✅ **Votre situation semble optimisée !** Je n'ai pas détecté d'anomalies évidentes ou d'oublis classiques.";
-            response += "\n\n🤔 *Voulez-vous aller plus loin ? Tapez 'diagnostic' pour que je vous pose quelques questions.*";
+            response += "✅ **Votre situation semble optimisée sur les bases déclarées.**";
         } else {
             response += advice.map(a => `- ${a}`).join('\n\n');
-            response += "\n\nℹ️ *Tapez 'diagnostic' pour un audit approfondi.*";
         }
+
+        response += "\n\n💡 *Note : Pour un audit sur vos revenus mobiliers, posez une question directe.*";
 
         return response;
     }

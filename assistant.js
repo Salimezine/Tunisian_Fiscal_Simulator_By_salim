@@ -221,9 +221,12 @@ async function handleUserInput() {
         // Call AI
         await aiService.sendMessage(
             text,
-            // On chunk (for streaming effect)
+            // On chunk (for streaming or early errors)
             (chunk, fullText) => {
-                // For n8n we might just get one chunk, but this keeps UI ready for streaming
+                const existingMsg = typingUI.querySelector('.msg-text');
+                if (existingMsg) {
+                    existingMsg.innerHTML = formatAIResponse(fullText); // Optional formatting
+                }
             },
             // On complete
             (fullResponse) => {

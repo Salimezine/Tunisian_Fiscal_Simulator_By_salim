@@ -749,8 +749,13 @@ function displayIRPPResults(result, isReverseMode) {
                         <span style="float:right; color:var(--text-main);">${result.irppNet.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     <p style="margin: 5px 0; color: var(--accent);">
-                        <strong>2. ${t("label_css_short")} (0,5% IRPP Net) :</strong>
+                        <strong>2. ${t("label_css_short")} (0,5% Assiette) :</strong>
                         <span style="float:right">+ ${result.css.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
+                    </p>
+                    
+                    <p style="margin: 10px 0 5px 0; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; font-weight: bold; color: #ef4444;">
+                        <strong data-i18n="label_total_irpp_css">${t("label_total_irpp_css")} :</strong>
+                        <span style="float:right">${result.totalRetenue.toLocaleString('fr-TN', { minimumFractionDigits: 3 })} DT</span>
                     </p>
                     
                     <div style="margin-top: 15px; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">

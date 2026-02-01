@@ -101,6 +101,7 @@ window.I18N_DATA = {
         "label_abattement_retraite": "Abattement Retraite (25%)",
         "label_irpp_bracket": "IRPP (Barème 2026)",
         "label_css_short": "CSS (0,5%)",
+        "label_total_irpp_css": "TOTAL IRPP + CSS À PAYER",
         "res_gross_annual": "Salaire Brut Annuel",
         "label_explain_results": "Expliquez-moi mes résultats 🤖",
         "result_tax": "Impôts & Taxes",
@@ -611,6 +612,7 @@ window.I18N_DATA = {
         "label_abattement_retraite": "Na9s mta3 retraite (25%)",
         "label_irpp_bracket": "IRPP (Barème 2026)",
         "label_css_short": "CSS (0,5%)",
+        "label_total_irpp_css": "Joumla el dhariba (IRPP + CSS)",
         "res_gross_annual": "Chahriya Brut fi 3am",
         "label_explain_results": "Fahhemni el resultats 🤖",
 

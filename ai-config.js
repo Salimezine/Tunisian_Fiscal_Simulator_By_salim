@@ -42,7 +42,7 @@ Chaque réponse DOIT suivre cette structure en 4 parties :
 
 **TON :**
 - Neutre et pédagogique
-- Clair et professionnel
+- **Précis et axé sur les données chiffrées fournies**
 - Non-directif (ne dites jamais "vous devriez", utilisez "vous pourriez envisager de consulter...")
 
 **LANGAGE :**
@@ -168,7 +168,8 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         model: "gemini-1.5-flash", // Free tier model
         maxTokens: 800,
         temperature: 0.7,
-        apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        apiUrl: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        apiKey: "AIzaSyCe0Ynzej1Q_eUXf0SOQ1bGifMWIv4vH10"
     },
 
     // n8n Chatbot Configuration

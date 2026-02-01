@@ -310,26 +310,24 @@ async function analyserProfil() {
     const isDroitCommun = ![data.startup, data.zoneRegionale, data.export, data.extension].some(Boolean);
 
     if (ai) {
+        const lastCalc = window.lastCalculation;
+        const snapshot = lastCalc && lastCalc.type === 'IRPP' ? JSON.stringify(ai._getFiscalSnapshot()) : '';
         const prompt = `Analyse expert fiscale Tunisie (LF 2026 STRICT) :
         - Profil : ${data.type === 'societe' ? 'Société (IS)' : 'Particulier (IRPP)'}
         - Secteur : ${data.secteur}
         - Options : ${[
-                data.startup ? 'Startup Act (Exonération 8 ans)' : '',
-                data.zoneRegionale ? 'ZDR (Exonération 10 ans + 10% après)' : '',
-                data.export ? 'Export (Exonération 10 ans + 0.2% Min Impôt)' : '',
-                data.extension ? 'Extension (Amor. accéléré)' : ''
-            ].filter(Boolean).join(', ') || 'Droit Commun (IS 15%, Min 0.2%)'}.
+                data.startup ? 'Startup Act' : '',
+                data.zoneRegionale ? 'ZDR' : '',
+                data.export ? 'Export' : '',
+                data.extension ? 'Extension' : ''
+            ].filter(Boolean).join(', ') || 'Droit Commun'}.
+        ${snapshot ? `- Données Réelles de Simulation : ${snapshot}` : ''}
 
-        RÈGLES CRITIQUES LF 2026 :
-        1. ZDR : Exonération totale IS+CSS (10 ans), puis IS 10% + CSS 0.1% Profit.
-        2. Export : Exonération totale (10 ans), puis Taux effectif 7.5%.
-        3. Min Impôt : 0.2% CA TTC (Standard & Export).
-
-        Réponds en JSON uniquement :
-        {
-          "verdict": "very_favorable" | "favorable" | "good" | "optimize" | "unfavorable",
-          "analysis": "Conseil stratégique court (Max 3 phrases) mentionnant les avantages précis calculés."
-        }`;
+        RÈGLES CRITIQUES :
+        1. ZDR : Exonération IS+CSS 10 ans.
+        2. Min Impôt : 0.2% CA TTC.
+        
+        Réponds en JSON : { "verdict": "...", "analysis": "ANALYSE TRÈS SPÉCIFIQUE AVEC CHIFFRES S'ILS SONT FOURNIS (Max 3 phrases)." }`;
 
         try {
             const response = await ai.sendMessageSimple(prompt);
