@@ -123,13 +123,41 @@ allPassed &= runTest("Standard IS 15%", {
     minTax: 1190 // 500k * 1.19 * 0.2% = 1190
 });
 
-// 2. ZDR (0-10 Years) - Exempt Total
-allPassed &= runTest("ZDR First 10y", {
+// 2a. ZDR Group 1 (5 Years) - Exempt Total for 5 years
+allPassed &= runTest("ZDR Group 1 - Year 5 (Exempt)", {
     sectorId: "industrie",
     resComptable: 100000,
     caHt: 500000,
     isZDR: true,
+    zdrGroup: 1,
     anciennete: 5
+}, {
+    is: 0,
+    css: 0
+});
+
+// 2b. ZDR Group 1 (5 Years) - 10% after 5 years
+allPassed &= runTest("ZDR Group 1 - Year 6 (10%)", {
+    sectorId: "industrie",
+    resComptable: 100000,
+    caHt: 500000,
+    isZDR: true,
+    zdrGroup: 1,
+    anciennete: 6
+}, {
+    is: 10000,
+    css: 100, // 0.1% Profit (ZDR specific)
+    minTax: 300
+});
+
+// 2c. ZDR Group 2 (10 Years) - Exempt Total for 10 years
+allPassed &= runTest("ZDR Group 2 - Year 10 (Exempt)", {
+    sectorId: "industrie",
+    resComptable: 100000,
+    caHt: 500000,
+    isZDR: true,
+    zdrGroup: 2,
+    anciennete: 10
 }, {
     is: 0,
     css: 0

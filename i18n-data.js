@@ -106,10 +106,21 @@ window.I18N_DATA = {
         "label_explain_results": "Expliquez-moi mes résultats 🤖",
         "result_tax": "Impôts & Taxes",
 
-        // IS
-        "is_title": "Impôt sur les Sociétés (IS)",
-        "is_subtitle": "Calcul du résultat fiscal et de l'impôt dû",
-        "label_activity_sector": "Secteur d'Activité",
+        "btn_calc_is": "Calculer IS 2026",
+        "res_is_pay": "Total à Payer (IS + Contributions)",
+
+        // Dashboard
+        "dashboard_title": "Mon Tableau de Bord",
+        "dashboard_subtitle": "Résumé de votre situation fiscale 2026",
+        "welcome_title": "Bienvenue sur votre Espace Fiscal !",
+        "welcome_msg": "Commencez par simuler vos impôts pour voir votre résumé ici. Notre IA analysera automatiquement vos résultats.",
+        "label_total_tax_irpp": "Total Impôt IRPP + CSS",
+        "label_total_tax_is": "Total Impôt IS + Contributions",
+        "label_tva_payable": "TVA à payer ce mois",
+        "msg_dashboard_complete": "Ce résumé est basé sur vos dernières simulations enregistrées localement.",
+        "btn_details": "Voir détails",
+
+        "label_comparative_analysis": "🎁 Analyse d'Impact Fiscal",
         "label_year_25_26": "Année Fiscale",
         "label_regime_reel": "Régime Réel",
         "group_10": "Taux Réduit 10%",
@@ -158,6 +169,8 @@ window.I18N_DATA = {
         "label_standard_mode": "Régime Standard",
         "label_optimized_mode": "Optimisé (Avec avantages)",
         "msg_you_save": "Vous économisez",
+        "label_zdr_group_1": "Groupe 1 (Exo. 5 ans)",
+        "label_zdr_group_2": "Groupe 2 (Exo. 10 ans)",
 
         "sect_culture": "Culture & Loisirs",
         "sect_recycling": "Recyclage & Environnement",
@@ -468,6 +481,14 @@ window.I18N_DATA = {
         "btn_back": "Retour",
         "btn_continue": "Continuer",
         "btn_finish": "Calculer & Analyser 🚀",
+        "btn_skip_wizard": "Passer au formulaire classique (Mode Expert)",
+        "btn_back_to_wizard": "🔄 Retourner au Wizard",
+        "wizard_step_option": "Choisissez votre profil fiscal",
+        "opt_wizard_standard": "Standard (Droit Commun)",
+        "opt_wizard_startup": "Startup Act (Optimisation)",
+        "opt_wizard_zdr": "Zone Régionale (ZDR)",
+        "opt_wizard_investor": "Investisseur (CEA/Assur)",
+        "wizard_title_invest": "Optimisation & Investissements",
 
         // Auto-Entrepreneur
         "auto_entrepreneur_title": "Régime Auto-Entrepreneur",
@@ -618,10 +639,21 @@ window.I18N_DATA = {
 
         // TEJ TN
 
-        // IS
-        "is_title": "Dhariba 3al Chariket (IS)",
-        "is_subtitle": "A7seb rbe7 safi w chnouwa tkhalles",
-        "label_activity_sector": "Chnouwa tekhdem charika ?",
+        "btn_calc_is": "A7seb IS 2026",
+        "res_is_pay": "Total el kol (IS + CSS)",
+
+        // Dashboard TN
+        "dashboard_title": "Tableau de Bord mta3i",
+        "dashboard_subtitle": "Résumé mta3 l'impots mta3ek 2026",
+        "welcome_title": "Mar7ba bik !",
+        "welcome_msg": "A3mel kalsoul mta3ek bech tchouf ej-joumla hna. L'IA bech tfahmek kol chay.",
+        "label_total_tax_irpp": "Joumla mta3 el IRPP",
+        "label_total_tax_is": "Joumla mta3 el IS",
+        "label_tva_payable": "TVA elli tkhallas'ha",
+        "msg_dashboard_complete": "Heda elli l9inah 7asb e-simulations mta3ek.",
+        "btn_details": "Détails",
+
+        "label_comparative_analysis": "🎁 Chouf el far9 (Comparatif)",
         "label_year_25_26": "El 3am",
         "label_regime_reel": "Régime Réel",
         "group_10": "Taux Sghir 10%",
@@ -670,6 +702,8 @@ window.I18N_DATA = {
         "label_standard_mode": "Régime 3adi",
         "label_optimized_mode": "Optimisé (Bel Avantages)",
         "msg_you_save": "Rbe7t",
+        "label_zdr_group_1": "Groupe 1 (5 snin)",
+        "label_zdr_group_2": "Groupe 2 (10 snin)",
 
         "sect_culture": "Thajafa w Jaw",
         "sect_recycling": "Recyclage",
@@ -1505,6 +1539,14 @@ window.I18N_DATA = {
         "btn_back": "رجوع",
         "btn_continue": "مواصلة",
         "btn_finish": "احتساب وتحليل 🚀",
+        "btn_skip_wizard": "المرور للنموذج العادي (وضع الخبير)",
+        "btn_back_to_wizard": "🔄 الرجوع للمساعد (Wizard)",
+        "wizard_step_option": "اختر ملفك الجبائي",
+        "opt_wizard_standard": "عادي (نظام عام)",
+        "opt_wizard_startup": "مؤوسسة ناشئة (Startup)",
+        "opt_wizard_zdr": "تنمية جهوية (ZDR)",
+        "opt_wizard_investor": "مستثمر (CEA/تأمين)",
+        "wizard_title_invest": "الادخار والديون",
         "result_tax": "الضرائب والأداءات",
 
         // Auto-Entrepreneur

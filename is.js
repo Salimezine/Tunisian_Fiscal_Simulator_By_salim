@@ -59,7 +59,7 @@ function initIS() {
     });
 
     container.innerHTML = `
-        <div class="form-section" style="border-left: 4px solid var(--primary);">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px;">
             <div class="section-title">
                 <span class="icon">🏢</span> <span data-i18n="label_sector">Secteur d'Activité</span>
             </div>
@@ -72,11 +72,11 @@ function initIS() {
         </div>
 
         <!-- Advantages Section -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px; animation-delay: 0.1s;">
             <div class="section-title">
                 <span class="icon">🎁</span> <span>Avantages Fiscaux & Régimes</span>
             </div>
-            <div style="background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1);">
+            <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                     <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
                         <input type="checkbox" id="isZDR" class="custom-checkbox">
@@ -94,6 +94,14 @@ function initIS() {
                         <input type="checkbox" id="isIPO" class="custom-checkbox">
                         <span style="font-size: 0.9em;">Intro. Bourse (IPO 5 ans)</span>
                     </label>
+                </div>
+
+                <div id="zdr-group-selection" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(34, 197, 94, 0.05); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2);">
+                    <label style="font-size: 0.85em; display: block; margin-bottom: 5px;">${t("label_zdr_group") || "Groupe ZDR"} :</label>
+                    <select id="zdrGroup" class="form-control" style="font-size: 0.9em;">
+                        <option value="1">${t("label_zdr_group_1") || "Groupe 1 (5 ans)"}</option>
+                        <option value="2" selected>${t("label_zdr_group_2") || "Groupe 2 (10 ans)"}</option>
+                    </select>
                 </div>
                 
                 <div class="form-group" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
@@ -245,6 +253,9 @@ function initIS() {
     document.getElementById('enableAdvancedMode').addEventListener('change', toggleAdvancedClassification);
     document.getElementById('caExport').addEventListener('input', updateProRataDisplay);
     document.getElementById('caLocal').addEventListener('input', updateProRataDisplay);
+    document.getElementById('isZDR').addEventListener('change', (e) => {
+        document.getElementById('zdr-group-selection').style.display = e.target.checked ? 'block' : 'none';
+    });
 
     updateSectorInfo();
 }
@@ -387,6 +398,7 @@ function computeIS(inputs) {
         isStartup = false,
         isExport = false,
         isIPO = false,
+        zdrGroup = 2,
         anciennete = 1
     } = inputs;
 
@@ -414,7 +426,8 @@ function computeIS(inputs) {
         let isExemptPeriod = false;
 
         if (zdrOverride) {
-            if (years <= 10) isExemptPeriod = true;
+            const zdrLimit = parseInt(config.zdrGroup) === 1 ? 5 : 10;
+            if (years <= zdrLimit) isExemptPeriod = true;
             else advantageRate = 0.10;
         } else if (startupOverride) {
             if (years <= 8) isExemptPeriod = true;
@@ -546,11 +559,12 @@ function computeIS(inputs) {
         let cssRate = standardRate >= 0.35 ? 0.04 : 0.03;
         let css = baseNet * cssRate;
 
-        // ZDR Specific CSS post-10y: 0.1% CA TTC
+        // ZDR Specific CSS post-exemption: 0.1% CA TTC
+        const zdrLimit = parseInt(config.zdrGroup) === 1 ? 5 : 10;
         if (isExemptPeriod || isETE) {
             css = 0;
-        } else if (zdrOverride && years > 10) {
-            // ZDR Specific CSS post-10y: 0.1% of PROFITS (Course 5.2.4)
+        } else if (zdrOverride && years > zdrLimit) {
+            // ZDR Specific CSS post-exemption: 0.1% of PROFITS (Course 5.2.4)
             css = baseNet * 0.001;
         }
 
@@ -599,6 +613,7 @@ function computeIS(inputs) {
         startupOverride: isStartup,
         exportOverride: isExport,
         ipoOverride: inputs.isIPO,
+        zdrGroup: inputs.zdrGroup || 2,
         anciennete: anciennete,
         advancedData: inputs.advancedMode ? {
             enabled: true,
@@ -661,11 +676,12 @@ function calculateIS() {
     const isStartup = document.getElementById('isStartup')?.checked || false;
     const isExport = document.getElementById('isExport')?.checked || false;
     const isIPO = document.getElementById('isIPO')?.checked || false;
+    const zdrGroup = document.getElementById('zdrGroup')?.value || 2;
     const anciennete = parseInt(document.getElementById('anciennete')?.value) || 1;
 
     let calculationInputs = {
         sectorId, resComptable, caHt, reintegrations, deductions, montantReinvesti, creditImpot,
-        isZDR, isStartup, isExport, isIPO, anciennete
+        isZDR, isStartup, isExport, isIPO, zdrGroup, anciennete
     };
 
     // Advanced Mode: Apply Note 20/2008 Classification
@@ -694,6 +710,10 @@ function calculateIS() {
     const result = computeIS(calculationInputs);
 
     if (!result) return;
+
+    // Store for dashboard
+    window.lastISResult = opt;
+    if (window.updateDashboard) window.updateDashboard();
 
     // Destructure results
     const opt = result.optimized;

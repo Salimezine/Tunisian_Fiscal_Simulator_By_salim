@@ -44,7 +44,7 @@ function initRS() {
             </div>
         </div>
 
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px;">
             <div class="section-title">
                 <span class="icon">⚙️</span>
                 <span data-i18n="label_transaction_params">Paramètres de la Transaction</span>

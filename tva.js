@@ -80,7 +80,7 @@ function initTVA() {
     container.innerHTML = `
         <!-- Main Form -->
         <!-- Section 1: Type d'opération -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px;">
             <div class="section-title">
                 <span class="icon">🏷️</span>
                 <span data-i18n="label_operation_type">Type d'Opération</span>
@@ -96,7 +96,7 @@ function initTVA() {
         </div>
 
         <!-- Section 2: TVA Collectée -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px; animation-delay: 0.1s;">
             <div class="section-title">
                 <span class="icon">💳</span>
                 <span data-i18n="label_tva_collected">TVA Collectée (Ventes)</span>
@@ -150,7 +150,7 @@ function initTVA() {
         </div>
 
         <!-- Section 3: TVA Déductible -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px; animation-delay: 0.2s;">
             <div class="section-title">
                 <span class="icon">🧾</span>
                 <span data-i18n="label_tva_deductible">TVA Déductible (Achats)</span>

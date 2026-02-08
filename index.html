@@ -92,11 +92,12 @@
 
         <div class="glass-card">
             <nav class="tabs-nav">
-                <button class="tab-btn active" data-tab="irpp" data-i18n="tab_irpp">👤 IRPP</button>
+                <button class="tab-btn active" data-tab="dashboard" data-i18n="tab_dashboard">📊 Dashboard</button>
+                <button class="tab-btn" data-tab="irpp" data-i18n="tab_irpp">👤 IRPP</button>
                 <button class="tab-btn" data-tab="is" data-i18n="tab_is">🏢 IS</button>
                 <button class="tab-btn" data-tab="tva" data-i18n="tab_tva">💸 TVA</button>
-                <button class="tab-btn" data-tab="isf" data-i18n="tab_isf">💎 IF</button>
-                <button class="tab-btn" data-tab="rs" data-i18n="tab_rs">⚡ RS</button>
+                <button class="tab-btn" data-tab="isf" data-i18n="tab_isf" style="display: none;">💎 IF</button>
+                <button class="tab-btn" data-tab="rs" data-i18n="tab_rs" style="display: none;">⚡ RS</button>
                 <button class="tab-btn" data-tab="auto_entrepreneur" data-i18n="tab_auto_entrepreneur"
                     style="display: none;">👤
                     Auto-Ent.</button>
@@ -105,7 +106,25 @@
                 <button class="tab-btn" data-tab="comparative" data-i18n="tab_compare">⚖️ Comparatif</button>
             </nav>
 
-            <div class="tab-content" id="irpp">
+            <div class="tab-content" id="dashboard">
+                <div class="module-header">
+                    <h2 data-i18n="dashboard_title">Mon Tableau de Bord</h2>
+                    <p data-i18n="dashboard_subtitle">Résumé de votre situation fiscale 2026</p>
+                </div>
+                <div class="module-body" id="dashboard-container">
+                    <div class="dashboard-grid">
+                        <!-- Dashboard cards will be injected here -->
+                        <div class="glass-card welcome-card">
+                            <h3 data-i18n="welcome_title">Bienvenue !</h3>
+                            <p data-i18n="welcome_msg">Commencez par simuler vos impôts pour voir votre résumé ici.</p>
+                            <button class="btn-primary" onclick="switchTab('irpp')"
+                                style="width: auto; margin-top: 15px;">Calculer mon IRPP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="irpp">
                 <div class="module-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                     <div>
@@ -120,7 +139,10 @@
                         <label for="year2026" class="year-label active" onclick="setYear('2026')">2026</label>
                     </div>
                 </div>
-                <div class="module-body" id="irpp-container"></div>
+                <div class="module-body">
+                    <div id="irpp-wizard"></div>
+                    <div id="irpp-container" class="hidden"></div>
+                </div>
             </div>
 
             <div class="tab-content hidden" id="is">
@@ -215,6 +237,7 @@
     <script src="conseiller.js"></script>
     <script src="comparative.js"></script>
     <script src="wizard.js"></script>
+    <script src="dashboard.js"></script>
     <script src="main.js"></script>
 
     <!-- Chatbot Widget -->

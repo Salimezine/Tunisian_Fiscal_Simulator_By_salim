@@ -30,6 +30,9 @@ function initIRPP() {
                  <span style="font-size:1.2em;">📜</span>
                  <span id="irpp-year-desc" data-i18n="label_year_2026" style="font-size: 0.85em; color: #818cf8;">Barème Progressif 2026 (8 tranches)</span>
             </div>
+            <a href="javascript:void(0)" onclick="launchWizard()" style="font-size: 0.8rem; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                <span data-i18n="btn_back_to_wizard">🔄 Retourner au Wizard</span>
+            </a>
         </div>
 
         <!-- NEW: Mon Bilan Dashboard (Quick View) -->
@@ -75,7 +78,7 @@ function initIRPP() {
         </div>
 
         <!-- Section 1: Revenus & Profil Fiscal -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px;">
             <div class="section-title">
                 <span class="icon">👤</span>
                 <span data-i18n="label_situation">Votre Profil & Revenus</span>
@@ -136,7 +139,7 @@ function initIRPP() {
         </div>
         
         <!-- Section 2: Cotisations Sociales -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px; animation-delay: 0.1s;">
             <div class="section-title">
                 <span class="icon">🏦</span>
                 <span>Cotisations Sociales</span>
@@ -150,7 +153,7 @@ function initIRPP() {
         </div>
 
         <!-- Section 3: Situation Familiale -->
-        <div class="form-section">
+        <div class="form-section glass-effect animate-slide-up" style="padding: 25px; margin-bottom: 20px; animation-delay: 0.2s;">
             <div class="section-title">
                 <span class="icon">👨‍👩‍👧‍👦</span>
                 <span data-i18n="label_situation">Situation Familiale</span>
@@ -336,6 +339,10 @@ function calculateStandardIRPP() {
 
     // Display
     displayIRPPResults(result, false); // false = Standard Mode
+
+    // Store for dashboard
+    window.lastIRPPResult = result;
+    if (window.updateDashboard) window.updateDashboard();
 }
 
 /**
@@ -402,6 +409,9 @@ function calculateReverseIRPP() {
     if (window.shareWithAI) window.shareWithAI(window.lastCalculation);
 
     displayIRPPResults(bestResult, true); // true = Reverse Mode
+
+    // Store for dashboard
+    window.lastIRPPResult = bestResult;
 }
 
 /**

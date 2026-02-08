@@ -29,9 +29,9 @@ DEBUT ALGORITHME CALCUL_IS_STRICT
     Taux_Facial = GET_TAUX_SECTEUR(Secteur) // 10%, 20%, 35%, 40%
     
     // Application Exonération ZDR
-    SI (ZDR_ZONE == 1 ET ANNEE <= 5) OU (ZDR_ZONE == 2 ET ANNEE <= 10) ALORS
+    SI (ZDR_GROUPE == 1 ET ANNEE <= 5) OU (ZDR_GROUPE == 2 ET ANNEE <= 10) ALORS
         Taux_Effectif = 0%
-    SINON SI (ZDR_ZONE != NULL) ALORS
+    SINON SI (ZDR_ZONE != NULL OU ZDR_CHECKED == TRUE) ALORS
         Taux_Effectif = 10%
     SINON
         Taux_Effectif = Taux_Facial
@@ -70,9 +70,9 @@ DEBUT ALGORITHME CALCUL_IS_STRICT
     Taux_Facial = GET_TAUX_SECTEUR(Secteur) // 10%, 15%, 35%
     
     // Application Exonération ZDR
-    SI (ZDR_ZONE == 1 ET ANNEE <= 5) OU (ZDR_ZONE == 2 ET ANNEE <= 10) ALORS
+    SI (ZDR_GROUPE == 1 ET ANNEE <= 5) OU (ZDR_GROUPE == 2 ET ANNEE <= 10) ALORS
         Taux_Effectif = 0%
-    SINON SI (ZDR_ZONE != NULL) ALORS
+    SINON SI (ZDR_ZONE != NULL OU ZDR_CHECKED == TRUE) ALORS
         Taux_Effectif = 10%
     SINON
         Taux_Effectif = Taux_Facial

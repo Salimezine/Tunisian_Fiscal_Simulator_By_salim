@@ -17,11 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     try { initComparative(); } catch (e) { console.error("Erreur initComparative:", e); }
     try { initAutoEntrepreneur(); } catch (e) { console.error("Erreur initAutoEntrepreneur:", e); }
 
-    // 3. Initialize Wizard
+    // 3. Initialize Dashboard & Wizard
     try {
+        if (typeof dashboardManager !== 'undefined') dashboardManager.init();
         if (typeof irppWizard !== 'undefined') irppWizard.init();
     } catch (e) {
-        console.error("Erreur initWizard:", e);
+        console.error("Erreur initModules:", e);
     }
 
     // 4. Initialize UX Preferences (Theme & Language)
@@ -54,7 +55,12 @@ function switchTab(targetId) {
     const activeContent = document.getElementById(targetId);
 
     if (activeTab) activeTab.classList.add('active');
-    if (activeContent) activeContent.classList.remove('hidden');
+    if (activeContent) {
+        activeContent.classList.remove('hidden');
+        activeContent.classList.add('animate-fade-in');
+        // Remove animation class after finish to allow re-trigger
+        setTimeout(() => activeContent.classList.remove('animate-fade-in'), 500);
+    }
 
     // Auto-scroll to top
     window.scrollTo(0, 0);
@@ -69,8 +75,18 @@ function switchTab(targetId) {
     const irppContainer = document.getElementById('irpp-container');
 
     if (targetId === 'irpp') {
-        if (wizardContainer) wizardContainer.classList.add('hidden');
-        if (irppContainer) irppContainer.classList.remove('hidden');
+        const salaryInput = document.getElementById('revenuInput');
+        if (!salaryInput || !salaryInput.value || salaryInput.value == "0") {
+            // No data yet, show wizard
+            launchWizard();
+        } else {
+            if (wizardContainer) wizardContainer.classList.add('hidden');
+            if (irppContainer) irppContainer.classList.remove('hidden');
+        }
+    }
+
+    if (targetId === 'dashboard') {
+        if (window.dashboardManager) window.dashboardManager.update();
     }
 }
 
@@ -86,6 +102,11 @@ window.populateIRPP = function (data) {
     const enfantsInput = document.getElementById('nbEnfants');
 
     if (brutInput) brutInput.value = data.salaireBrut;
+    const frequenceSelect = document.getElementById('frequenceRevenu');
+    if (frequenceSelect && data.frequence) {
+        frequenceSelect.value = data.frequence;
+        if (window.updateSalaryLabel) window.updateSalaryLabel();
+    }
     if (enfantsInput) {
         // Find option with data.enfants or closest
         enfantsInput.value = data.enfants > 4 ? "4" : data.enfants.toString();
@@ -117,7 +138,7 @@ window.launchWizard = function () {
     if (wizardContainer) wizardContainer.classList.remove('hidden');
     if (irppContainer) irppContainer.classList.add('hidden');
     if (typeof irppWizard !== 'undefined') {
-        irppWizard.currentStep = 1;
+        irppWizard.currentStep = 0; // Start at Profile Selection
         irppWizard.render();
     }
 };
@@ -214,5 +235,13 @@ function initPreferences() {
             changeLanguage(savedLang);
         }
     }, 100);
+}
+
+/**
+ * Update Dashboard with latest simulation results
+ * @deprecated Use dashboardManager.update()
+ */
+function updateDashboard() {
+    if (window.dashboardManager) window.dashboardManager.update();
 }
 
