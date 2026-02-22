@@ -143,7 +143,19 @@ class AIService {
                 }
             }
 
-            // Priority 3: Fallback to Local Intelligence (Deterministic)
+            // Priority 3: Hugging Face API (Qwen)
+            if (AI_CONFIG.huggingface && AI_CONFIG.huggingface.enabled) {
+                let hfKey = localStorage.getItem('fiscal_ai_hf_key') || AI_CONFIG.huggingface.apiKey;
+                if (hfKey) {
+                    try {
+                        return await this.callHuggingFaceAPI(userMessage, hfKey, onChunk, onComplete);
+                    } catch (hfError) {
+                        console.warn("⚠️ Hugging Face error, falling back to Local Expert:", hfError);
+                    }
+                }
+            }
+
+            // Priority 4: Fallback to Local Intelligence (Deterministic)
             const response = this.getLocalResponse(userMessage);
 
             // Simulate brief "typing" for UX
@@ -239,6 +251,58 @@ class AIService {
         // Assuming N8n returns { output: "text response" } or similar structure
         // Adapt this based on your actual N8n node output
         const aiResponse = data.output || data.text || data.message || JSON.stringify(data);
+
+        if (onChunk) onChunk(aiResponse, aiResponse);
+        if (onComplete) onComplete(aiResponse);
+
+        this.addToHistory('assistant', aiResponse);
+        return aiResponse;
+    }
+
+    /**
+     * Call Hugging Face Inference API (Qwen)
+     */
+    async callHuggingFaceAPI(userMessage, apiKey, onChunk, onComplete) {
+        const url = AI_CONFIG.huggingface.apiUrl;
+        const snapshot = this._getFiscalSnapshot();
+        const systemPrompt = AI_CONFIG.systemPrompt;
+
+        const payload = {
+            inputs: `<|im_start|>system\n${systemPrompt}\nContext: ${JSON.stringify(snapshot)}<|im_end|>\n<|im_start|>user\n${userMessage}<|im_end|>\n<|im_start|>assistant\n`,
+            parameters: {
+                max_new_tokens: 512,
+                temperature: 0.7,
+                return_full_text: false
+            }
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(payload),
+            signal: this.abortController.signal
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`HF Error: ${response.status} - ${error}`);
+        }
+
+        const data = await response.json();
+        let aiResponse = "";
+
+        if (Array.isArray(data) && data[0].generated_text) {
+            aiResponse = data[0].generated_text;
+        } else if (data.error) {
+            throw new Error(data.error);
+        } else {
+            aiResponse = JSON.stringify(data);
+        }
+
+        aiResponse = `### 🤖 Assistant Qwen (Hugging Face AI)\n\n${aiResponse}`;
 
         if (onChunk) onChunk(aiResponse, aiResponse);
         if (onComplete) onComplete(aiResponse);

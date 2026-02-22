@@ -178,6 +178,14 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         enabled: false
     },
 
+    // Hugging Face Configuration (Qwen 2.5)
+    huggingface: {
+        model: "Qwen/Qwen2.5-1.5B-Instruct",
+        apiUrl: "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-1.5B-Instruct",
+        apiKey: "", // Use localStorage.setItem('fiscal_ai_hf_key', 'YOUR_KEY')
+        enabled: true
+    },
+
     // UI Transformation Config
     theme: {
         modern: true,
