@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fiscal-tn-v2026-1';
+const CACHE_NAME = 'fiscal-tn-v2026-2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -18,6 +18,7 @@ const ASSETS_TO_CACHE = [
     './comparative.js',
     './wizard.js',
     './main.js',
+    './dashboard.js',
     './export-service.js',
     './legal-references.js',
     './ai-config.js',
@@ -31,8 +32,9 @@ const ASSETS_TO_CACHE = [
     './i18n-data.js'
 ];
 
-// Install Event - Cache Files
+// Install Event - Cache Files & Force Activate
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Force new SW to activate immediately
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -42,31 +44,41 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Fetch Event - Serve from Cache or Network
+// Fetch Event - Network First, Cache Fallback
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // Cache Hit - Return response
-                if (response) {
-                    return response;
+        fetch(event.request)
+            .then((networkResponse) => {
+                // Update cache with fresh response
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
                 }
-                return fetch(event.request);
+                return networkResponse;
+            })
+            .catch(() => {
+                // Network failed, fall back to cache (offline support)
+                return caches.match(event.request);
             })
     );
 });
 
-// Activate Event - Clean old caches
+// Activate Event - Clean old caches & claim clients
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
+                        console.log('[Service Worker] Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
+        }).then(() => {
+            return self.clients.claim(); // Take control of all open tabs
         })
     );
 });
