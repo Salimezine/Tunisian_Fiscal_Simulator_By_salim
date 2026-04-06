@@ -1644,6 +1644,10 @@ window.I18N_DATA = {
         "adv_ipo": "الإدراج بالبورصة (IPO)",
         "adv_reinvest": "إعادة استثمار الأرباح",
         "adv_auto_entrepreneur": "نظام المبادر الذاتي",
-        "adv_tax_credit": "طرح مصاريف البحث والتطوير"
+        "adv_tax_credit": "طرح مصاريف البحث والتطوير",
+        "adv_filters": "التصفية",
+        "adv_list_title": "الأنظمة",
+        "adv_details_title": "تفاصيل الامتياز",
+        "adv_select_prompt": "الرجاء اختيار نظام مبسط أو تحفيزي من القائمة لعرض التفاصيل."
     }
 };
