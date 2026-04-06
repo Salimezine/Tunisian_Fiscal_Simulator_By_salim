@@ -189,242 +189,398 @@ function initAvantages() {
     };
 
     container.innerHTML = `
-        <div class="avantages-wrapper animate-slide-up">
+        <div class="avantages-wrapper">
             <!-- Hero Section -->
-            <div class="advisor-hero" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(99, 102, 241, 0.1)); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 20px; padding: 30px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
+            <div class="avantages-hero glass-effect animate-slide-up" style="
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(34, 197, 94, 0.08));
+                border: 1px solid rgba(99, 102, 241, 0.2);
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            ">
                 <div style="font-size: 3.5rem;">🎁</div>
                 <div>
-                    <h3 style="margin: 0; color: #fff; font-size: 1.6rem;" data-i18n="avantages_hero_title">${t("avantages_hero_title") || "Simulateur d'Incitations Fiscales"}</h3>
-                    <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.4;">
-                        <span data-i18n="avantages_hero_desc">${t("avantages_hero_desc") || "Calculez vos économies d'impôts avec les régimes avantageux (LF 2026)"}</span><br>
-                        <span style="font-size: 0.85em; opacity: 0.8; color: #818cf8;">✨ ${AVANTAGES_CATALOG.length} régimes documentés</span>
+                    <h3 style="margin: 0; color: #fff; font-size: 1.5rem;" data-i18n="avantages_hero_title">Guide des Incitations Fiscales</h3>
+                    <p style="margin: 5px 0 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
+                        <span data-i18n="avantages_hero_desc">Tous les régimes fiscaux avantageux prévus par la Loi de Finances 2026</span><br>
+                        <span style="font-size: 0.85em; opacity: 0.8; color: #818cf8;">
+                            📚 ${AVANTAGES_CATALOG.length} régimes documentés — Cliquez pour en savoir plus
+                        </span>
                     </p>
                 </div>
             </div>
 
-            <!-- Paramètres Form (Calculator) -->
-            <div class="glass-card" style="padding: 25px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="color: #6366f1; text-transform: uppercase; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 20px;">
-                    ⚙️ <span data-i18n="adv_filters">${t("adv_filters") || "Paramètres de Simulation"}</span>
+            
+            <!-- Simulateur Rapide -->
+            <div class="glass-card animate-slide-up" style="margin-bottom: 25px; padding: 25px; background: rgba(34, 197, 94, 0.03); border: 1px solid rgba(34, 197, 94, 0.2);">
+                <div style="color: #22c55e; text-transform: uppercase; font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 15px;">
+                    🧮 Simulateur de Gain Rapide
                 </div>
-                
-                <div class="flex-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div class="form-group" style="flex: 1; min-width: 200px;">
-                        <label>Catégorie</label>
-                        <select id="adv-filter-type" class="form-control" onchange="filterAvantages(this.value)">
-                            <option value="all">Toutes Catégories</option>
-                            <option value="Exonération">Exonération (IS=0%)</option>
-                            <option value="Réduction">Réduction d'Impôt</option>
-                            <option value="Déduction">Déduction Frais</option>
-                            <option value="Crédit">Crédit d'Impôt</option>
-                            <option value="Contribution Unique">Contribution Unique</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="flex: 2; min-width: 250px;">
-                        <label>Choix du Régime / Avantage</label>
-                        <select id="adv-select-regime" class="form-control" onchange="selectAdvantage(this.value)">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
+                    <div style="flex: 2; min-width: 250px;">
+                        <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">1. Choisissez un régime</label>
+                        <select id="sim-regime" class="form-control" style="background: rgba(0,0,0,0.3);">
                             ${AVANTAGES_CATALOG.map(a => `<option value="${a.id}">${a.icon} ${t(a.title_key) || a.title_fallback}</option>`).join('')}
                         </select>
                     </div>
-                </div>
-
-                <div class="flex-row" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
-                    <div class="form-group" style="flex: 2; min-width: 200px;">
-                        <label>Bénéfice estimé (DT)</label>
-                        <div class="input-with-icon" style="position: relative;">
+                    <div style="flex: 2; min-width: 200px;">
+                        <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">2. Bénéfice estimé (DT)</label>
+                        <div style="position: relative;">
                             <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;">💰</span>
-                            <input type="number" id="adv-benefice" class="form-control" placeholder="Ex: 50000" style="padding-left: 40px;" onkeypress="if(event.key === 'Enter') calculerAvantage()" />
+                            <input type="number" id="sim-amount" class="form-control" placeholder="Ex: 100000" style="background: rgba(0,0,0,0.3); padding-left: 40px;" onkeypress="if(event.key === 'Enter') calculerAvantageLocal()" />
                         </div>
                     </div>
-                    <div class="form-group" style="flex: 1; min-width: 150px; display: flex; align-items: flex-end;">
-                        <button class="btn btn-primary w-100" onclick="calculerAvantage()" style="height: 48px; border-radius: 12px; font-weight: bold; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                            <span style="font-size: 1.2rem; margin-right: 8px;">🧮</span> Calculer mon Gain
+                    <div style="flex: 1; min-width: 150px;">
+                        <button class="btn btn-primary w-100" onclick="calculerAvantageLocal()" style="height: 48px; font-weight: bold; background: linear-gradient(135deg, #22c55e, #10b981);">
+                            Calculer
                         </button>
                     </div>
                 </div>
+                <div id="sim-result" style="display: none; margin-top: 20px;"></div>
             </div>
 
-            <!-- Simulation Result Container -->
-            <div id="avantage-simulation-result" style="display: none; margin-bottom: 25px;"></div>
-
-            <!-- Report Area -->
-            <div class="avantages-main-report">
-                <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column;">
-                    <div style="background: rgba(255,255,255,0.03); padding: 15px 25px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="color: #22c55e;">●</span> <strong style="font-size: 0.9rem;" data-i18n="adv_details_title">${t("adv_details_title") || "GUIDE THÉORIQUE DU RÉGIME SÉLECTIONNÉ"}</strong>
-                        </div>
-                    </div>
-                    <div id="avantage-details-content" style="padding: 30px; flex: 1;"></div>
-                </div>
+            <!-- Filter Bar -->
+            <div class="avantages-filters animate-slide-up" style="
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                animation-delay: 0.05s;
+            ">
+                <button class="avantage-filter-btn active" data-filter="all" onclick="filterAvantages('all')">
+                    🔍 <span data-i18n="filter_all">Tous</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Exonération" onclick="filterAvantages('Exonération')">
+                    🛡️ <span data-i18n="filter_exemption">Exonérations</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Réduction" onclick="filterAvantages('Réduction')">
+                    📉 <span data-i18n="filter_reduction">Réductions</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Déduction" onclick="filterAvantages('Déduction')">
+                    🌱 <span data-i18n="filter_deduction">Déductions</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Crédit" onclick="filterAvantages('Crédit')">
+                    💳 <span data-i18n="filter_credit">Crédits</span>
+                </button>
             </div>
-            
-            <style>
-                .adv-detail-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-                @media (max-width: 600px) {
-                    .adv-detail-header { flex-direction: column; align-items: center; text-align: center; }
-                }
-                .adv-detail-icon { font-size: 3rem; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px; flex-shrink: 0; }
-                .adv-detail-title { margin: 0 0 10px; font-size: 1.4rem; color: #fff; font-weight: 700; }
-                .adv-detail-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; display: inline-block; }
-                
-                .adv-detail-section { margin-bottom: 25px; }
-                .adv-detail-section h4 { color: #818cf8; font-size: 0.95rem; margin: 0 0 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-                .adv-detail-text { color: #cbd5e1; line-height: 1.7; font-size: 0.95rem; }
-                .adv-detail-list { margin: 0; padding-inline-start: 22px; color: #cbd5e1; font-size: 0.95rem; }
-                .adv-detail-list li { margin-bottom: 8px; line-height: 1.5; }
-                
-                .adv-fiscal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-                @media (max-width: 600px) { .adv-fiscal-grid { grid-template-columns: 1fr; } }
-                .adv-fiscal-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; }
-                .adv-fiscal-label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-                .adv-fiscal-value { color: #fff; font-size: 1.05rem; font-weight: 600; }
-                
-                .adv-legal-ref { margin-top: 30px; padding: 15px; background: rgba(99, 102, 241, 0.05); border-inline-start: 3px solid #818cf8; border-radius: 0 8px 8px 0; font-style: italic; color: #a5b4fc; font-size: 0.85rem; }
-            </style>
+
+            <!-- Cards Grid -->
+            <div class="avantages-grid" id="avantages-grid">
+                ${AVANTAGES_CATALOG.map((adv, i) => renderAdvantageCard(adv, i)).join('')}
+            </div>
+
+            <!-- Legal Disclaimer -->
+            <div style="
+                margin-top: 25px;
+                padding: 15px;
+                background: rgba(245, 158, 11, 0.05);
+                border: 1px solid rgba(245, 158, 11, 0.2);
+                border-radius: 10px;
+                font-size: 0.85rem;
+                color: #94a3b8;
+                line-height: 1.6;
+            ">
+                <strong style="color: #f59e0b;">⚠️ <span data-i18n="avantages_legal_title">Important</span></strong><br>
+                <span data-i18n="avantages_legal_text">Ces informations sont à titre indicatif et pédagogique. 
+                Les conditions d'éligibilité et les taux peuvent évoluer. 
+                Consultez un expert-comptable ou la DGI pour une application conforme à votre situation.</span>
+            </div>
         </div>
+
+        <style>
+            .avantages-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                gap: 16px;
+            }
+
+            .avantage-card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 16px;
+                overflow: hidden;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
+
+            .avantage-card:hover {
+                transform: translateY(-3px);
+                border-color: rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            }
+
+            .avantage-card.expanded {
+                grid-column: 1 / -1;
+            }
+
+            .avantage-card-header {
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .avantage-icon-box {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.6rem;
+                flex-shrink: 0;
+            }
+
+            .avantage-card-header-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .avantage-card-header-info h4 {
+                margin: 0;
+                color: #fff;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1.3;
+            }
+
+            .avantage-type-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-top: 4px;
+            }
+
+            .avantage-card-summary {
+                padding: 0 20px 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .avantage-summary-item {
+                font-size: 0.8rem;
+                color: #94a3b8;
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+            }
+
+            .avantage-summary-item strong {
+                color: #cbd5e1;
+                font-weight: 600;
+            }
+
+            .avantage-card-details {
+                display: none;
+                padding: 0 20px 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .avantage-card.expanded .avantage-card-details {
+                display: block;
+            }
+
+            .avantage-detail-section {
+                margin-top: 15px;
+            }
+
+            .avantage-detail-section h5 {
+                color: #818cf8;
+                font-size: 0.85rem;
+                margin: 0 0 8px;
+                font-weight: 700;
+            }
+
+            .avantage-detail-section p,
+            .avantage-detail-section li {
+                font-size: 0.85rem;
+                color: #94a3b8;
+                line-height: 1.6;
+            }
+
+            .avantage-detail-section ul {
+                padding-left: 18px;
+                margin: 0;
+            }
+
+            .avantage-detail-section li {
+                margin-bottom: 4px;
+            }
+
+            .avantage-legal-ref {
+                font-size: 0.75rem;
+                color: #818cf8;
+                font-style: italic;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px dashed rgba(129, 140, 248, 0.2);
+            }
+
+            .avantage-expand-hint {
+                text-align: center;
+                padding: 8px;
+                font-size: 0.75rem;
+                color: #64748b;
+                transition: color 0.2s;
+            }
+
+            .avantage-card:hover .avantage-expand-hint {
+                color: #818cf8;
+            }
+
+            .avantage-filter-btn {
+                padding: 6px 14px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.03);
+                color: #94a3b8;
+                font-size: 0.8rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-family: inherit;
+            }
+
+            .avantage-filter-btn:hover {
+                background: rgba(99, 102, 241, 0.1);
+                border-color: rgba(99, 102, 241, 0.3);
+                color: #a5b4fc;
+            }
+
+            .avantage-filter-btn.active {
+                background: rgba(99, 102, 241, 0.15);
+                border-color: #6366f1;
+                color: #a5b4fc;
+                font-weight: 600;
+            }
+
+            @media (max-width: 700px) {
+                .avantages-grid {
+                    grid-template-columns: 1fr;
+                }
+                .avantage-card-summary {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
     `;
 
-    // Global Filter Function
-    window.filterAvantages = function(filter) {
-        const selectBox = document.getElementById('adv-select-regime');
-        if (!selectBox) return;
-        
-        selectBox.innerHTML = '';
-        
-        let foundAny = false;
-        AVANTAGES_CATALOG.forEach(adv => {
-            if (filter === 'all' || adv.type.includes(filter)) {
-                foundAny = true;
-                const title = t(adv.title_key) || adv.title_fallback;
-                selectBox.innerHTML += \`<option value="\${adv.id}">\${adv.icon} \${title}</option>\`;
-            }
+    // Global function for card toggle
+    window.toggleAdvantageCard = function(id) {
+        const card = document.getElementById(`adv-card-${id}`);
+        if (!card) return;
+
+        const wasExpanded = card.classList.contains('expanded');
+
+        // Close all cards first
+        document.querySelectorAll('.avantage-card.expanded').forEach(c => {
+            c.classList.remove('expanded');
+            const hint = c.querySelector('.avantage-expand-hint');
+            if (hint) hint.textContent = '▼ Voir détails';
         });
-        
-        if(foundAny) {
-            window.selectAdvantage(selectBox.options[0].value);
-        } else {
-            document.getElementById('avantage-details-content').innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #94a3b8;">
-                    Aucun régime trouvé.
-                </div>
-            `;
+
+        // Toggle clicked card
+        if (!wasExpanded) {
+            card.classList.add('expanded');
+            const hint = card.querySelector('.avantage-expand-hint');
+            if (hint) hint.textContent = '▲ Réduire';
+            // Smooth scroll to card
+            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
         }
     };
 
-    // Global Selection Function
-    window.selectAdvantage = function(id) {
-        const adv = AVANTAGES_CATALOG.find(a => a.id === id);
-        if(adv) {
-            const container = document.getElementById('avantage-details-content');
-            container.innerHTML = renderAvantageDetails(adv);
-            container.style.animation = 'none';
-            container.offsetHeight; /* trigger reflow */
-            container.style.animation = 'fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-
-            // Hide calculation result when switching regime, until they click Calculate again
-            const resBox = document.getElementById('avantage-simulation-result');
-            if(resBox) resBox.style.display = 'none';
-        }
-    };
 
     // Global Calculate Function
-    window.calculerAvantage = function() {
-        const id = document.getElementById('adv-select-regime').value;
-        const benefStr = document.getElementById('adv-benefice').value;
+    window.calculerAvantageLocal = function() {
+        const id = document.getElementById('sim-regime').value;
+        const benefStr = document.getElementById('sim-amount').value;
         const benefice = parseFloat(benefStr);
-        
         if (isNaN(benefice) || benefice <= 0) {
-            // Simple visual error state if no amount
-            const inputEl = document.getElementById('adv-benefice');
-            inputEl.style.border = "1px solid #ef4444";
-            setTimeout(() => inputEl.style.border = "1px solid rgba(255,255,255,0.1)", 1000);
+            const el = document.getElementById('sim-amount');
+            el.style.border = "1px solid #ef4444";
+            setTimeout(() => el.style.border = "", 1000);
             return;
         }
-
+        
         const adv = AVANTAGES_CATALOG.find(a => a.id === id);
         if(!adv) return;
         
-        // STANDARD IS RATE
-        // En Tunisie, le taux IS par défaut est de 15% pour la plupart des PMEs selon LF 2026.
         const tauxStandard = 0.15; 
         let impotNormal = benefice * tauxStandard;
         let impotAvantage = impotNormal;
         
-        // APPLY RULES based on ID
         if (adv.id === 'zdr' || adv.id === 'startup' || adv.id === 'export') {
-            impotAvantage = 0; // Exonération totale
+            impotAvantage = 0;
         } else if (adv.id === 'agri') {
-            impotAvantage = benefice * 0.10; // Taux réduit à 10%
+            impotAvantage = benefice * 0.10;
         } else if (adv.id === 'reinvest') {
-            const plafondDed = benefice * 0.35; // Déduction max 35%
-            const baseImposable = benefice - plafondDed;
-            impotAvantage = baseImposable * tauxStandard;
-            // Floor is min tax (which is handled later or simplified here as lower)
+            const plafondDed = benefice * 0.35;
+            impotAvantage = (benefice - plafondDed) * tauxStandard;
         } else if (adv.id === 'ipo') {
-            // Assume the user wants to IPO because their tax rate is high e.g. 35%. 
-            // So we mock the standard rate at 35% and the advantaged at 20%
             impotNormal = benefice * 0.35;
             impotAvantage = benefice * 0.20;
         } else if (adv.id === 'auto_entrepreneur') {
-            if (benefice > 75000) {
-                alert("Le bénéfice saisi dépasse le plafond de l'Auto-Entrepreneur (75 000 DT) ! Simulation impossible.");
-                return;
-            }
-            impotAvantage = 200; // Contribution unique annuelle forfaitaire min
+            if (benefice > 75000) return alert("Le bénéfice dépasse le plafond Auto-Entrepreneur (75 000 DT) !");
+            impotAvantage = 200;
         } else if (adv.id === 'credit_impot') {
-            // Hypothesis: user spends 20% of their profit in RD
-            const rdSpend = benefice * 0.20; 
-            impotAvantage = impotNormal - rdSpend; 
+            impotAvantage = impotNormal - (benefice * 0.20); 
             if(impotAvantage < 0) impotAvantage = 0;
         }
         
         const economie = impotNormal - impotAvantage;
         const formatDT = (n) => new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(n) + ' DT';
         
-        const resultBox = document.getElementById('avantage-simulation-result');
+        const resultBox = document.getElementById('sim-result');
         resultBox.style.display = 'block';
         
-        let insightMsg = ``;
-        if(adv.id === 'credit_impot') insightMsg = "Hypothèse de base : dépenses en R&D équivalentes à 20% de votre bénéfice.";
-        if(adv.id === 'ipo') insightMsg = "Hypothèse : Vous faites partie d'un secteur taxé à 35% (Plafonné à 20%).";
-
         resultBox.innerHTML = `
-            <div class="glass-card animate-slide-up" style="border-inline-start: 5px solid ${adv.color}; background: linear-gradient(90deg, rgba(34,197,94,0.05), rgba(0,0,0,0));">
-                <h4 style="color: ${adv.color}; margin-top:0; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
-                    📊 Simulation d'économie : ${adv.title_fallback}
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
-                        <div style="font-size: 0.8rem; color:#94a3b8; text-transform: uppercase;">Impôt Standard (15%)</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: #ef4444; opacity: 0.8; text-decoration: line-through;">${formatDT(impotNormal)}</div>
+            <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; border-inline-start: 4px solid ${adv.color}; animation: fadeIn 0.4s ease;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="font-size: 0.75rem; color:#94a3b8; text-transform: uppercase;">Impôt Standard (15%)</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #ef4444; opacity: 0.8; text-decoration: line-through;">${formatDT(impotNormal)}</div>
                     </div>
-                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
-                        <div style="font-size: 0.8rem; color:#94a3b8; text-transform: uppercase;">Impôt avec Avantage</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: ${adv.color};">${formatDT(impotAvantage)}</div>
+                    <div>
+                        <div style="font-size: 0.75rem; color:#94a3b8; text-transform: uppercase;">Impôt ${adv.title_fallback}</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: ${adv.color};">${formatDT(impotAvantage)}</div>
                     </div>
-                    <div style="background: rgba(34,197,94,0.1); padding: 15px; border-radius: 10px; border: 1px solid rgba(34,197,94,0.4);">
+                    <div style="padding-left: 15px; border-left: 1px solid rgba(255,255,255,0.1);">
                         <div style="font-size: 0.8rem; color:#22c55e; text-transform: uppercase; font-weight: 800;">Économie Nette 🚀</div>
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #22c55e;">+ ${formatDT(economie)}</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: #22c55e;">+ ${formatDT(economie)}</div>
                     </div>
-                </div>
-                <div style="font-size: 0.75rem; color:#94a3b8; margin-top:15px; font-style:italic; line-height: 1.4;">
-                    * Ce calcul est une <strong>estimation simplifiée</strong> basée sur les taux réglementaires de l'IS (LF 2026). Le minimum d'impôt (IMF) et la CSS peuvent impacter ce montant en situation réelle. <br> ${insightMsg}
                 </div>
             </div>
         `;
-        
-        // Scroll slightly down to focus on result
-        resultBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
     };
-    
-    // Auto-select first item
-    if (AVANTAGES_CATALOG.length > 0) {
-        setTimeout(() => { window.selectAdvantage(AVANTAGES_CATALOG[0].id); }, 100);
-    }
+
+    // Global filter function
+    window.filterAvantages = function(filter) {
+        // Update button states
+        document.querySelectorAll('.avantage-filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+        });
+
+        // Filter cards
+        document.querySelectorAll('.avantage-card').forEach(card => {
+            const type = card.getAttribute('data-type');
+            if (filter === 'all' || type.includes(filter)) {
+                card.style.display = '';
+                card.style.animation = 'fadeIn 0.3s ease-out';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
 }
 
-function renderAvantageDetails(adv) {
+function renderAdvantageCard(adv, index) {
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || '';
@@ -433,58 +589,64 @@ function renderAvantageDetails(adv) {
     const title = t(adv.title_key) || adv.title_fallback;
 
     return `
-        <div class="adv-detail-header">
-            <div class="adv-detail-icon" style="background: ${adv.color}15; border: 2px solid ${adv.color}40; box-shadow: 0 0 20px ${adv.color}20;">
-                ${adv.icon}
-            </div>
-            <div>
-                <h3 class="adv-detail-title">${title}</h3>
-                <div class="adv-detail-badge" style="background: ${adv.color}20; color: ${adv.color}; border: 1px solid ${adv.color}40;">${adv.type}</div>
-            </div>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>📋 Description</h4>
-            <p class="adv-detail-text">${adv.details.replace(/\n\s+/g, '<br><br>')}</p>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>✅ Conditions d\'éligibilité</h4>
-            <ul class="adv-detail-list">
-                ${adv.eligibility.map(e => `<li>${e}</li>`).join('')}
-            </ul>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>📊 Détails Fiscaux</h4>
-            <div class="adv-fiscal-grid">
-                <div class="adv-fiscal-box">
-                    <div class="adv-fiscal-label">Taux / Avantage</div>
-                    <div class="adv-fiscal-value" style="color: ${adv.color};">${adv.rate_benefit}</div>
+        <div class="avantage-card animate-slide-up" 
+             id="adv-card-${adv.id}" 
+             data-type="${adv.type}"
+             style="animation-delay: ${0.05 * (index + 1)}s; border-left: 3px solid ${adv.color};"
+             onclick="toggleAdvantageCard('${adv.id}')">
+            
+            <div class="avantage-card-header">
+                <div class="avantage-icon-box" style="background: ${adv.color}15; border: 1px solid ${adv.color}30;">
+                    ${adv.icon}
                 </div>
-                <div class="adv-fiscal-box">
-                    <div class="adv-fiscal-label">Durée</div>
-                    <div class="adv-fiscal-value">⏱️ <span dir="auto">${adv.duration}</span></div>
+                <div class="avantage-card-header-info">
+                    <h4>${title}</h4>
+                    <span class="avantage-type-badge" style="background: ${adv.color}20; color: ${adv.color};">${adv.type}</span>
                 </div>
             </div>
-        </div>
-        
-        <div class="adv-detail-section" style="margin-top: 25px;">
-            <h4>⚙️ Autres Taxes (Impact)</h4>
-            <div class="adv-fiscal-grid">
-                <div class="adv-fiscal-box" style="padding: 12px;">
-                    <div class="adv-fiscal-label">Minimum d\'Impôt (IMF)</div>
-                    <div class="adv-fiscal-value" style="font-size: 0.9rem;">${adv.min_tax}</div>
+
+            <div class="avantage-card-summary">
+                <div class="avantage-summary-item">
+                    ⏱️ <strong>${adv.duration}</strong>
                 </div>
-                <div class="adv-fiscal-box" style="padding: 12px;">
-                    <div class="adv-fiscal-label">Contributions Sociales (CSS)</div>
-                    <div class="adv-fiscal-value" style="font-size: 0.9rem;">${adv.css}</div>
+                <div class="avantage-summary-item">
+                    📊 <strong>${adv.rate_benefit}</strong>
                 </div>
             </div>
-        </div>
 
-        <div class="adv-legal-ref">
-            <strong>📖 Référence légale :</strong> <span dir="auto">${adv.legal}</span>
+            <div class="avantage-card-details">
+                <div class="avantage-detail-section">
+                    <h5>📋 Description</h5>
+                    <p>${adv.details}</p>
+                </div>
+
+                <div class="avantage-detail-section">
+                    <h5>✅ Conditions d'éligibilité</h5>
+                    <ul>
+                        ${adv.eligibility.map(e => `<li>${e}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="avantage-detail-section">
+                    <h5>📊 Détails Fiscaux</h5>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem;">
+                        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                            <div style="color: #64748b; font-size: 0.75rem;">Minimum d'Impôt</div>
+                            <div style="color: #cbd5e1; font-weight: 600; margin-top: 2px;">${adv.min_tax}</div>
+                        </div>
+                        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                            <div style="color: #64748b; font-size: 0.75rem;">CSS</div>
+                            <div style="color: #cbd5e1; font-weight: 600; margin-top: 2px;">${adv.css}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="avantage-legal-ref">
+                    📖 Référence : ${adv.legal}
+                </div>
+            </div>
+
+            <div class="avantage-expand-hint">▼ Voir détails</div>
         </div>
     `;
 }
