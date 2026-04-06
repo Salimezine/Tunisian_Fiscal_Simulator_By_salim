@@ -668,6 +668,182 @@ function initAvantages() {
         `;
     };
 
+    
+    // Dynamic Input Updater
+    window.updateSimInputs = function(id) {
+        const container = document.getElementById('sim-dynamic-inputs');
+        if(!container) return;
+        const resBox = document.getElementById('sim-result');
+        if(resBox) resBox.style.display = 'none'; 
+        
+        if(!id && AVANTAGES_CATALOG.length) id = AVANTAGES_CATALOG[0].id;
+        
+        let html = '';
+        if (id === 'auto_entrepreneur') {
+            html += `
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">CA Services (DT)</label>
+                    <input type="number" id="sim-ca-service" class="form-control" placeholder="0" style="background: rgba(0,0,0,0.3);" />
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">CA Commerce (DT)</label>
+                    <input type="number" id="sim-ca-commerce" class="form-control" placeholder="0" style="background: rgba(0,0,0,0.3);" />
+                </div>
+            `;
+        } else if (id === 'reinvest') {
+            html += `
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Bénéfice Réel (DT)</label>
+                    <input type="number" id="sim-benefice" class="form-control" placeholder="Ex: 100000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Mnt Réinvesti (DT)</label>
+                    <input type="number" id="sim-invest" class="form-control" placeholder="Ex: 35000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+            `;
+        } else if (id === 'export') {
+            html += `
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Bénéfice Marché Local (DT)</label>
+                    <input type="number" id="sim-ben-local" class="form-control" placeholder="Ex: 20000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Bénéfice Export (0%) (DT)</label>
+                    <input type="number" id="sim-ben-export" class="form-control" placeholder="Ex: 80000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+            `;
+        } else if (id === 'credit_impot') {
+            html += `
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Bénéfice Brut (DT)</label>
+                    <input type="number" id="sim-benefice" class="form-control" placeholder="Ex: 100000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Dépenses Agrées R&D (DT)</label>
+                    <input type="number" id="sim-rd" class="form-control" placeholder="Ex: 15000" style="background: rgba(0,0,0,0.3);" />
+                </div>
+            `;
+        } else {
+            // Default (ZDR, Startup, Agri, IPO)
+            html += `
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">2. Bénéfice estimé (DT)</label>
+                    <div style="position: relative;">
+                        <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;">💰</span>
+                        <input type="number" id="sim-benefice" class="form-control" placeholder="Ex: 100000" style="background: rgba(0,0,0,0.3); padding-left: 40px;" onkeypress="if(event.key === 'Enter') calculerAvantageLocal()" />
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = html;
+        container.style.animation = 'none';
+        container.offsetHeight; /* trigger reflow */
+        container.style.animation = 'fadeIn 0.3s ease';
+    };
+
+    // Global Calculate Function
+    window.calculerAvantageLocal = function() {
+        const selectObj = document.getElementById('sim-regime');
+        if (!selectObj) return;
+        const id = selectObj.value;
+        const adv = AVANTAGES_CATALOG.find(a => a.id === id);
+        if(!adv) return;
+        
+        const tauxStandard = 0.15; 
+        let impotNormal = 0;
+        let impotAvantage = 0;
+        
+        const getVal = (cid) => {
+            const el = document.getElementById(cid);
+            return el ? (parseFloat(el.value) || 0) : 0;
+        };
+        const errorInput = (cid) => {
+             const el = document.getElementById(cid);
+             if(el) { el.style.border = "1px solid #ef4444"; setTimeout(() => el.style.border = "1px solid rgba(255,255,255,0.1)", 1000); }
+        };
+
+        if (adv.id === 'auto_entrepreneur') {
+            const caServ = getVal('sim-ca-service');
+            const caComm = getVal('sim-ca-commerce');
+            if (caServ === 0 && caComm === 0 && !document.getElementById('sim-ca-service').value) return errorInput('sim-ca-service');
+            
+            if (caServ > 75000 || caComm > 150000 || (caServ + caComm) > 150000) {
+                return alert("Le plafond est dépassé (75K Services, 150K Commerce) ! Régime Auto-Entrepreneur invalide.");
+            }
+            impotAvantage = 200; // Flat base contribution
+            impotNormal = (caServ * 0.5 + caComm * 0.2) * 0.15; // Rough estimate of standard personal tax if they were in normal regime
+        } 
+        else if (adv.id === 'reinvest') {
+            const benef = getVal('sim-benefice');
+            const invest = getVal('sim-invest');
+            if (!document.getElementById('sim-benefice').value) return errorInput('sim-benefice');
+            
+            impotNormal = benef * tauxStandard;
+            const plafondDed = benef * 0.35;
+            const deduced = Math.min(invest, plafondDed);
+            impotAvantage = (benef - deduced) * tauxStandard;
+        }
+        else if (adv.id === 'export') {
+            const benLoc = getVal('sim-ben-local');
+            const benExp = getVal('sim-ben-export');
+            if (!document.getElementById('sim-ben-export').value && !document.getElementById('sim-ben-local').value) return errorInput('sim-ben-export');
+            
+            const totalBen = benLoc + benExp;
+            impotNormal = totalBen * tauxStandard;
+            impotAvantage = benLoc * tauxStandard; // export strictly 0%
+        }
+        else if (adv.id === 'credit_impot') {
+            const benef = getVal('sim-benefice');
+            const rd = getVal('sim-rd');
+            if (!document.getElementById('sim-benefice').value) return errorInput('sim-benefice');
+            
+            impotNormal = benef * tauxStandard;
+            impotAvantage = impotNormal - rd;  // 1:1 direct credit deduction
+            if(impotAvantage < 0) impotAvantage = 0;
+        }
+        else {
+            const benef = getVal('sim-benefice');
+            if (!document.getElementById('sim-benefice').value) return errorInput('sim-benefice');
+            
+            impotNormal = benef * tauxStandard;
+            
+            if (adv.id === 'zdr' || adv.id === 'startup') impotAvantage = 0;
+            else if (adv.id === 'agri') impotAvantage = benef * 0.10;
+            else if (adv.id === 'ipo') {
+                impotNormal = benef * 0.35; // mock max rate to show cap effect
+                impotAvantage = benef * 0.20;
+            }
+        }
+        
+        let economie = impotNormal - impotAvantage;
+        if(economie < 0) economie = 0; // Prevent showing negative economy due to mock math differences
+        
+        const formatDT = (n) => new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(n) + ' DT';
+        
+        const resultBox = document.getElementById('sim-result');
+        resultBox.style.display = 'block';
+        
+        resultBox.innerHTML = `
+            <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; border-inline-start: 4px solid ${adv.color}; animation: fadeIn 0.4s ease;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="font-size: 0.75rem; color:#94a3b8; text-transform: uppercase;">Impôt Standard (Estimé)</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #ef4444; opacity: 0.8; text-decoration: line-through;">${formatDT(impotNormal)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; color:#94a3b8; text-transform: uppercase;">Impôt Régime ${adv.title_fallback}</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: ${adv.color};">${formatDT(impotAvantage)}</div>
+                    </div>
+                    <div style="padding-left: 15px; border-left: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.8rem; color:#22c55e; text-transform: uppercase; font-weight: 800;">Économie Nette 🚀</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: #22c55e;">+ ${formatDT(economie)}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
     // Global filter function
     window.filterAvantages = function(filter) {
         // Update button states
