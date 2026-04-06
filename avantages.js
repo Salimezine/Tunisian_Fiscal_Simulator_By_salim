@@ -686,6 +686,8 @@ function initAvantages() {
             }
         });
     };
+
+    setTimeout(() => { if(window.updateSimInputs && AVANTAGES_CATALOG.length) { window.updateSimInputs(AVANTAGES_CATALOG[0].id); document.getElementById('sim-regime').value = AVANTAGES_CATALOG[0].id; } }, 150);
 }
 
 function renderAdvantageCard(adv, index) {
