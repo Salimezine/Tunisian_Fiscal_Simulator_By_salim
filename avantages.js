@@ -189,9 +189,9 @@ function initAvantages() {
     };
 
     container.innerHTML = `
-        <div class="avantages-wrapper animate-slide-up">
+        <div class="avantages-wrapper">
             <!-- Hero Section -->
-            <div class="avantages-hero glass-effect" style="
+            <div class="avantages-hero glass-effect animate-slide-up" style="
                 background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(34, 197, 94, 0.08));
                 border: 1px solid rgba(99, 102, 241, 0.2);
                 border-radius: 20px;
@@ -203,234 +203,291 @@ function initAvantages() {
             ">
                 <div style="font-size: 3.5rem;">🎁</div>
                 <div>
-                    <h3 style="margin: 0; color: #fff; font-size: 1.5rem;" data-i18n="avantages_hero_title">${t('avantages_hero_title') || 'Guide des Incitations Fiscales'}</h3>
+                    <h3 style="margin: 0; color: #fff; font-size: 1.5rem;" data-i18n="avantages_hero_title">Guide des Incitations Fiscales</h3>
                     <p style="margin: 5px 0 0; color: #94a3b8; font-size: 0.95rem; line-height: 1.5;">
-                        <span data-i18n="avantages_hero_desc">${t('avantages_hero_desc') || 'Tous les régimes fiscaux avantageux (LF 2026)'}</span><br>
+                        <span data-i18n="avantages_hero_desc">Tous les régimes fiscaux avantageux prévus par la Loi de Finances 2026</span><br>
                         <span style="font-size: 0.85em; opacity: 0.8; color: #818cf8;">
-                            📚 ${AVANTAGES_CATALOG.length} régimes documentés
+                            📚 ${AVANTAGES_CATALOG.length} régimes documentés — Cliquez pour en savoir plus
                         </span>
                     </p>
                 </div>
             </div>
 
-            <!-- Master-Detail Dashboard -->
-            <section id="avantages-dashboard">
-                <div class="avantages-grid-layout" style="display: grid; grid-template-columns: 320px 1fr; gap: 25px; align-items: start;">
-                    
-                    <!-- Sidebar (Master) -->
-                    <div class="avantages-sidebar" style="display: flex; flex-direction: column; gap: 15px;">
-                        
-                        <!-- Filters -->
-                        <div class="glass-card" style="padding: 15px; border-inline-start: 4px solid #6366f1;">
-                            <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 15px;">🔍 <span data-i18n="adv_filters">${t('adv_filters') || 'FILTRES'}</span></div>
-                            <div class="avantages-filters" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                <button class="avantage-filter-btn active" data-filter="all" onclick="filterAvantages('all')">
-                                    <span data-i18n="filter_all">${t('filter_all') || 'Tous'}</span>
-                                </button>
-                                <button class="avantage-filter-btn" data-filter="Exonération" onclick="filterAvantages('Exonération')">
-                                    <span data-i18n="filter_exemption">${t('filter_exemption') || 'Exonérations'}</span>
-                                </button>
-                                <button class="avantage-filter-btn" data-filter="Réduction" onclick="filterAvantages('Réduction')">
-                                    <span data-i18n="filter_reduction">${t('filter_reduction') || 'Réductions'}</span>
-                                </button>
-                                <button class="avantage-filter-btn" data-filter="Déduction" onclick="filterAvantages('Déduction')">
-                                    <span data-i18n="filter_deduction">${t('filter_deduction') || 'Déductions'}</span>
-                                </button>
-                                <button class="avantage-filter-btn" data-filter="Crédit" onclick="filterAvantages('Crédit')">
-                                    <span data-i18n="filter_credit">${t('filter_credit') || 'Crédits'}</span>
-                                </button>
-                            </div>
-                        </div>
+            <!-- Filter Bar -->
+            <div class="avantages-filters animate-slide-up" style="
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                animation-delay: 0.05s;
+            ">
+                <button class="avantage-filter-btn active" data-filter="all" onclick="filterAvantages('all')">
+                    🔍 <span data-i18n="filter_all">Tous</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Exonération" onclick="filterAvantages('Exonération')">
+                    🛡️ <span data-i18n="filter_exemption">Exonérations</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Réduction" onclick="filterAvantages('Réduction')">
+                    📉 <span data-i18n="filter_reduction">Réductions</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Déduction" onclick="filterAvantages('Déduction')">
+                    🌱 <span data-i18n="filter_deduction">Déductions</span>
+                </button>
+                <button class="avantage-filter-btn" data-filter="Crédit" onclick="filterAvantages('Crédit')">
+                    💳 <span data-i18n="filter_credit">Crédits</span>
+                </button>
+            </div>
 
-                        <!-- List of Advantages -->
-                        <div class="glass-card" style="padding: 15px;">
-                            <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                                <span>📜 <span data-i18n="adv_list_title">${t('adv_list_title') || 'INCITATIONS'}</span></span>
-                                <span style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${AVANTAGES_CATALOG.length}</span>
-                            </div>
-                            <div id="avantages-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 550px; overflow-y: auto; padding-right: 5px;">
-                                ${AVANTAGES_CATALOG.map((adv, i) => renderAvantageListItem(adv, i)).join('')}
-                            </div>
-                        </div>
-                    </div>
+            <!-- Cards Grid -->
+            <div class="avantages-grid" id="avantages-grid">
+                ${AVANTAGES_CATALOG.map((adv, i) => renderAdvantageCard(adv, i)).join('')}
+            </div>
 
-                    <!-- Main Report (Detail) -->
-                    <div class="avantages-main-report">
-                        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); min-height: 550px; display: flex; flex-direction: column;">
-                            <div style="background: rgba(255,255,255,0.03); padding: 15px 25px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="color: #22c55e;">●</span> <strong style="font-size: 0.9rem;" data-i18n="adv_details_title">${t('adv_details_title') || 'DÉTAILS DU RÉGIME SÉLECTIONNÉ'}</strong>
-                                </div>
-                            </div>
-                            <div id="avantage-details-content" style="padding: 30px; flex: 1;">
-                                <!-- Placeholder -->
-                                <div style="text-align: center; color: #64748b; margin-top: 100px; animation: fadeIn 0.5s ease;">
-                                    <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">👈</div>
-                                    <p style="font-size: 1.1rem; max-width: 300px; margin: 0 auto; line-height: 1.5;" data-i18n="adv_select_prompt">${t('adv_select_prompt') || 'Veuillez sélectionner une incitation dans la liste de gauche pour afficher ses détails.'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                         <!-- Legal Disclaimer -->
-                        <div style="
-                            margin-top: 15px;
-                            padding: 15px;
-                            background: rgba(245, 158, 11, 0.05);
-                            border: 1px solid rgba(245, 158, 11, 0.2);
-                            border-radius: 10px;
-                            font-size: 0.8rem;
-                            color: #94a3b8;
-                            line-height: 1.5;
-                        ">
-                            <strong style="color: #f59e0b;">⚠️ <span data-i18n="avantages_legal_title">${t('avantages_legal_title') || 'Important'}</span></strong><br>
-                            <span data-i18n="avantages_legal_text">${t('avantages_legal_text') || "Ces informations sont à titre indicatif et pédagogique."}</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <!-- Legal Disclaimer -->
+            <div style="
+                margin-top: 25px;
+                padding: 15px;
+                background: rgba(245, 158, 11, 0.05);
+                border: 1px solid rgba(245, 158, 11, 0.2);
+                border-radius: 10px;
+                font-size: 0.85rem;
+                color: #94a3b8;
+                line-height: 1.6;
+            ">
+                <strong style="color: #f59e0b;">⚠️ <span data-i18n="avantages_legal_title">Important</span></strong><br>
+                <span data-i18n="avantages_legal_text">Ces informations sont à titre indicatif et pédagogique. 
+                Les conditions d'éligibilité et les taux peuvent évoluer. 
+                Consultez un expert-comptable ou la DGI pour une application conforme à votre situation.</span>
+            </div>
         </div>
 
         <style>
-            /* Layout & General Styles */
-            @media (max-width: 900px) {
-                .avantages-grid-layout {
-                    grid-template-columns: 1fr !important;
-                }
+            .avantages-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                gap: 16px;
             }
 
-            /* Custom Scrollbar for sidebar list */
-            #avantages-list::-webkit-scrollbar { width: 4px; }
-            #avantages-list::-webkit-scrollbar-track { background: transparent; }
-            #avantages-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+            .avantage-card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 16px;
+                overflow: hidden;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
 
-            /* Filter Buttons */
+            .avantage-card:hover {
+                transform: translateY(-3px);
+                border-color: rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            }
+
+            .avantage-card.expanded {
+                grid-column: 1 / -1;
+            }
+
+            .avantage-card-header {
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .avantage-icon-box {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.6rem;
+                flex-shrink: 0;
+            }
+
+            .avantage-card-header-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .avantage-card-header-info h4 {
+                margin: 0;
+                color: #fff;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1.3;
+            }
+
+            .avantage-type-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-top: 4px;
+            }
+
+            .avantage-card-summary {
+                padding: 0 20px 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .avantage-summary-item {
+                font-size: 0.8rem;
+                color: #94a3b8;
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+            }
+
+            .avantage-summary-item strong {
+                color: #cbd5e1;
+                font-weight: 600;
+            }
+
+            .avantage-card-details {
+                display: none;
+                padding: 0 20px 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .avantage-card.expanded .avantage-card-details {
+                display: block;
+            }
+
+            .avantage-detail-section {
+                margin-top: 15px;
+            }
+
+            .avantage-detail-section h5 {
+                color: #818cf8;
+                font-size: 0.85rem;
+                margin: 0 0 8px;
+                font-weight: 700;
+            }
+
+            .avantage-detail-section p,
+            .avantage-detail-section li {
+                font-size: 0.85rem;
+                color: #94a3b8;
+                line-height: 1.6;
+            }
+
+            .avantage-detail-section ul {
+                padding-left: 18px;
+                margin: 0;
+            }
+
+            .avantage-detail-section li {
+                margin-bottom: 4px;
+            }
+
+            .avantage-legal-ref {
+                font-size: 0.75rem;
+                color: #818cf8;
+                font-style: italic;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px dashed rgba(129, 140, 248, 0.2);
+            }
+
+            .avantage-expand-hint {
+                text-align: center;
+                padding: 8px;
+                font-size: 0.75rem;
+                color: #64748b;
+                transition: color 0.2s;
+            }
+
+            .avantage-card:hover .avantage-expand-hint {
+                color: #818cf8;
+            }
+
             .avantage-filter-btn {
-                padding: 6px 12px;
+                padding: 6px 14px;
                 border-radius: 20px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 background: rgba(255, 255, 255, 0.03);
                 color: #94a3b8;
-                font-size: 0.75rem;
+                font-size: 0.8rem;
                 cursor: pointer;
                 transition: all 0.2s;
                 font-family: inherit;
             }
-            .avantage-filter-btn:hover { background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc; }
-            .avantage-filter-btn.active { background: rgba(99, 102, 241, 0.15); border-color: #6366f1; color: #a5b4fc; font-weight: 600; }
 
-            /* List Items (Sidebar) */
-            .avantage-list-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px;
-                border-radius: 10px;
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid transparent;
-                cursor: pointer;
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            .avantage-list-item:hover {
-                background: rgba(255, 255, 255, 0.05);
-                transform: translateX(4px);
-            }
-            .dir-rtl .avantage-list-item:hover {
-                transform: translateX(-4px);
-            }
-            .avantage-list-item.active {
+            .avantage-filter-btn:hover {
                 background: rgba(99, 102, 241, 0.1);
                 border-color: rgba(99, 102, 241, 0.3);
+                color: #a5b4fc;
             }
-            
-            .adv-list-icon {
-                width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
-            }
-            .adv-list-content { flex: 1; min-width: 0; }
-            .adv-list-title { color: #cbd5e1; font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .adv-list-type { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; display: inline-block; font-weight: 600; text-transform: uppercase; }
 
-            /* Details View */
-            .adv-detail-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .adv-detail-icon { font-size: 3rem; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px; flex-shrink: 0; }
-            .adv-detail-title { margin: 0 0 10px; font-size: 1.4rem; color: #fff; font-weight: 700; }
-            .adv-detail-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; display: inline-block; }
-            
-            .adv-detail-section { margin-bottom: 25px; }
-            .adv-detail-section h4 { color: #818cf8; font-size: 0.95rem; margin: 0 0 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-            .adv-detail-text { color: #cbd5e1; line-height: 1.7; font-size: 0.95rem; }
-            .adv-detail-list { margin: 0; padding-inline-start: 22px; color: #cbd5e1; font-size: 0.95rem; }
-            .adv-detail-list li { margin-bottom: 8px; line-height: 1.5; }
-            
-            .adv-fiscal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-            @media (max-width: 600px) { .adv-fiscal-grid { grid-template-columns: 1fr; } }
-            .adv-fiscal-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; }
-            .adv-fiscal-label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-            .adv-fiscal-value { color: #fff; font-size: 1.05rem; font-weight: 600; }
-            
-            .adv-legal-ref { margin-top: 30px; padding: 15px; background: rgba(99, 102, 241, 0.05); border-inline-start: 3px solid #818cf8; border-radius: 0 8px 8px 0; font-style: italic; color: #a5b4fc; font-size: 0.85rem; }
+            .avantage-filter-btn.active {
+                background: rgba(99, 102, 241, 0.15);
+                border-color: #6366f1;
+                color: #a5b4fc;
+                font-weight: 600;
+            }
+
+            @media (max-width: 700px) {
+                .avantages-grid {
+                    grid-template-columns: 1fr;
+                }
+                .avantage-card-summary {
+                    grid-template-columns: 1fr;
+                }
+            }
         </style>
     `;
 
-    // Global Selection Function
-    window.selectAdvantage = function(id) {
-        // Highlight active item within the list
-        document.querySelectorAll('.avantage-list-item').forEach(el => el.classList.remove('active'));
-        const activeItem = document.getElementById(`adv-list-item-${id}`);
-        if(activeItem) {
-            activeItem.classList.add('active');
-        }
+    // Global function for card toggle
+    window.toggleAdvantageCard = function(id) {
+        const card = document.getElementById(`adv-card-${id}`);
+        if (!card) return;
 
-        // Render Details in Main Report Area
-        const adv = AVANTAGES_CATALOG.find(a => a.id === id);
-        if(adv) {
-            const container = document.getElementById('avantage-details-content');
-            container.innerHTML = renderAvantageDetails(adv);
-            container.style.animation = 'none';
-            container.offsetHeight; /* trigger reflow */
-            container.style.animation = 'fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            
-            // Scroll to details on small screens
-            if(window.innerWidth <= 900) {
-                container.closest('.avantages-main-report').scrollIntoView({ behavior: 'smooth' });
-            }
+        const wasExpanded = card.classList.contains('expanded');
+
+        // Close all cards first
+        document.querySelectorAll('.avantage-card.expanded').forEach(c => {
+            c.classList.remove('expanded');
+            const hint = c.querySelector('.avantage-expand-hint');
+            if (hint) hint.textContent = '▼ Voir détails';
+        });
+
+        // Toggle clicked card
+        if (!wasExpanded) {
+            card.classList.add('expanded');
+            const hint = card.querySelector('.avantage-expand-hint');
+            if (hint) hint.textContent = '▲ Réduire';
+            // Smooth scroll to card
+            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
         }
     };
 
-    // Global Filter Function
+    // Global filter function
     window.filterAvantages = function(filter) {
-        // Buttons
+        // Update button states
         document.querySelectorAll('.avantage-filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
         });
 
-        // List Items
-        let firstVisible = null;
-        document.querySelectorAll('.avantage-list-item').forEach(item => {
-            const type = item.getAttribute('data-type');
+        // Filter cards
+        document.querySelectorAll('.avantage-card').forEach(card => {
+            const type = card.getAttribute('data-type');
             if (filter === 'all' || type.includes(filter)) {
-                item.style.display = 'flex';
-                item.style.animation = 'fadeIn 0.3s ease-out';
-                if(!firstVisible) firstVisible = item.id.replace('adv-list-item-', '');
+                card.style.display = '';
+                card.style.animation = 'fadeIn 0.3s ease-out';
             } else {
-                item.style.display = 'none';
+                card.style.display = 'none';
             }
         });
-
-        // Auto-select first visible if current is hidden
-        const activeItem = document.querySelector('.avantage-list-item.active');
-        if ((!activeItem || activeItem.style.display === 'none') && firstVisible) {
-            window.selectAdvantage(firstVisible);
-        }
     };
-    
-    // Automatically select the first advantage to populate the dashboard on load
-    if (AVANTAGES_CATALOG.length > 0) {
-        // Small delay to ensure render is complete
-        setTimeout(() => { window.selectAdvantage(AVANTAGES_CATALOG[0].id); }, 100);
-    }
 }
 
-function renderAvantageListItem(adv, index) {
+function renderAdvantageCard(adv, index) {
     const t = (key) => {
         const lang = localStorage.getItem('language') || 'fr';
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || '';
@@ -439,79 +496,64 @@ function renderAvantageListItem(adv, index) {
     const title = t(adv.title_key) || adv.title_fallback;
 
     return `
-        <div class="avantage-list-item animate-slide-up" id="adv-list-item-${adv.id}" data-type="${adv.type}" onclick="selectAdvantage('${adv.id}')" style="border-inline-start: 3px solid ${adv.color}; animation-delay: ${0.05 * (index + 1)}s;">
-            <div class="adv-list-icon" style="background: ${adv.color}15; color: ${adv.color}; border: 1px solid ${adv.color}30;">
-                ${adv.icon}
-            </div>
-            <div class="adv-list-content">
-                <div class="adv-list-title" title="${title}">${title}</div>
-                <div class="adv-list-type" style="background: ${adv.color}20; color: ${adv.color};">${adv.type}</div>
-            </div>
-        </div>
-    `;
-}
-
-function renderAvantageDetails(adv) {
-    const t = (key) => {
-        const lang = localStorage.getItem('language') || 'fr';
-        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || '';
-    };
-
-    const title = t(adv.title_key) || adv.title_fallback;
-
-    return `
-        <div class="adv-detail-header">
-            <div class="adv-detail-icon" style="background: ${adv.color}15; border: 2px solid ${adv.color}40; box-shadow: 0 0 20px ${adv.color}20;">
-                ${adv.icon}
-            </div>
-            <div>
-                <h3 class="adv-detail-title">${title}</h3>
-                <div class="adv-detail-badge" style="background: ${adv.color}20; color: ${adv.color}; border: 1px solid ${adv.color}40;">${adv.type}</div>
-            </div>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>📋 Description</h4>
-            <p class="adv-detail-text">${adv.details.replace(/\n\s+/g, '<br><br>')}</p>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>✅ Conditions d'éligibilité</h4>
-            <ul class="adv-detail-list">
-                ${adv.eligibility.map(e => `<li>${e}</li>`).join('')}
-            </ul>
-        </div>
-
-        <div class="adv-detail-section">
-            <h4>📊 Détails Fiscaux</h4>
-            <div class="adv-fiscal-grid">
-                <div class="adv-fiscal-box">
-                    <div class="adv-fiscal-label">Taux / Avantage</div>
-                    <div class="adv-fiscal-value" style="color: ${adv.color};">${adv.rate_benefit}</div>
+        <div class="avantage-card animate-slide-up" 
+             id="adv-card-${adv.id}" 
+             data-type="${adv.type}"
+             style="animation-delay: ${0.05 * (index + 1)}s; border-left: 3px solid ${adv.color};"
+             onclick="toggleAdvantageCard('${adv.id}')">
+            
+            <div class="avantage-card-header">
+                <div class="avantage-icon-box" style="background: ${adv.color}15; border: 1px solid ${adv.color}30;">
+                    ${adv.icon}
                 </div>
-                <div class="adv-fiscal-box">
-                    <div class="adv-fiscal-label">Durée</div>
-                    <div class="adv-fiscal-value">⏱️ <span dir="auto">${adv.duration}</span></div>
+                <div class="avantage-card-header-info">
+                    <h4>${title}</h4>
+                    <span class="avantage-type-badge" style="background: ${adv.color}20; color: ${adv.color};">${adv.type}</span>
                 </div>
             </div>
-        </div>
-        
-        <div class="adv-detail-section" style="margin-top: 25px;">
-            <h4>⚙️ Autres Taxes (Impact)</h4>
-            <div class="adv-fiscal-grid">
-                <div class="adv-fiscal-box" style="padding: 12px;">
-                    <div class="adv-fiscal-label">Minimum d'Impôt (IMF)</div>
-                    <div class="adv-fiscal-value" style="font-size: 0.9rem;">${adv.min_tax}</div>
+
+            <div class="avantage-card-summary">
+                <div class="avantage-summary-item">
+                    ⏱️ <strong>${adv.duration}</strong>
                 </div>
-                <div class="adv-fiscal-box" style="padding: 12px;">
-                    <div class="adv-fiscal-label">Contributions Sociales (CSS)</div>
-                    <div class="adv-fiscal-value" style="font-size: 0.9rem;">${adv.css}</div>
+                <div class="avantage-summary-item">
+                    📊 <strong>${adv.rate_benefit}</strong>
                 </div>
             </div>
-        </div>
 
-        <div class="adv-legal-ref">
-            <strong>📖 Référence légale :</strong> <span dir="auto">${adv.legal}</span>
+            <div class="avantage-card-details">
+                <div class="avantage-detail-section">
+                    <h5>📋 Description</h5>
+                    <p>${adv.details}</p>
+                </div>
+
+                <div class="avantage-detail-section">
+                    <h5>✅ Conditions d'éligibilité</h5>
+                    <ul>
+                        ${adv.eligibility.map(e => `<li>${e}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="avantage-detail-section">
+                    <h5>📊 Détails Fiscaux</h5>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem;">
+                        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                            <div style="color: #64748b; font-size: 0.75rem;">Minimum d'Impôt</div>
+                            <div style="color: #cbd5e1; font-weight: 600; margin-top: 2px;">${adv.min_tax}</div>
+                        </div>
+                        <div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                            <div style="color: #64748b; font-size: 0.75rem;">CSS</div>
+                            <div style="color: #cbd5e1; font-weight: 600; margin-top: 2px;">${adv.css}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="avantage-legal-ref">
+                    📖 Référence : ${adv.legal}
+                </div>
+            </div>
+
+            <div class="avantage-expand-hint">▼ Voir détails</div>
         </div>
     `;
 }
