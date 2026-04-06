@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fiscal-tn-v2026-2';
+const CACHE_NAME = 'fiscal-tn-v2026-3';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
     './wizard.js',
     './main.js',
     './dashboard.js',
+    './avantages.js',
     './export-service.js',
     './legal-references.js',
     './ai-config.js',

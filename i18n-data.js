@@ -27,6 +27,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ RS",
         "tab_expert": "🛡️ Expert",
         "tab_compare": "⚖️ Comparatif",
+        "tab_avantages": "🎁 Avantages",
         "tab_auto_entrepreneur": "👤 Auto-Ent.",
 
         // Common
@@ -531,7 +532,24 @@ window.I18N_DATA = {
         "res_is_dividends": "IS + Dividendes",
         "label_potential_saving": "Économie potentielle :",
         "label_buy_power_gain": "🔥 Gain de pouvoir d'achat :",
-        "label_fiscal_pressure_increase": "Légère augmentation de la pression fiscale."
+        "label_fiscal_pressure_increase": "Légère augmentation de la pression fiscale.",
+
+        // Avantages Fiscaux
+        "avantages_title": "🎁 Avantages & Incitations Fiscales",
+        "avantages_subtitle": "Guide complet des régimes fiscaux avantageux — LF 2026",
+        "avantages_hero_title": "Guide des Incitations Fiscales",
+        "avantages_hero_desc": "Tous les régimes fiscaux avantageux prévus par la Loi de Finances 2026",
+        "avantages_legal_title": "Important",
+        "avantages_legal_text": "Ces informations sont à titre indicatif et pédagogique. Les conditions d'éligibilité et les taux peuvent évoluer. Consultez un expert-comptable ou la DGI pour une application conforme à votre situation.",
+        "filter_all": "Tous",
+        "filter_exemption": "Exonérations",
+        "filter_reduction": "Réductions",
+        "filter_deduction": "Déductions",
+        "filter_credit": "Crédits",
+        "adv_ipo": "Introduction en Bourse (IPO)",
+        "adv_reinvest": "Réinvestissement des Bénéfices",
+        "adv_auto_entrepreneur": "Régime Auto-Entrepreneur",
+        "adv_tax_credit": "Crédit d'Impôt R&D"
 
     },
     // ---------------------- TUNISIAN (TN) ----------------------
@@ -558,6 +576,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ الخصم",
         "tab_expert": "🛡️ الخبير",
         "tab_compare": "⚖️ مقارنة",
+        "tab_avantages": "🎁 حوافز",
         "tab_auto_entrepreneur": "👤 Auto-Ent.",
         "tab_tej": "📂 منصة تاج",
 
@@ -1056,7 +1075,24 @@ window.I18N_DATA = {
         "res_is_dividends": "IS + Dividendes",
         "label_potential_saving": "Erbe7 mta3ek :",
         "label_buy_power_gain": "🔥 Gain fi pouvoir d'achat :",
-        "label_fiscal_pressure_increase": "Ziyada sghira fil dhariba."
+        "label_fiscal_pressure_increase": "Ziyada sghira fil dhariba.",
+
+        // Avantages Fiscaux
+        "avantages_title": "🎁 Les Avantages Fiscaux",
+        "avantages_subtitle": "Dليل el régimes elli fihom tas'hilat — LF 2026",
+        "avantages_hero_title": "Dlil el Avantages",
+        "avantages_hero_desc": "Les régimes lkol elli fihom avantages (LF 2026)",
+        "avantages_legal_title": "Balek !",
+        "avantages_legal_text": "Hedhi aswem w pourcentage ta9ribiya. El 9awanin tnajem tetbadel, chouf m3a el 9badha walla comptable pro.",
+        "filter_all": "El Kol",
+        "filter_exemption": "Exonération (Blech)",
+        "filter_reduction": "Na9es %",
+        "filter_deduction": "Déduction (Men asl el flous)",
+        "filter_credit": "Crédit (Men l'IS)",
+        "adv_ipo": "Dakhel Bourse (IPO)",
+        "adv_reinvest": "Reinvestissement",
+        "adv_auto_entrepreneur": "Régime Auto-Entrepreneur",
+        "adv_tax_credit": "Crédit d'Impôt R&D"
     },
     // ---------------------- ARABIC (AR) ----------------------
     "ar": {
@@ -1082,6 +1118,7 @@ window.I18N_DATA = {
         "tab_rs": "⚡ الخصم من المورد",
         "tab_expert": "🛡️ خبير جبائي",
         "tab_compare": "⚖️ مقارنة أنظمة",
+        "tab_avantages": "🎁 الحوافز الجبائية",
         "tab_auto_entrepreneur": "👤 المبادر الذاتي",
 
         // Common
@@ -1590,6 +1627,23 @@ window.I18N_DATA = {
         "res_is_dividends": "ضريبة الشركات + الأرباح",
         "label_potential_saving": "الإدخار الجبائي الممكن :",
         "label_buy_power_gain": "🔥 زيادة في القدرة الشرائية :",
-        "label_fiscal_pressure_increase": "ارتفاع طفيف في الضغط الجبائي."
+        "label_fiscal_pressure_increase": "ارتفاع طفيف في الضغط الجبائي.",
+
+        // Avantages Fiscaux
+        "avantages_title": "🎁 الحوافز والامتيازات الجبائية",
+        "avantages_subtitle": "الدليل الشامل للأنظمة الجبائية التحفيزية — قانون المالية 2026",
+        "avantages_hero_title": "دليل الحوافز الجبائية",
+        "avantages_hero_desc": "جميع الأنظمة التحفيزية والتشجيعية المتاحة (قانون المالية 2026)",
+        "avantages_legal_title": "مهم جدا",
+        "avantages_legal_text": "هذه المعلومات إرشادية وبيداغوجية. الشروط والنسب قابلة للتعديل. يرجى استشارة خبير محاسب أو القباضة المالية لضمان التطبيق السليم.",
+        "filter_all": "الكل",
+        "filter_exemption": "إعفاءات",
+        "filter_reduction": "تخفيض في النسبة",
+        "filter_deduction": "طرح من الأساس",
+        "filter_credit": "طرح من الضريبة",
+        "adv_ipo": "الإدراج بالبورصة (IPO)",
+        "adv_reinvest": "إعادة استثمار الأرباح",
+        "adv_auto_entrepreneur": "نظام المبادر الذاتي",
+        "adv_tax_credit": "طرح مصاريف البحث والتطوير"
     }
 };
