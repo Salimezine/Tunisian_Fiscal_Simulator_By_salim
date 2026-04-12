@@ -1032,6 +1032,14 @@ window.I18N_DATA = {
         "btn_back": "Erja3",
         "btn_continue": "Kamal",
         "btn_finish": "A7seb w fassarli 🚀",
+        "btn_skip_wizard": "T3addi lel formulaire l'expert",
+        "btn_back_to_wizard": "🔄 Erja3 lel Wizard",
+        "wizard_step_option": "Ekhtar el profil mta3ek",
+        "opt_wizard_standard": "3adi (Droit Commun)",
+        "opt_wizard_startup": "Startup Act (Optimisation)",
+        "opt_wizard_zdr": "Zone Régionale (ZDR)",
+        "opt_wizard_investor": "Moustathmer (CEA/Assur)",
+        "wizard_title_invest": "Optimisation w Investissement",
 
         // Auto-Entrepreneur
         "auto_entrepreneur_title": "Régime Auto-Entrepreneur",
@@ -1583,7 +1591,12 @@ window.I18N_DATA = {
         "opt_wizard_startup": "مؤوسسة ناشئة (Startup)",
         "opt_wizard_zdr": "تنمية جهوية (ZDR)",
         "opt_wizard_investor": "مستثمر (CEA/تأمين)",
-        "wizard_title_invest": "الادخار والديون",
+        "wizard_title_invest": "الاستثمار والادخار",
+        "wizard_step_option": "اختر ملفك الجبائي",
+        "opt_wizard_standard": "عادي (نظام عام)",
+        "opt_wizard_startup": "مؤسسة ناشئة (Startup Act)",
+        "opt_wizard_zdr": "تنمية جهوية (ZDR)",
+        "opt_wizard_investor": "مستثمر (CEA/تأمين)",
         "result_tax": "الضرائب والأداءات",
 
         // Auto-Entrepreneur

@@ -1334,16 +1334,12 @@ select.control-btn option {
         font-size: 0.8rem;
     }
 
-    /* Navigation Tabs - Horizontal Scroll */
+    /* Navigation Tabs - Wrap Multi-line */
     .tabs-nav {
-        overflow-x: auto;
-        overflow-y: hidden;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 8px;
-        padding: 6px;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
+        padding: 10px;
     }
 
     .tabs-nav::-webkit-scrollbar {
@@ -1351,11 +1347,11 @@ select.control-btn option {
     }
 
     .tab-btn {
-        min-width: 110px;
-        padding: 12px 18px;
-        font-size: 0.9rem;
-        scroll-snap-align: start;
-        flex-shrink: 0;
+        flex: 1 1 calc(33.33% - 8px); /* 3 tabs per row */
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        text-align: center;
+        min-width: unset;
     }
 
     /* Forms - Touch Friendly */
@@ -1543,16 +1539,18 @@ select.control-btn option {
         font-size: 1rem;
     }
 
-    /* Tabs - Ensure Touch Friendly */
+    /* Tabs - Ensure Touch Friendly Wrap */
     .tabs-nav {
         gap: 6px;
         padding: 5px;
         margin-bottom: 25px;
+        justify-content: center;
     }
 
     .tab-btn {
-        min-width: 95px;
-        padding: 11px 14px;
+        flex: 1 1 calc(50% - 6px); /* 2 tabs per row on very small phones */
+        min-width: unset;
+        padding: 11px 8px;
         font-size: 0.85rem;
         min-height: 44px;
         /* iOS minimum touch target */
