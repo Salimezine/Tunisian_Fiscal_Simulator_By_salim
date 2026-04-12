@@ -153,10 +153,10 @@ class IRPPWizard {
             case 4:
                 return `
                     <div class="glass-card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
-                        <p><strong>Profil :</strong> ${t('opt_wizard_' + this.data.profil)}</p>
+                        <p><strong>Profil :</strong> ${t('opt_wizard_' + (this.data.profil === 'investisseur' ? 'investor' : this.data.profil))}</p>
                         <p><strong>${t('label_situation')} :</strong> ${this.data.situation === 'celibataire' ? t('opt_single') : t('opt_married')}</p>
                         <p><strong>${t('label_children_count')} :</strong> ${this.data.enfants}</p>
-                        <p><strong>${t('label_salary_short')} :</strong> ${this.data.salaireBrut} ${t('unit_dt')} (${t('opt_' + this.data.frequence)})</p>
+                        <p><strong>Brut :</strong> ${this.data.salaireBrut} ${t('unit_dt')} (${t('opt_' + this.data.frequence)})</p>
                         <p><strong>${t('label_sector_short')} :</strong> ${this.data.secteur === 'prive' ? t('opt_prive') : t('opt_public')}</p>
                         ${this.data.profil === 'investisseur' ? `
                             <p><strong>Assur. Vie :</strong> ${this.data.assuranceVie} DT</p>
@@ -234,6 +234,14 @@ class IRPPWizard {
                 context: `Profil: ${this.data.profil}`
             });
         }
+
+        // Mobile: Scroll to result
+        setTimeout(() => {
+            const results = document.getElementById('result-irpp');
+            if (results && window.innerWidth < 768) {
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 300);
     }
 }
 

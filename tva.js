@@ -281,6 +281,18 @@ function calculateTVA() {
         return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
     };
 
+    // Visual feedback for calculation
+    const calcBtn = document.getElementById('btn-calc-tva');
+    if (calcBtn) {
+        const originalText = calcBtn.innerHTML;
+        calcBtn.innerHTML = `<span>⏳ ${t('status_sending')}</span>`;
+        calcBtn.disabled = true;
+        setTimeout(() => {
+            calcBtn.innerHTML = originalText;
+            calcBtn.disabled = false;
+        }, 600);
+    }
+
     // 1. Collectée
     const base = parseFloat(document.getElementById('baseHt').value) || 0;
     const opSpec = parseFloat(document.getElementById('opSpecifiqueTva').value) || 0;
@@ -449,6 +461,14 @@ function calculateTVA() {
             </div>
         </div>
     `;
+
+    // Mobile: Scroll to result
+    setTimeout(() => {
+        const resultsEl = document.getElementById('result-tva');
+        if (resultsEl && window.innerWidth < 768) {
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 400);
 
     document.getElementById('btn-explain-tva').addEventListener('click', () => {
         if (window.askAssistant) window.askAssistant(t("chat_suggest_bilan"));

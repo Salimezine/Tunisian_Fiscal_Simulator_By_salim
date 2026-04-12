@@ -706,10 +706,30 @@ function calculateIS() {
         };
     }
 
+    // Visual feedback for calculation
+    const calcBtn = document.getElementById('btn-calc-is');
+    if (calcBtn) {
+        const originalText = calcBtn.innerHTML;
+        calcBtn.innerHTML = `<span>⏳ ${t('status_sending')}</span>`;
+        calcBtn.disabled = true;
+        setTimeout(() => {
+            calcBtn.innerHTML = originalText;
+            calcBtn.disabled = false;
+        }, 600);
+    }
+
     // Perform Calculation
     const result = computeIS(calculationInputs);
 
     if (!result) return;
+
+    // Mobile: Scroll to result
+    setTimeout(() => {
+        const resultsEl = document.getElementById('result-is');
+        if (resultsEl && window.innerWidth < 768) {
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 400);
 
     // Store for dashboard
     window.lastISResult = opt;

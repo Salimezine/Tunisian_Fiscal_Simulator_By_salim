@@ -15,6 +15,18 @@ window.setYear = function (year) {
         labelDesc.textContent = year === '2026' ? 'Barème Progressif 2026 (8 tranches)' : 'Barème Progressif 2025 (5 tranches)';
     }
 
+    // Visual feedback for calculation
+    const calcBtn = document.getElementById('btn-calc-irpp');
+    if (calcBtn) {
+        const originalText = calcBtn.innerHTML;
+        calcBtn.innerHTML = `<span>⏳ ${window.t ? window.t('status_sending') : '...'}</span>`;
+        calcBtn.disabled = true;
+        setTimeout(() => {
+            calcBtn.innerHTML = originalText;
+            calcBtn.disabled = false;
+        }, 600);
+    }
+
     // Recalculate if possible
     const val = document.getElementById('revenuInput');
     if (val && val.value) handleIRPPCalculation();
