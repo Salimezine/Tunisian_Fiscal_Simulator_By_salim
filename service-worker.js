@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fiscal-tn-v2026-4';
+const CACHE_NAME = 'fiscal-tn-v2026-5';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

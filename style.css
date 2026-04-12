@@ -1413,42 +1413,18 @@ select.control-btn option {
     .mode-card {
         padding: 20px;
     }
+}
 
-    /* Dashboard */
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
+/* Tablets and Smaller (768px and below) */
+@media (max-width: 768px) {
+    .tabs-nav {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
-    .dash-card {
-        padding: 24px;
-    }
-
-    /* Wizard */
-    .wizard-options-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    /* Reduce Background Shapes - Performance */
-    .shape {
-        filter: blur(60px);
-        opacity: 0.3;
-    }
-
-    .shape-1 {
-        width: 600px;
-        height: 600px;
-    }
-
-    .shape-2 {
-        width: 500px;
-        height: 500px;
-    }
-
-    .shape-3 {
-        width: 400px;
-        height: 400px;
+    .tab-btn {
+        flex: 1 1 calc(25% - 8px); /* 4 tabs per row on tablets */
+        min-width: 80px;
     }
 }
 
@@ -1541,19 +1517,22 @@ select.control-btn option {
 
     /* Tabs - Ensure Touch Friendly Wrap */
     .tabs-nav {
-        gap: 6px;
-        padding: 5px;
-        margin-bottom: 25px;
+        flex-wrap: wrap;
         justify-content: center;
+        gap: 8px;
+        padding: 8px;
+        margin-bottom: 25px;
+        overflow-x: visible;
     }
 
     .tab-btn {
-        flex: 1 1 calc(50% - 6px); /* 2 tabs per row on very small phones */
-        min-width: unset;
-        padding: 11px 8px;
-        font-size: 0.85rem;
+        flex: 1 1 calc(33.33% - 8px); /* 3 tabs per row on small screens */
+        min-width: 90px;
+        padding: 10px 6px;
+        font-size: 0.8rem;
         min-height: 44px;
-        /* iOS minimum touch target */
+        text-align: center;
+        justify-content: center;
     }
 
     /* Module Headers */
