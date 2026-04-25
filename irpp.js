@@ -851,10 +851,16 @@ function displayIRPPResults(result, isReverseMode) {
                 <button id="btn-export-excel" class="btn-secondary" style="flex: 1; border: 1px solid #10b981; color: #10b981;">
                     <span class="icon">📊</span> Excel
                 </button>
+                <button id="btn-view-payslip" class="btn-secondary" style="flex: 1; border: 1px solid #fbbf24; color: #fbbf24;">
+                    <span class="icon">🎫</span> ${t("btn_payslip")}
+                </button>
              </div>
 
              <!-- NEW: Optimization Suggestions -->
              <div id="optimization-suggestions"></div>
+             
+             <!-- NEW: Payslip Visualization Area -->
+             <div id="payslip-area"></div>
         </div>
     `;
 
@@ -875,6 +881,14 @@ function displayIRPPResults(result, isReverseMode) {
 
     document.getElementById('btn-export-excel').addEventListener('click', () => {
         if (window.FiscalExport) window.FiscalExport.generateExcel(result, 'IRPP');
+    });
+
+    document.getElementById('btn-view-payslip').addEventListener('click', () => {
+        const payslipArea = document.getElementById('payslip-area');
+        if (payslipArea) {
+            payslipArea.innerHTML = renderBulletinPaie(result);
+            payslipArea.scrollIntoView({ behavior: 'smooth' });
+        }
     });
 
     // Run Optimization Check
@@ -1123,3 +1137,203 @@ function checkOptimization(result) {
         container.innerHTML = html;
     }
 }
+
+/**
+ * Renders a professional Tunisian Payslip (Bulletin de Paie)
+ * Matches the structure provided in the user's reference image
+ */
+function renderBulletinPaie(result) {
+    const t = (key) => {
+        const lang = localStorage.getItem('language') || 'fr';
+        return (window.I18N_DATA && window.I18N_DATA[lang] && window.I18N_DATA[lang][key]) || key;
+    };
+
+    const formatDate = (date) => date.toLocaleDateString('fr-TN');
+    const formatAmount = (amt) => (amt || 0).toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+
+    const now = new Date();
+    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+    
+    // Estimations for Patronal parts (standard rates)
+    const patronalRate = 0.1657; // 16.57% standard
+    const accidentRate = 0.005; // 0.5% standard
+    const patronalAmount = result.grossIncome * patronalRate;
+    const accidentAmount = result.grossIncome * accidentRate;
+
+    return `
+        <div class="payslip-wrapper animate-slide-up">
+            <div class="payslip-header">
+                <div class="company-info">
+                    <strong style="font-size: 1.2em;">SOCIETE SIMULATION FISCALE</strong><br>
+                    1002 TUNIS, TUNISIE<br>
+                    Affiliation CNSS: 00000000-00
+                </div>
+                <div class="payslip-meta">
+                    <strong>${t("label_period")}:</strong> ${months[now.getMonth()]} ${now.getFullYear()}<br>
+                    <strong>${t("label_date")}:</strong> ${formatDate(now)}
+                </div>
+            </div>
+
+            <div class="employee-info-grid">
+                <div>
+                    <strong>${t("label_matricule")}:</strong> 001<br>
+                    <strong>${t("label_cin")}:</strong> 00000000<br>
+                    <strong>${t("label_cnss_num")}:</strong> 00000000-00
+                </div>
+                <div>
+                    <strong>${t("label_employee")}:</strong> NOM & PRÉNOM<br>
+                    <strong>Situation:</strong> ${result.inputs.chefFamille ? 'Chef de famille' : 'Célibataire'}<br>
+                    <strong>Enfants:</strong> ${result.inputs.nbEnfants || 0}
+                </div>
+            </div>
+
+            <table class="payslip-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">${t("label_designation")}</th>
+                        <th rowspan="2">${t("label_base")}</th>
+                        <th colspan="3" style="text-align:center">${t("label_part_salariale")}</th>
+                        <th colspan="3" style="text-align:center">${t("label_part_patronale")}</th>
+                    </tr>
+                    <tr>
+                        <th>${t("label_taux")}</th>
+                        <th>${t("label_gain")}</th>
+                        <th>${t("label_retenue")}</th>
+                        <th>${t("label_taux")}</th>
+                        <th>${t("label_gain")}</th>
+                        <th>${t("label_retenue")}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Salaire de base</td>
+                        <td class="num">${formatAmount(result.grossIncome)}</td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.grossIncome)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                    </tr>
+                    <tr class="bold">
+                        <td>TOTAL BRUT</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.grossIncome)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                    </tr>
+                    <tr>
+                        <td>Cotisation CNSS (9.18%)</td>
+                        <td class="num">${formatAmount(result.grossIncome)}</td>
+                        <td class="num">9.18</td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.cnss)}</td>
+                        <td class="num">16.57</td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(patronalAmount)}</td>
+                    </tr>
+                    <tr>
+                        <td>Accident du travail</td>
+                        <td class="num">${formatAmount(result.grossIncome)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">0.50</td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(accidentAmount)}</td>
+                    </tr>
+                    <tr class="bold">
+                        <td>TOTAL COTISATIONS</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.cnss)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(patronalAmount + accidentAmount)}</td>
+                    </tr>
+                    <tr>
+                        <td>Salaire Brut Imposable</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.assietteSoumise)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                    </tr>
+                    <tr>
+                        <td>IRPP (Impôt sur le Revenu)</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.irppNet)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                    </tr>
+                    <tr>
+                        <td>CSS (Contrib. Solidarité)</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num">${formatAmount(result.css)}</td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                        <td class="num"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="payslip-footer">
+                <div>
+                    <strong>Mode de paiement:</strong> Virement Bancaire<br>
+                    <strong>Note:</strong> Bulletin généré par Simulateur Fiscal ISAAS
+                </div>
+                <div class="net-to-pay-box">
+                    <span style="font-size: 0.8em; text-transform: uppercase;">${t("label_net_to_pay")}</span>
+                    <span class="net-amount">${formatAmount(result.netMensuel)} DT</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center; border-top: 1px dashed #ccc; padding-top: 10px;">
+                <button onclick="window.printPayslip()" class="btn-primary" style="width: auto; padding: 10px 20px; background: #333;">
+                    🖨️ ${t("btn_print")}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Global helper for targeted payslip printing
+ */
+window.printPayslip = function() {
+    const payslip = document.querySelector('.payslip-wrapper');
+    if (!payslip) return;
+    
+    // Save original position
+    const originalParent = payslip.parentElement;
+    const nextSibling = payslip.nextSibling;
+    
+    // Move to body to ensure it's the only thing the print engine sees properly
+    document.body.appendChild(payslip);
+    document.body.classList.add('printing-payslip');
+    
+    window.print();
+    
+    // Move back after a short delay
+    setTimeout(() => {
+        document.body.classList.remove('printing-payslip');
+        if (nextSibling) {
+            originalParent.insertBefore(payslip, nextSibling);
+        } else {
+            originalParent.appendChild(payslip);
+        }
+        // Scroll back to the area
+        payslip.scrollIntoView();
+    }, 500);
+};

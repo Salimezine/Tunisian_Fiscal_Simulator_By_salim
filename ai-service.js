@@ -128,6 +128,16 @@ class AIService {
                 }
             }
 
+            // Priority 1.5: Groq Fast API
+            let groqKey = localStorage.getItem(AI_CONFIG.storage.groqKey) || AI_CONFIG.groq.apiKey;
+            if (AI_CONFIG.groq && AI_CONFIG.groq.enabled && groqKey) {
+                try {
+                    return await this.callGroqAPI(userMessage, groqKey, onChunk, onComplete);
+                } catch (groqError) {
+                    console.warn("⚠️ Groq API error, falling back to Gemini:", groqError);
+                }
+            }
+
             // Priority 2: Direct Gemini Call (Robust Key Selection)
             let apiKey = this.loadApiKey();
             if (!this.isValidApiKeyFormat(apiKey)) {
@@ -251,6 +261,64 @@ class AIService {
         // Assuming N8n returns { output: "text response" } or similar structure
         // Adapt this based on your actual N8n node output
         const aiResponse = data.output || data.text || data.message || JSON.stringify(data);
+
+        if (onChunk) onChunk(aiResponse, aiResponse);
+        if (onComplete) onComplete(aiResponse);
+
+        this.addToHistory('assistant', aiResponse);
+        return aiResponse;
+    }
+
+    /**
+     * Call Groq Inference API
+     */
+    async callGroqAPI(userMessage, apiKey, onChunk, onComplete) {
+        const url = AI_CONFIG.groq.apiUrl;
+        const snapshot = this._getFiscalSnapshot();
+        const systemPrompt = AI_CONFIG.systemPrompt;
+
+        const payload = {
+            model: AI_CONFIG.groq.model,
+            messages: [
+                {
+                    role: "system",
+                    content: `${systemPrompt}\n\nContext: ${JSON.stringify(snapshot)}`
+                },
+                {
+                    role: "user",
+                    content: userMessage
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 1024,
+            stream: false
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(payload),
+            signal: this.abortController.signal
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Groq Error: ${response.status} - ${error}`);
+        }
+
+        const data = await response.json();
+        let aiResponse = "";
+
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            aiResponse = data.choices[0].message.content;
+        } else {
+            throw new Error("Invalid Groq API response format");
+        }
+
+        aiResponse = `### 🤖 Assistant Fiscal (Groq AI)\n\n${aiResponse}`;
 
         if (onChunk) onChunk(aiResponse, aiResponse);
         if (onComplete) onComplete(aiResponse);

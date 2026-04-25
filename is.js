@@ -723,6 +723,12 @@ function calculateIS() {
 
     if (!result) return;
 
+    // Enrich result with inputs and additional info for Export Service
+    const selectedSector = SECTOR_OPTIONS.find(s => s.id === sectorId);
+    calculationInputs.sectorName = selectedSector ? t(selectedSector.lang_key) : sectorId;
+    calculationInputs.caTtc = caHt * 1.19; // Default TVA 19% for estimation
+    result.inputs = calculationInputs;
+
     // Mobile: Scroll to result
     setTimeout(() => {
         const resultsEl = document.getElementById('result-is');
@@ -731,14 +737,14 @@ function calculateIS() {
         }
     }, 400);
 
-    // Store for dashboard
-    window.lastISResult = opt;
-    if (window.updateDashboard) window.updateDashboard();
-
     // Destructure results
     const opt = result.optimized;
     const std = result.standard;
     const savings = result.savings;
+
+    // Store for dashboard
+    window.lastISResult = opt;
+    if (window.updateDashboard) window.updateDashboard();
 
     // Display
     const resultDiv = document.getElementById('result-is');

@@ -15,7 +15,7 @@ Ce document détaille l'algorithme de calcul de l'Impôt sur le Revenu des Perso
 | **Crédit Impôt Parent** | 450 DT | Art. 40-4 (Par parent - Déduit de l'impôt) |
 | **Déduction Enfant Infirme** | 2 000 DT | Art. 40-3 (Par enfant) |
 
-- **CSS Personnes Physiques** : **0,5 %** appliqué sur l'IRPP Net (Mesure exceptionnelle 2026).
+- **CSS Personnes Physiques** : **0,5 %** appliqué sur le revenu annuel net imposable (**Assiette Soumise**).
 - **Exonération CSS** : Exonération totale si le revenu annuel net imposable (**Assiette Soumise**) <= **5 000 DT**.
 - **CSS Personnes Morales** : **3 %** (IS à 10/15/20/25%) ou **4 %** (IS à 35/40%).
 - **Assiette CSS (Sociétés)** : Bénéfice net imposable.
@@ -64,9 +64,9 @@ DEBUT ALGORITHME CALCUL_FISCAL_CORRIGE
     
     irpp_net = MAX(0, irpp_brut - credits_impot)
 
-    // --- 7. Calcul CSS (1% sur IRPP NET) ---
-    SI irpp_net > 0 ALORS
-        css = irpp_net * 0.01
+    // --- 7. Calcul CSS (0,5% sur Assiette Soumise) ---
+    SI assiette > 5000 ALORS
+        css = assiette * 0.005
     SINON
         css = 0
     FIN SI

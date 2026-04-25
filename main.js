@@ -196,7 +196,7 @@ window.changeLanguage = function (langCode) {
                 // For selects, we might want to translate the label if it's a placeholder-like first option
                 // But usually we translate the options themselves
             } else {
-                el.innerText = translation;
+                el.innerHTML = translation;
             }
         }
     });

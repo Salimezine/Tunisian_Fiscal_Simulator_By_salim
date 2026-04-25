@@ -183,6 +183,14 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         model: "Qwen/Qwen2.5-1.5B-Instruct",
         apiUrl: "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-1.5B-Instruct",
         apiKey: "", // Use localStorage.setItem('fiscal_ai_hf_key', 'YOUR_KEY')
+        enabled: false // Disabled in favor of Groq
+    },
+
+    // Groq API Configuration (Fast Inference)
+    groq: {
+        model: "llama-3.3-70b-versatile", // Or "llama-3.1-8b-instant" / "mixtral-8x7b-32768"
+        apiUrl: "https://api.groq.com/openai/v1/chat/completions",
+        apiKey: "", // Use localStorage.setItem('fiscal_ai_groq_key', 'YOUR_KEY') or .env
         enabled: true
     },
 
@@ -198,7 +206,8 @@ Rappelez-vous : Vous êtes un outil ÉDUCATIF. Vous ne remplacez JAMAIS un exper
         apiKey: "fiscal_ai_gemini_key",
         provider: "fiscal_ai_provider",
         conversationHistory: "fiscal_ai_conversation",
-        preferences: "fiscal_ai_preferences"
+        preferences: "fiscal_ai_preferences",
+        groqKey: "fiscal_ai_groq_key"
     }
 };
 

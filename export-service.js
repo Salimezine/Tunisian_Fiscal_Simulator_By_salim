@@ -82,57 +82,83 @@ class ExportService {
      */
     _renderIRPPDetails(doc, data, startY) {
         let y = startY;
-
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.text("1. SITUATION DU CONTRIBUABLE", 14, y);
-        y += 8;
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-
+        const now = new Date();
         const inputs = data.inputs || {};
 
-        const details = [
-            `• Date de la simulation : ${new Date().toLocaleString('fr-TN')}`,
-            `• Revenu Brut Annuel : ${data.grossIncome.toLocaleString('fr-TN')} DT`,
-            `• Situation : ${inputs.typeRevenu || 'Non défini'}, ${inputs.nbEnfants || 0} enfant(s)`,
-            `• Chef de famille : ${inputs.chefFamille ? 'Oui' : 'Non'}`
-        ];
-
-        details.forEach(line => {
-            doc.text(line, 20, y);
-            y += 6;
-        });
-
-        y += 10;
-        doc.setFontSize(12);
+        // --- EN-TÊTE BULLETIN ---
+        doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("2. DÉTAIL DU CALCUL (LF 2026)", 14, y);
+        doc.text("BULLETIN DE PAIE", 105, y, null, null, "center");
         y += 10;
 
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        
+        // Cadre Employeur & Employé
+        doc.rect(14, y, 90, 25); // Employeur
+        doc.rect(106, y, 90, 25); // Employé
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("EMPLOYEUR:", 16, y + 5);
+        doc.text("SALARIÉ:", 108, y + 5);
+        
+        doc.setFont("helvetica", "normal");
+        doc.text("SOCIETE SIMULATION FISCALE", 16, y + 10);
+        doc.text("1002 TUNIS", 16, y + 15);
+        doc.text("CNSS: 00000000-00", 16, y + 20);
+        
+        doc.text(`NOM: NOM & PRÉNOM`, 108, y + 10);
+        doc.text(`CIN: 00000000 | Matricule: 001`, 108, y + 15);
+        doc.text(`Situation: ${inputs.chefFamille ? 'Chef de famille' : 'Célibataire'}`, 108, y + 20);
+        
+        y += 30;
+
+        // Période
+        doc.setFont("helvetica", "bold");
+        doc.text(`PÉRIODE: ${now.toLocaleString('default', { month: 'long' })} ${now.getFullYear()}`, 14, y);
+        doc.text(`DATE: ${now.toLocaleDateString()}`, 160, y);
+        y += 8;
+
+        // Table des rubriques
         const tableData = [
-            ["Salaire Brut Annuel", `${data.grossIncome.toFixed(3)} DT`],
-            ["Cotisations Sociales (CNSS)", `-${data.cnss.toFixed(3)} DT`],
-            ["Frais Professionnels (10%, Max 2000)", `-${data.abattement.toFixed(3)} DT`],
-            ["Déductions Familiales", `-${data.totalDeductions.toFixed(3)} DT`],
-            ["Assiette Imposable", `${data.assietteSoumise.toFixed(3)} DT`],
-            ["IRPP Dû (Barème)", `${data.irpp.toFixed(3)} DT`],
-            ["CSS (0.5%)", `${data.css.toFixed(3)} DT`],
-            ["TOTAL IMPÔT", `${data.totalRetenue.toFixed(3)} DT`],
-            ["SALAIRE NET ANNUEL", `${(data.netMensuel * 12).toFixed(3)} DT`],
-            ["SALAIRE NET MENSUEL", `${data.netMensuel.toFixed(3)} DT`]
+            ["Salaire de base", "1", data.grossIncome.toFixed(3), data.grossIncome.toFixed(3), "", "", ""],
+            ["Cotisation CNSS (9.18%)", "", data.grossIncome.toFixed(3), "", data.cnss.toFixed(3), "16.57%", (data.grossIncome * 0.1657).toFixed(3)],
+            ["Accident du travail", "", data.grossIncome.toFixed(3), "", "", "0.50%", (data.grossIncome * 0.005).toFixed(3)],
+            ["Salaire Brut Imposable", "", "", data.assietteSoumise.toFixed(3), "", "", ""],
+            ["IRPP", "", "", "", data.irppNet.toFixed(3), "", ""],
+            ["CSS (0.5%)", "", "", "", data.css.toFixed(3), "", ""],
         ];
 
         doc.autoTable({
             startY: y,
-            head: [['Rubrique', 'Montant']],
+            head: [['Désignation', 'Nb', 'Base', 'Gain', 'Retenue', 'Taux Pat.', 'Ret. Pat.']],
             body: tableData,
             theme: 'grid',
-            headStyles: { fillColor: [59, 130, 246] },
-            styles: { fontSize: 10, cellPadding: 3 },
-            alternateRowStyles: { fillColor: [240, 249, 255] }
+            headStyles: { fillColor: [40, 40, 40], textColor: 255 },
+            styles: { fontSize: 8, cellPadding: 2 },
+            columnStyles: {
+                0: { cellWidth: 45 },
+                1: { halign: 'center' },
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' },
+                5: { halign: 'right' },
+                6: { halign: 'right' }
+            }
         });
+
+        y = doc.lastAutoTable.finalY + 10;
+
+        // Total Net
+        doc.setFillColor(240, 240, 240);
+        doc.rect(130, y, 66, 15, 'F');
+        doc.rect(130, y, 66, 15, 'D');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("NET À PAYER", 135, y + 6);
+        doc.setFontSize(12);
+        doc.text(`${data.netMensuel.toFixed(3)} DT`, 135, y + 12);
+    }
 
         y = doc.lastAutoTable.finalY + 15;
 
@@ -172,7 +198,7 @@ class ExportService {
 
         const details = [
             `• Date : ${new Date().toLocaleString('fr-TN')}`,
-            `• Secteur d'activité : ${inputs.sectorId || 'Non défini'}`,
+            `• Secteur d'activité : ${inputs.sectorName || inputs.sectorId || 'Non défini'}`,
             `• Chiffre d'Affaires TTC : ${parseFloat(inputs.caTtc || 0).toLocaleString()} DT`
         ];
 
@@ -297,85 +323,102 @@ class ExportService {
         let rows = [];
         const timestamp = new Date().toLocaleString();
 
+        const formatDT = (val) => typeof val === 'number' ? val.toFixed(3) : val;
+
         if (type === 'IRPP') {
+            const now = new Date();
             rows = [
-                [`SIMULATION FISCALE - IRPP 2026`],
-                ["Date", timestamp],
+                ["SOCIETE SIMULATION FISCALE", "", "", "", "", "", "Année :", now.getFullYear()],
+                ["1002 TUNIS, TUNISIE", "", "", "", "", "", "Mois de paie :", now.getMonth() + 1],
+                ["Affiliation CNSS: 00000000-00", "", "", "", "", "", "Date de paiement :", now.toLocaleDateString()],
                 [],
-                ["PARAMÈTRES"],
-                ["Brut Annuel", data.grossIncome],
-                ["Situation", data.inputs.typeRevenu],
-                ["Enfants", data.inputs.nbEnfants],
+                ["Matricule :", "001", "Emploi :", "Collaborateur", "Nom & Prénom :", "NOM & PRÉNOM"],
+                ["CIN :", "00000000", "Catégorie :", "A", ""],
+                ["N° CNSS :", "00000000-00", "Echelon :", "1", "Adresse :", "Tunis, Tunisie"],
+                ["Situation familiale :", data.inputs?.chefFamille ? "Chef de famille" : "Célibataire", "Salaire de base :", formatDT(data.grossIncome)],
+                ["Enfants à charge :", data.inputs?.nbEnfants || 0, "Taux horaire :", ""],
                 [],
-                ["RÉSULTATS"],
-                ["CNSS", data.cnss],
-                ["Frais Pro", data.abattement],
-                ["Assiette", data.assietteSoumise],
-                ["IRPP", data.irpp],
-                ["CSS", data.css],
-                ["Total Retenues", data.totalRetenue],
-                ["Net Annuel", data.netMensuel * 12],
-                ["Net Mensuel", data.netMensuel]
+                ["Désignation", "Nombre", "Base", "Part Salariale", "", "", "Part Patronale"],
+                ["", "", "", "Taux %", "Gain", "Retenue", "Taux %", "Gain", "Retenue"],
+                ["Salaire de base", "1", formatDT(data.grossIncome), "", formatDT(data.grossIncome), "", "", "", ""],
+                ["TOTAL BRUT", "", "", "", formatDT(data.grossIncome), "", "", "", ""],
+                [],
+                ["Retenue CNSS (9.18%)", "", formatDT(data.grossIncome), "9.18", "", formatDT(data.cnss), "16.57", "", formatDT(data.grossIncome * 0.1657)],
+                ["Accident du travail", "", formatDT(data.grossIncome), "", "", "", "0.50", "", formatDT(data.grossIncome * 0.005)],
+                ["TOTAL COTISATIONS", "", "", "", "", formatDT(data.cnss), "", "", formatDT(data.grossIncome * 0.1707)],
+                [],
+                ["Salaire Brut Imposable", "", "", "", formatDT(data.assietteSoumise), "", "", "", ""],
+                ["IRPP", "", "", "", "", formatDT(data.irppNet), "", "", ""],
+                ["CSS (0.5%)", "", "", "", "", formatDT(data.css), "", "", ""],
+                [],
+                ["Salaire Net", "", "", "", formatDT(data.netMensuel), "", "", "", ""],
+                ["NET À PAYER", "", "", "", formatDT(data.netMensuel), "", "", "", ""],
+                [],
+                ["NET À PAYER EN DINARS", "", "", "", formatDT(data.netMensuel), "DT"]
             ];
-            if (data.bracketDetails) {
-                rows.push([], ["DÉTAIL TRANCHES"], ["Tranche", "Taux", "Base", "Impôt"]);
-                data.bracketDetails.forEach(b => rows.push([b.label, b.rate, b.base, b.tax]));
-            }
         } else if (type === 'IS') {
             const opt = data.optimized || data;
             const inputs = data.inputs || {};
             rows = [
-                [`SIMULATION FISCALE - IS 2026`],
-                ["Date", timestamp],
+                ["", "SIMULATION FISCALE - IS 2026"],
+                ["", `Généré le : ${timestamp}`],
                 [],
-                ["DONNÉES"],
-                ["Secteur", inputs.sectorId],
-                ["CA TTC", inputs.caTtc],
-                ["Résultat Comptable", inputs.resComptable],
+                ["PARAMÈTRES"],
+                ["Secteur", inputs.sectorName || inputs.sectorId || "Non défini"],
+                ["Chiffre d'Affaires (TTC)", formatDT(inputs.caTtc)],
+                ["Résultat Comptable", formatDT(inputs.resComptable)],
                 [],
-                ["RÉSULTATS FISCAUX"],
-                ["Base Globale", opt.baseGlobal],
-                ["Réinvestissement", opt.reinvestmentDeducted],
-                ["Base Nette", opt.baseNet],
-                ["Taux IS", opt.appliedRate],
-                ["IS Dû", opt.is],
-                ["CSS", opt.css],
-                ["Charge Fiscale Totale", opt.total]
+                ["RÉSULTATS FISCAUX (DT)"],
+                ["Bénéfice Fiscal (Base Globale)", formatDT(opt.baseGlobal)],
+                ["Déduction Réinvestissement", formatDT(opt.reinvestmentDeducted)],
+                ["Base Nette Imposable", formatDT(opt.baseNet)],
+                ["Taux IS Appliqué", (opt.appliedRate * 100).toFixed(0) + "%"],
+                [],
+                ["IMPÔTS DUS (DT)"],
+                ["IS Théorique", formatDT(opt.isBeforeMin)],
+                ["Minimum d'Impôt", formatDT(opt.minTaxCA)],
+                ["IS Final Retenu", formatDT(opt.is)],
+                ["CSS Sociétale", formatDT(opt.css)],
+                ["Total à Payer", formatDT(opt.total)]
             ];
         } else if (type === 'TVA') {
             const d = data.data || data;
             rows = [
-                [`SIMULATION FISCALE - TVA`],
-                ["Date", timestamp],
+                ["", "SIMULATION FISCALE - TVA"],
+                ["", `Généré le : ${timestamp}`],
                 [],
-                ["COLLECTÉE"],
-                ["Base HT", d.baseHT],
-                ["TVA Facturée", d.tvaCollectee],
-                ["Total TTC", d.montantTTC],
+                ["TVA COLLECTÉE (VENTES)"],
+                ["Chiffre d'Affaires HT", formatDT(d.baseHT)],
+                ["TVA Facturée", formatDT(d.tvaCollectee)],
+                ["Total TTC", formatDT(d.montantTTC)],
                 [],
-                ["DÉDUCTIBLE"],
-                ["TVA Récupérable Totale", d.totalDeductible],
+                ["TVA DÉDUCTIBLE (ACHATS)"],
+                ["TVA Récupérable Totale", formatDT(d.totalDeductible)],
                 [],
-                ["BILAN"],
-                ["Solde", d.solde],
-                ["Statut", d.solde > 0 ? "À payer" : "Crédit"]
+                ["SOLDE FISCAL"],
+                ["Solde de TVA", formatDT(d.solde)],
+                ["Statut", d.solde > 0 ? "À REVERSER" : "CRÉDIT DE TVA"]
             ];
         } else if (type === 'RS') {
             const d = data.data || data;
             rows = [
-                [`SIMULATION FISCALE - RS`],
-                ["Date", timestamp],
+                ["", "SIMULATION FISCALE - RETENUE À LA SOURCE"],
+                ["", `Généré le : ${timestamp}`],
                 [],
-                ["TRANSACTION"],
-                ["Montant HT", d.brutHT],
-                ["Montant TVA", d.tvaAmount],
-                ["Montant TTC", d.brutTTC],
+                ["DÉTAILS DE LA TRANSACTION"],
+                ["Montant HT", formatDT(d.brutHT)],
+                ["Montant TVA", formatDT(d.tvaAmount)],
+                ["Montant TTC", formatDT(d.brutTTC)],
                 [],
-                ["RETENUE"],
-                ["Montant RS", d.rsAmount],
-                ["NET À PAYER", d.netAPayer]
+                ["RETENUES À LA SOURCE (DT)"],
+                ["Montant RS", formatDT(d.rsAmount)],
+                ["NET À PAYER AU FOURNISSEUR", formatDT(d.netAPayer)]
             ];
         }
+
+        // Add Academic Footer to all
+        rows.push([], ["Note : Ce document est généré par le Simulateur Fiscal Intelligent (PFE 2026 - ISAAS)"]);
+
 
         const ws = XLSX.utils.aoa_to_sheet(rows);
         const wb = XLSX.utils.book_new();
